@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   CalendarIcon,
   Eye,
@@ -25,6 +26,7 @@ import {
   useGetAffiliates,
 } from "@/features/affiliate/hook";
 import type { AffiliateResponse } from "@/types/affiliate";
+import { useRouter } from "@/src/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -120,14 +122,28 @@ const AffiliateEventsPage = () => {
   const [selectedAffiliateId, setSelectedAffiliateId] = useState("");
   const [fromDate, setFromDate] = useState<Date>();
   const [toDate, setToDate] = useState<Date>();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   const affiliateQuery = useGetAffiliates();
   const affiliates = affiliateQuery.data ?? emptyAffiliates;
+  const affiliateIdFromUrl = searchParams.get("affiliate_id") ?? "";
 
   useEffect(() => {
-    if (selectedAffiliateId || affiliates.length === 0) return;
+    if (affiliates.length === 0) return;
+
+    const urlAffiliateExists = affiliates.some(
+      (affiliate) => affiliate.id === affiliateIdFromUrl,
+    );
+
+    if (urlAffiliateExists) {
+      setSelectedAffiliateId(affiliateIdFromUrl);
+      return;
+    }
+
+    if (selectedAffiliateId) return;
     setSelectedAffiliateId(affiliates[0].id);
-  }, [affiliates, selectedAffiliateId]);
+  }, [affiliateIdFromUrl, affiliates, selectedAffiliateId]);
 
   const selectedAffiliate = useMemo(
     () =>
@@ -169,6 +185,16 @@ const AffiliateEventsPage = () => {
     setToDate(undefined);
   };
 
+  const handleAffiliateChange = (affiliateId: string) => {
+    setSelectedAffiliateId(affiliateId);
+
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", "events");
+    params.set("affiliate_id", affiliateId);
+
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <main className="min-h-screen bg-[#f6f8f4] px-4 py-6 text-slate-950 md:px-8">
       <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
@@ -199,7 +225,7 @@ const AffiliateEventsPage = () => {
                   </span>
                   <Select
                     value={selectedAffiliateId}
-                    onValueChange={setSelectedAffiliateId}
+                    onValueChange={handleAffiliateChange}
                   >
                     <SelectTrigger
                       className="h-[4.25rem] rounded-2xl border-emerald-100 bg-white px-4 text-slate-950 shadow-sm hover:bg-emerald-50"

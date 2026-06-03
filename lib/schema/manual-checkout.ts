@@ -19,7 +19,7 @@ export const ManualOrderItemSchema = z.object({
   quantity: z
     .number()
     .int({ message: "Quantity must be an integer" })
-    .nonnegative({ message: "Quantity must be positive" }),
+    .min(1, { message: "Quantity must be at least 1" }),
   title: z.string().optional().nullable(),
   sku: z.string().optional(),
   final_price: z

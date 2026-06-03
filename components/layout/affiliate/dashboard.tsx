@@ -5,8 +5,6 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -42,6 +40,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -75,6 +81,21 @@ const emptyFunnel: AffiliateFunnelResponse = {
 };
 
 const emptyAffiliates: AffiliateResponse[] = [];
+
+const affiliateOutputChartConfig = {
+  clicks: {
+    label: "Clicks",
+    color: "#10b981",
+  },
+  orders: {
+    label: "Orders",
+    color: "#f59e0b",
+  },
+  conversions: {
+    label: "Conversions",
+    color: "#f97316",
+  },
+} satisfies ChartConfig;
 
 const funnelStages = [
   {
@@ -432,52 +453,59 @@ const AffiliateDashboard = () => {
               {isLoading ? (
                 <Skeleton className="h-72 w-full rounded-2xl" />
               ) : chartData.length ? (
-                <div className="h-72">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={chartData}
-                      margin={{ top: 8, right: 8, left: -18, bottom: 0 }}
-                    >
-                      <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                      <XAxis
-                        dataKey="code"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={10}
-                      />
-                      <YAxis
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={10}
-                      />
-                      <Tooltip
-                        cursor={{ fill: "rgba(16, 185, 129, 0.08)" }}
-                        formatter={(value, name) => [
-                          formatNumber(Number(value)),
-                          String(name),
-                        ]}
-                      />
-                      <Bar
-                        dataKey="clicks"
-                        name="Clicks"
-                        fill="#10b981"
-                        radius={[6, 6, 0, 0]}
-                      />
-                      <Bar
-                        dataKey="orders"
-                        name="Orders"
-                        fill="#f59e0b"
-                        radius={[6, 6, 0, 0]}
-                      />
-                      <Bar
-                        dataKey="conversions"
-                        name="Conversions"
-                        fill="#f97316"
-                        radius={[6, 6, 0, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                <ChartContainer
+                  config={affiliateOutputChartConfig}
+                  className="h-72 w-full aspect-auto"
+                >
+                  <BarChart
+                    data={chartData}
+                    barGap={4}
+                    barCategoryGap={24}
+                    margin={{ top: 12, right: 8, left: -16, bottom: 8 }}
+                  >
+                    <CartesianGrid
+                      vertical={false}
+                      strokeDasharray="4 4"
+                    />
+                    <XAxis
+                      dataKey="code"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={12}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={10}
+                      allowDecimals={false}
+                    />
+                    <ChartTooltip
+                      cursor={{ fill: "rgba(16, 185, 129, 0.08)" }}
+                      content={
+                        <ChartTooltipContent
+                          indicator="dot"
+                          className="min-w-44"
+                        />
+                      }
+                    />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Bar
+                      dataKey="clicks"
+                      fill="var(--color-clicks)"
+                      radius={[8, 8, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="orders"
+                      fill="var(--color-orders)"
+                      radius={[8, 8, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="conversions"
+                      fill="var(--color-conversions)"
+                      radius={[8, 8, 0, 0]}
+                    />
+                  </BarChart>
+                </ChartContainer>
               ) : (
                 <EmptyState label="No affiliate funnel data yet." />
               )}
