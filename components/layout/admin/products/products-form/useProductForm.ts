@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
@@ -33,15 +33,22 @@ export const useProductForm = ({
     defaultValues: initialValues,
     mode: "onBlur",
   });
+  const lastResetSourceKeyRef = useRef<string | null>(null);
+  const { isDirty } = form.formState;
 
   useEffect(() => {
-    if (productValuesClone) {
-      form.reset(normalizeProductValues(productValuesClone));
-    }
-    if (productValues) {
-      form.reset(normalizeProductValues(productValues));
-    }
-  }, [productValuesClone, productValues, form]);
+    const sourceValues = productValuesClone ?? productValues;
+    if (!sourceValues) return;
+
+    const sourceMode = productValuesClone ? "clone" : "edit";
+    const sourceKey = `${sourceMode}:${sourceValues.id ?? "new"}`;
+    const isDifferentProduct = lastResetSourceKeyRef.current !== sourceKey;
+
+    if (isDirty && !isDifferentProduct) return;
+
+    form.reset(normalizeProductValues(sourceValues));
+    lastResetSourceKeyRef.current = sourceKey;
+  }, [productValuesClone, productValues, form, isDirty]);
 
   const onSubmit = (values: ProductInput) => {
     submitProduct({

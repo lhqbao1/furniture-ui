@@ -226,6 +226,7 @@ export const submitProduct = async ({
       {
         onSuccess: () => {
           showSuccessToast("Updated product successfully");
+          form.reset(latestValues);
         },
         onError: (error: any) => {
           const { message, description } = getErrorMessage(error);
