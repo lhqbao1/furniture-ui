@@ -97,13 +97,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // URL tĩnh
   const staticUrls: MetadataRoute.Sitemap = [
     {
-      url: "https://www.prestige-home.de/de",
+      url: "https://www.prestige-home.de/de?utm_source=GG-O&aff=8S2lcc8iC5",
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: "https://www.prestige-home.de/de/about-us",
+      url: "https://www.prestige-home.de/de/about-us?utm_source=GG-O&aff=8S2lcc8iC5",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,
@@ -216,28 +216,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         isPublishableProduct(p),
     )
     .map((p: ProductItem) => ({
-      url: `https://www.prestige-home.de/de/product/${p.url_key}`,
+      url: `https://www.prestige-home.de/de/product/${p.url_key}?utm_source=GG-O&aff=8S2lcc8iC5`,
       lastModified: new Date(p.updated_at || new Date()),
       changeFrequency: "daily",
       priority: 0.6,
     }));
 
   const blogs: BlogItem[] =
-    blogsRes.status === "fulfilled" &&
-    Array.isArray(blogsRes.value.data?.items)
+    blogsRes.status === "fulfilled" && Array.isArray(blogsRes.value.data?.items)
       ? blogsRes.value.data.items
       : [];
 
   const blogUrls: MetadataRoute.Sitemap = blogs.map((p: BlogItem) => ({
-    url: `https://www.prestige-home.de/de/blog/${p.slug}`,
+    url: `https://www.prestige-home.de/de/blog/${p.slug}?utm_source=GG-O&aff=8S2lcc8iC5`,
     lastModified: new Date(p.created_at || new Date()),
     changeFrequency: "daily",
     priority: 0.6,
   }));
 
   const keywords: unknown[] =
-    keywordsRes.status === "fulfilled" &&
-    Array.isArray(keywordsRes.value.data)
+    keywordsRes.status === "fulfilled" && Array.isArray(keywordsRes.value.data)
       ? keywordsRes.value.data
       : [];
 
@@ -245,7 +243,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .map((keyword) => toKeywordValue(keyword))
     .filter((keyword) => keyword.length > 0)
     .map((keyword) => ({
-      url: `https://www.prestige-home.de/de/shop/${encodeURIComponent(keyword)}`,
+      url: `https://www.prestige-home.de/de/shop/${encodeURIComponent(keyword)}?utm_source=GG-O&aff=8S2lcc8iC5`,
       lastModified: new Date(new Date()),
       changeFrequency: "daily",
       priority: 0.6,
