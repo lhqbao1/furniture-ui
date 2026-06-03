@@ -4,9 +4,15 @@ import { BeatLoader, FadeLoader } from "react-spinners";
 
 interface ProtectedProps {
   children: ReactNode;
+  redirectTo?: string;
+  loadingLabel?: string;
 }
 
-export default function Protected({ children }: ProtectedProps) {
+export default function Protected({
+  children,
+  redirectTo = "/admin-login",
+  loadingLabel = "admin",
+}: ProtectedProps) {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -14,11 +20,11 @@ export default function Protected({ children }: ProtectedProps) {
     const adminToken = localStorage.getItem("admin_access_token");
     if (!adminToken) {
       // không có token → redirect login
-      window.location.href = "/admin-login";
+      window.location.href = redirectTo;
     } else {
       setIsAdmin(true);
     }
-  }, []);
+  }, [redirectTo]);
 
   if (isAdmin === null) {
     // màn hình loading với spinner và backdrop mờ
@@ -38,7 +44,9 @@ export default function Protected({ children }: ProtectedProps) {
 
           {/* text */}
           <div className="text-center">
-            <p className="text-sm font-medium text-black">Loading admin...</p>
+            <p className="text-sm font-medium text-black">
+              Loading {loadingLabel}...
+            </p>
             <p className="mt-1 text-xs text-black">
               Checking access — please wait
             </p>

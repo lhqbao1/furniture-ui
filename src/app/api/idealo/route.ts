@@ -79,8 +79,8 @@ export async function GET() {
 
         const url =
           p.brand?.name?.toLowerCase() === "econelo"
-            ? `https://econelo.de/produkt/${p.url_key ?? ""}`
-            : `https://prestige-home.de/de/product/${p.url_key ?? ""}`;
+            ? `https://econelo.de/produkt/${p.url_key ?? ""}?utm_source=IDE&aff=J0vCASFwaR`
+            : `https://prestige-home.de/de/product/${p.url_key ?? ""}?utm_source=IDE&aff=J0vCASFwaR`;
 
         const images =
           p.static_files

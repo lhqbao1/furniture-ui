@@ -69,8 +69,11 @@ export default function middleware(req: NextRequest) {
 
   const noIndexPrefixes = [
     "/admin",
+    "/affiliate",
+    "/affiliate-login",
     "/dsp",
     "/de/admin",
+    "/de/affiliate",
     "/de/dsp",
     "/de/cart",
     "/de/check-out",
@@ -84,6 +87,7 @@ export default function middleware(req: NextRequest) {
     "/de/forgot-password",
     "/de/reset-password",
     "/de/admin-login",
+    "/de/affiliate-login",
     "/de/auth/callback",
   ];
 

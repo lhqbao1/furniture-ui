@@ -33,9 +33,13 @@ import { adminIdAtom, userIdAtom } from "@/store/auth";
 
 interface LoginFormProps {
   isAdmin?: boolean;
+  redirectTo?: string;
 }
 
-export default function LoginForm({ isAdmin = false }: LoginFormProps) {
+export default function LoginForm({
+  isAdmin = false,
+  redirectTo,
+}: LoginFormProps) {
   const [userId, setUserId] = useAtom(userIdAtom);
   const [adminUserId, setAdminUserId] = useAtom(adminIdAtom);
   const [seePassword, setSeePassword] = useState(false);
@@ -149,7 +153,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             // Giả sử backend trả về token
             const token = data.access_token;
             localStorage.setItem("admin_access_token", token);
-            router.push("/admin", { locale });
+            router.push(redirectTo ?? "/admin", { locale });
             setAdminUserId(data.id);
 
             // Có thể lưu userId nếu cần
@@ -197,7 +201,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             const token = data.access_token;
             localStorage.setItem("admin_access_token", token);
             setAdminUserId(data.id);
-            router.push("/admin", { locale });
+            router.push(redirectTo ?? "/admin", { locale });
             toast.success(t("loginSuccess"));
           },
           onError(error) {

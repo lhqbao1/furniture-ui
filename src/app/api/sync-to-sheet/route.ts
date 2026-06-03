@@ -137,7 +137,7 @@ export async function GET() {
     );
 
     const values = publishableProducts.map((p) => {
-      const productUrl = `https://www.prestige-home.de/de/product/${p.url_key}`;
+      const productUrl = `https://www.prestige-home.de/de/product/${p.url_key}?utm_source=GM&aff=Pzp5SjImUL`;
       const stock = calculateAvailableStock(p);
 
       const imageUrl =
@@ -215,9 +215,6 @@ export async function GET() {
       if (googleApiError.message) message = googleApiError.message;
     }
 
-    return NextResponse.json(
-      { success: false, error: message },
-      { status },
-    );
+    return NextResponse.json({ success: false, error: message }, { status });
   }
 }

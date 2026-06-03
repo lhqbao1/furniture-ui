@@ -7,9 +7,10 @@ import Script from "next/script";
 export function TrustedShops() {
   const pathname = usePathname();
 
-  // ❌ Không load TrustedShops trong admin
+  // Internal tools should not load storefront trust widgets.
   if (
     pathname.includes("/admin") ||
+    pathname.includes("/affiliate") ||
     pathname.includes("/login") ||
     pathname.includes("/dsp")
   ) {

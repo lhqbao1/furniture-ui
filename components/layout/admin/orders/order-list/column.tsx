@@ -242,6 +242,7 @@ const ActionCell = ({
   const isExpanded = currentRowId
     ? (isRowExpanded?.(currentRowId) ?? expandedRowId === currentRowId)
     : false;
+  const noteText = note?.trim();
 
   return (
     <div className="flex justify-center">
@@ -253,19 +254,31 @@ const ActionCell = ({
         <Eye className="w-4 h-4" stroke="#F7941D" />
       </Button>
 
-      {note?.trim() && (
+      {noteText && (
         <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <NotebookPen className="w-4 h-4 text-blue-600" />
-            </Button>
-          </DialogTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <NotebookPen className="w-4 h-4 text-blue-600" />
+                </Button>
+              </DialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              sideOffset={8}
+              className="max-w-[320px] whitespace-pre-wrap break-words border border-slate-200 bg-white text-slate-950 shadow-xl"
+              arrowColor="#ffffff"
+            >
+              {noteText}
+            </TooltipContent>
+          </Tooltip>
           <DialogContent className="w-[400px] max-w-[300px]">
             <DialogHeader>
               <DialogTitle>Note of {marketplaceOrderId || ""}</DialogTitle>
             </DialogHeader>
             <div className="text-sm whitespace-pre-wrap break-words">
-              {note}
+              {noteText}
             </div>
           </DialogContent>
         </Dialog>

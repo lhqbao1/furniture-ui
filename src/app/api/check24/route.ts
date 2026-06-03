@@ -134,8 +134,8 @@ export async function GET() {
             }</div></div>`,
           ),
           p.brand.name.toLowerCase() === "econelo"
-            ? `https://econelo.de/produkt/${p.url_key}`
-            : `https://prestige-home.de/de/product/${p.url_key}`,
+            ? `https://econelo.de/produkt/${p.url_key}?utm_source=C24&aff=g7Nn7Xm40R`
+            : `https://prestige-home.de/de/product/${p.url_key}?utm_source=C24&aff=g7Nn7Xm40R`,
           p.brand.name ?? "",
           p.color ? color.toUpperCase() : "",
           size,
