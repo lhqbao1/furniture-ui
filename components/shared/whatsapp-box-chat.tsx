@@ -43,8 +43,14 @@ export default function WhatsAppChatBox() {
     }
   }, [open, mounted]);
 
+  const isInternalToolRoute =
+    pathname.includes("/admin") ||
+    pathname.includes("/affiliate") ||
+    pathname.includes("/dsp") ||
+    pathname.includes("/login");
+
   /* 🔹 AFTER all hooks */
-  if (!mounted || pathname.includes("/admin")) return null;
+  if (!mounted || isInternalToolRoute) return null;
 
   const PHONE_NUMBER = "+4930814537080";
 

@@ -23,6 +23,7 @@ Disallow: /de/sign-up
 Disallow: /de/forgot-password
 Disallow: /de/reset-password
 Disallow: /de/admin-login
+Disallow: /de/affiliate-login
 Disallow: /de/auth/callback
 Disallow: /*add_to_cart
 Disallow: /*remove_item
@@ -30,8 +31,11 @@ Disallow: /*_wpnonce
 Disallow: /*?add-to-cart
 Disallow: /*?add_to_wishlist
 Disallow: /admin/
+Disallow: /affiliate/
+Disallow: /affiliate-login
 Disallow: /dsp/
 Disallow: /de/admin/
+Disallow: /de/affiliate/
 Disallow: /de/dsp/
 
 Allow: /

@@ -75,9 +75,9 @@ export async function GET() {
     <purl>${
       p.brand
         ? p.brand.name.toLowerCase() === "econelo"
-          ? `https://econelo.de/produkt/${p.url_key}`
-          : `https://prestige-home.de/de/product/${p.url_key}`
-        : `https://prestige-home.de/de/product/${p.url_key}`
+          ? `https://econelo.de/produkt/${p.url_key}?utm_source=AWIN&aff=Q70yam8MNR`
+          : `https://prestige-home.de/de/product/${p.url_key}?utm_source=AWIN&aff=Q70yam8MNR`
+        : `https://prestige-home.de/de/product/${p.url_key}?utm_source=AWIN&aff=Q70yam8MNR`
     }</purl>
     <imgurl>${escapeXml(encodeURI(largeImage))}</imgurl>
     <price>

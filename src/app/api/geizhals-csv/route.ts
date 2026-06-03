@@ -61,9 +61,9 @@ export async function GET() {
             Preis: p.final_price.toFixed(2),
             Deeplink: p.brand
               ? p.brand.name.toLowerCase() === "econelo"
-                ? `https://econelo.de/produkt/${p.url_key}`
-                : `https://prestige-home.de/de/product/${p.url_key}`
-              : `https://prestige-home.de/de/product/${p.url_key}`,
+                ? `https://econelo.de/produkt/${p.url_key}?utm_source=GH&aff=SdtG6EN6T1`
+                : `https://prestige-home.de/de/product/${p.url_key}?utm_source=GH&aff=SdtG6EN6T1`
+              : `https://prestige-home.de/de/product/${p.url_key}?utm_source=GH&aff=SdtG6EN6T1`,
             EAN: p.ean ?? "",
             Verfügbarkeit: categoryPath,
             Kategorie: categories,

@@ -69,7 +69,15 @@ apiAdmin.interceptors.response.use(
       localStorage.removeItem("admin_user_id");
 
       // 👉 Redirect về admin login
-      window.location.href = "/admin-login";
+      const isAffiliateRoute =
+        window.location.pathname === "/affiliate" ||
+        window.location.pathname.startsWith("/affiliate/") ||
+        window.location.pathname === "/de/affiliate" ||
+        window.location.pathname.startsWith("/de/affiliate/");
+
+      window.location.href = isAffiliateRoute
+        ? "/affiliate-login"
+        : "/admin-login";
     }
     return Promise.reject(error);
   },

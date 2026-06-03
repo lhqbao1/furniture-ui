@@ -113,7 +113,7 @@ export async function GET() {
             Category_Path: categoryPath,
             Description: formatHtmlDescription(p?.description ?? ""),
             Product_URL: p?.url_key
-              ? `https://prestige-home.de/de/product/${p.url_key}`
+              ? `https://prestige-home.de/de/product/${p.url_key}?utm_source=M24&aff=51ymBcLcQR`
               : "",
             Clean_URL: p?.url_key ?? "",
             Color: p?.color ?? "",
