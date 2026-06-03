@@ -11,11 +11,13 @@ export default function MainLayout({
   return (
     <>
       <PageHeader />
-      <main className="relative w-full">
+      <main className="relative w-full min-h-screen">
         {/* <StickyIcon /> */}
-        <div className="">
+        <div className="min-h-screen">
           <Banner height={200} />
-          <div className="container-padding flex-1">{children}</div>
+          <div className="container-padding flex-1 min-h-screen">
+            {children}
+          </div>
         </div>
       </main>
       <Footer />

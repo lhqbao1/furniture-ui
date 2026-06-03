@@ -91,6 +91,7 @@ export default async function WiderrufPage() {
               versionData={versions}
               initialPolicy={items}
               versionName={versions[0].name}
+              activePolicyKey="cancellation"
             />
           ) : (
             <div className="text-center py-20 text-gray-500">

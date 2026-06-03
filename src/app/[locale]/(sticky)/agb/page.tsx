@@ -85,6 +85,7 @@ export default async function AGBPage() {
               versionData={versions}
               initialPolicy={items}
               versionName={versions[0].name}
+              activePolicyKey="agb"
             />
           ) : (
             <div className="text-center py-20 text-gray-500">

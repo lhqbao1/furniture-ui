@@ -3,7 +3,6 @@ import React from "react";
 import Image from "next/image";
 import { Link, usePathname } from "@/src/i18n/navigation";
 import { useTranslations } from "next-intl";
-import ListStars from "./list-stars";
 import { cn } from "@/lib/utils";
 
 const Footer = () => {
@@ -98,8 +97,11 @@ const Footer = () => {
             <Link href={`/zahlungsbedingungen`}>{t("paymentTerms")}</Link>
           </li>
           <li className="hover:pl-2 transition-all duration-500">
-            <Link href={`/widerrufsbelehrung`}>
-              Widerrufs-, Rückgabe- & Erstattungsrichtlinie
+            <Link href={`/widerrufsbelehrung`}>Widerrufsbelehrung</Link>
+          </li>
+          <li className="hover:pl-2 transition-all duration-500">
+            <Link href={`/rueckgabe-und-erstattung`}>
+              Rückgabe- & Erstattungsrichtlinie
             </Link>
           </li>
 

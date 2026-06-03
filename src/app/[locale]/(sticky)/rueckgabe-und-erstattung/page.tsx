@@ -8,32 +8,37 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
-import { Metadata } from "next";
+import { findPolicyByRouteKey } from "@/lib/policy-route";
 import { notFound } from "next/navigation";
 import Script from "next/script";
-import React from "react";
 
-export const revalidate = 3600; // ISR: regenerate mỗi 1h
-
-export const metadata: Metadata = {
-  title: "Datenschutzerklärung",
+export const metadata = {
+  title: "Rückgabe und Erstattung",
   description:
-    "Lesen Sie die Datenschutzerklärung von Prestige Home – Informationen zum Datenschutz, zur Verarbeitung personenbezogener Daten und zu Ihren Rechten.",
+    "Informationen zu Rückgabe, Retoure und Erstattung bei Prestige Home.",
   alternates: {
-    canonical: "https://www.prestige-home.de/de/datenschutzerklaerung",
+    canonical: "https://www.prestige-home.de/de/rueckgabe-und-erstattung",
   },
   openGraph: {
-    title: "Datenschutzerklärung",
+    title: "Rückgabe und Erstattung - Prestige Home",
     description:
-      "Transparenz über Datenschutz und Ihre Rechte bei Prestige Home.",
-    url: "https://www.prestige-home.de/de/datenschutzerklaerung",
+      "Alle Informationen zu Rückgabe, Retoure und Erstattung bei Prestige Home.",
+    url: "https://www.prestige-home.de/de/rueckgabe-und-erstattung",
     siteName: "Prestige Home",
     locale: "de_DE",
     type: "article",
   },
+  twitter: {
+    card: "summary",
+    title: "Rückgabe und Erstattung",
+    description:
+      "Informationen zu Rückgabe, Retoure und Erstattung bei Prestige Home.",
+  },
 };
 
-export default async function DatenschutzerklarungPage() {
+export const revalidate = 3600; // ISR: regenerate mỗi 1h
+
+export default async function ReturnRefundPolicyPage() {
   const queryClient = new QueryClient();
 
   const versions = await getPolicyVersion();
@@ -49,32 +54,39 @@ export default async function DatenschutzerklarungPage() {
   const items = await getPolicyItemsByVersion(firstVersion);
   queryClient.setQueryData(["policy-items", firstVersion], items);
 
+  const returnRefundPolicy = findPolicyByRouteKey(
+    items?.legal_policies ?? [],
+    "returnRefund",
+  );
+
+  if (!returnRefundPolicy) {
+    return notFound();
+  }
+
   const dehydratedState = dehydrate(queryClient);
 
   return (
     <>
       <Script
-        id="schema-privacy"
+        id="schema-return-refund"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "AboutPage",
-            name: "Datenschutzerklärung – Prestige Home",
-            url: "https://www.prestige-home.de/de/datenschutzerklaerung",
-            about: {
-              "@type": "Thing",
-              name: "Privacy Policy / Data Protection",
-            },
+            "@type": "MerchantReturnPolicy",
+            name: "Rückgabe und Erstattung",
+            url: "https://www.prestige-home.de/de/rueckgabe-und-erstattung",
+            applicableCountry: "DE",
             inLanguage: "de",
+            returnPolicyCategory:
+              "https://schema.org/MerchantReturnFiniteReturnWindow",
+            merchantReturnDays: 14,
+            returnMethod: "https://schema.org/ReturnByMail",
+            returnFees: "https://schema.org/FreeReturn",
             publisher: {
               "@type": "Organization",
               name: "Prestige Home",
               url: "https://www.prestige-home.de",
-              logo: {
-                "@type": "ImageObject",
-                url: "https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/5c38c322-bafc-4e6f-8d14-0c1ba4b7b8de_invoice-logo.png",
-              },
             },
           }),
         }}
@@ -88,7 +100,7 @@ export default async function DatenschutzerklarungPage() {
               versionData={versions}
               initialPolicy={items}
               versionName={versions[0].name}
-              activePolicyKey="privacy"
+              activePolicyKey="returnRefund"
             />
           ) : (
             <div className="text-center py-20 text-gray-500">

@@ -89,7 +89,7 @@ export function AdminSideBar() {
           icon: CornerDownRight,
         },
         {
-          title: "Refund Orders",
+          title: "Returned Orders",
           url: "/admin/orders/return-orders",
           icon: CornerDownRight,
         },
