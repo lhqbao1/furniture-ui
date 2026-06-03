@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { AffiliateResponse } from "@/types/affiliate";
 import AddOrEditAffiliateDialog from "./add-or-edit-dialog";
 import DeleteAffiliateDialog from "./delete-dialog";
-import GenerateAffiliateLinkDialog from "./generate-link-dialog";
+// import GenerateAffiliateLinkDialog from "./generate-link-dialog";
 
 const formatNumber = (value: number) =>
   value.toLocaleString("de-DE", {
@@ -73,10 +73,10 @@ export const affiliateColumns: ColumnDef<AffiliateResponse>[] = [
           isEdit
           affiliateValues={row.original}
         />
-        <GenerateAffiliateLinkDialog
+        {/* <GenerateAffiliateLinkDialog
           affiliateId={row.original.id}
           affiliateName={row.original.name}
-        />
+        /> */}
         <DeleteAffiliateDialog
           affiliateId={row.original.id}
           affiliateName={row.original.name}

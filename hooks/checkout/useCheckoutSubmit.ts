@@ -29,6 +29,8 @@ import { userIdAtom, userIdGuestAtom } from "@/store/auth";
 import { currentVoucherAtom } from "@/store/voucher";
 import { calculateProductDeliveryRange } from "@/hooks/get-estimated-shipping";
 import { useTrackAffiliateOrder } from "@/features/affiliate/hook";
+import { calculateProductVAT } from "@/lib/caculate-vat";
+import { CartItem } from "@/types/cart";
 
 const formatCheckoutDateTime = (date: Date): string =>
   date.toISOString().replace(/Z$/, "");
@@ -55,6 +57,60 @@ const calculateCheckoutDeliveryRange = (cartData: CartResponse) => {
 
   if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return null;
   return { from, to };
+};
+
+const calculateAffiliateOrderNetAmount = ({
+  items,
+  shippingGross,
+  countryCode,
+  taxId,
+}: {
+  items: CartItem[];
+  shippingGross: number;
+  countryCode?: string | null;
+  taxId?: string | null;
+}) => {
+  const productNetTotal = items.reduce((sum, item) => {
+    const quantity = Math.max(0, Number(item?.quantity) || 0);
+    const unitGross = Math.max(
+      0,
+      Number(
+        item?.item_price ??
+          item?.final_price ??
+          item?.products?.final_price ??
+          item?.purchased_products?.final_price,
+      ) || 0,
+    );
+    const lineGross = unitGross * quantity;
+
+    if (lineGross <= 0) return sum;
+
+    const lineNet = Math.max(
+      0,
+      Number(
+        calculateProductVAT(
+          lineGross,
+          item?.products?.tax ?? item?.purchased_products?.tax,
+          countryCode,
+          taxId,
+        ).net,
+      ) || 0,
+    );
+
+    return +(sum + lineNet).toFixed(2);
+  }, 0);
+
+  const shippingNet =
+    shippingGross > 0
+      ? Math.max(
+          0,
+          Number(
+            calculateProductVAT(shippingGross, "19%", countryCode, taxId).net,
+          ) || 0,
+        )
+      : 0;
+
+  return +(productNetTotal + shippingNet).toFixed(2);
 };
 
 export function useCheckoutSubmit({
@@ -252,12 +308,22 @@ export function useCheckoutSubmit({
         setVoucherId(null);
 
         try {
+          const countryCode =
+            data.shipping_country ?? data.invoice_country ?? "DE";
+          const taxId = user?.tax_id ?? data.tax_id ?? null;
+          const affiliateTotalAmount = calculateAffiliateOrderNetAmount({
+            items: cartData.flatMap((group) => group?.items ?? []),
+            shippingGross: Math.max(0, Number(shippingCost) || 0),
+            countryCode,
+            taxId,
+          });
+
           await trackAffiliateOrder.mutateAsync({
             checkout_id: checkout.id,
             status: "PENDING",
             user_id: userLoginId ?? currentGuestId ?? finalUserId ?? "",
             total_discount: Number(checkout.voucher_amount ?? 0),
-            total_amount: Number(checkout.total_amount ?? 0),
+            total_amount: affiliateTotalAmount,
           });
         } catch (trackOrderError) {
           console.error("trackAffiliateOrder failed:", trackOrderError);
