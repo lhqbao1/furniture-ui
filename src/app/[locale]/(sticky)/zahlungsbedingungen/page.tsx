@@ -94,6 +94,7 @@ export default async function PaymentTermsPage() {
               versionData={versions}
               initialPolicy={items}
               versionName={versions[0].name}
+              activePolicyKey="payment"
             />
           ) : (
             <div className="text-center py-20 text-gray-500">

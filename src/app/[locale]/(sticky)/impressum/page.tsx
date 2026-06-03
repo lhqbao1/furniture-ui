@@ -99,6 +99,7 @@ export default async function ImpressumPage() {
               versionData={versions}
               initialPolicy={items}
               versionName={versions[0].name}
+              activePolicyKey="impressum"
             />
           ) : (
             <div className="text-center py-20 text-gray-500">

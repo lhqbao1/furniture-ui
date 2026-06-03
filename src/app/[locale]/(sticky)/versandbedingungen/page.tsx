@@ -104,6 +104,7 @@ export default async function ShippingPolicyPage() {
               versionData={versions}
               initialPolicy={items}
               versionName={versions[0].name}
+              activePolicyKey="shipping"
             />
           ) : (
             <div className="text-center py-20 text-gray-500">

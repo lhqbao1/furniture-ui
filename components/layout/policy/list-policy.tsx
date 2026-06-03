@@ -1,24 +1,26 @@
 "use client";
-import React, { useState, useRef, useEffect, useTransition } from "react";
+import React, { useEffect, useMemo, useState, useTransition } from "react";
 import {
   Accordion,
-  AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
 import { getPolicyItemsByVersion } from "@/features/policy/api";
 import { Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { PolicyResponse, PolicyVersion } from "@/types/policy";
-import { useLocale, useTranslations } from "next-intl";
-import Image from "next/image";
+import { useLocale } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
 import { formatDate } from "@/lib/date-formated";
 import { usePathname } from "next/navigation";
 import { useSmoothScrollToRef } from "@/hooks/scrollToRef";
 import { sanitizeBodyHtml } from "@/lib/sanitize-body-html";
+import {
+  findPolicyByPathname,
+  findPolicyByRouteKey,
+  getPolicyHrefByName,
+  type PolicyRouteKey,
+} from "@/lib/policy-route";
 
 interface ListPolicyProps {
   versionId: string;
@@ -27,31 +29,38 @@ interface ListPolicyProps {
   policyId?: string;
   versionName?: string;
   isAdmin?: boolean;
+  activePolicyKey?: PolicyRouteKey;
+}
+
+function getInitialOpenPolicyId(
+  policies: PolicyResponse["legal_policies"] | undefined,
+  activePolicyKey?: PolicyRouteKey,
+) {
+  if (!policies?.length) return "";
+
+  const activePolicy = findPolicyByRouteKey(policies, activePolicyKey);
+  if (activePolicy) return activePolicy.id;
+
+  return activePolicyKey ? "" : policies[0]?.id ?? "";
 }
 
 const ListPolicy = ({
   versionId,
   versionData,
   initialPolicy,
-  policyId,
-  versionName,
   isAdmin = false,
+  activePolicyKey,
 }: ListPolicyProps) => {
-  const t = useTranslations();
-  const [openAccordion, setOpenAccordion] = useState<string>("");
-  const [currentPolicyItem, setCurrentPolicyItem] = useState(0);
+  const [openAccordion, setOpenAccordion] = useState<string>(() =>
+    getInitialOpenPolicyId(initialPolicy?.legal_policies, activePolicyKey),
+  );
   const [isNavigating, setIsNavigating] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const locale = useLocale();
   const [currentVersion, setCurrentVersion] = useState(versionId);
   const pathname = usePathname();
-  const { scrollTo, registerRef, setContainer } =
-    useSmoothScrollToRef<HTMLDivElement>();
-  // Khi click vào item
-  const handleClick = (key: string) => {
-    scrollTo(key, -80); // scroll lên trên một chút để tránh bị che bởi header
-  };
+  const { registerRef } = useSmoothScrollToRef<HTMLDivElement>();
 
   const { data: policy, isLoading } = useQuery({
     queryKey: ["policy-items", currentVersion],
@@ -60,19 +69,11 @@ const ListPolicy = ({
     initialData: currentVersion === versionId ? initialPolicy : undefined,
   });
 
-  const filteredPolicies = policy?.legal_policies ?? [];
+  const filteredPolicies = useMemo(
+    () => policy?.legal_policies ?? [],
+    [policy?.legal_policies],
+  );
   const isRouteLoading = isNavigating || isPending;
-
-  const getPolicyHref = (name: string) => {
-    const lowerName = name.toLowerCase();
-    if (lowerName.includes("agb")) return "/agb";
-    if (lowerName.includes("impressum")) return "/impressum";
-    if (lowerName.includes("versandbedingungen")) return "/versandbedingungen";
-    if (lowerName.includes("zahlungsbedingungen")) return "/zahlungsbedingungen";
-    if (lowerName.includes("widerruf")) return "/widerrufsbelehrung";
-    if (lowerName.includes("datenschutzer")) return "/datenschutzerklaerung";
-    return "/agb";
-  };
 
   const isSamePolicyRoute = (href: string) => {
     const normalizedPath = pathname?.replace(/\/+$/, "") ?? "";
@@ -84,28 +85,14 @@ const ListPolicy = ({
   };
 
   useEffect(() => {
-    const path = pathname?.toLowerCase();
+    const matchedItem =
+      findPolicyByRouteKey(filteredPolicies, activePolicyKey) ??
+      findPolicyByPathname(filteredPolicies, pathname);
 
-    const matchedItem = filteredPolicies.find((item) => {
-      const name = item.name.toLowerCase();
-      return (
-        (path?.includes("agb") && name.includes("agb")) ||
-        (path?.includes("impressum") && name.includes("impressum")) ||
-        (path?.includes("widerrufsbelehrung") && name.includes("widerruf")) ||
-        (path?.includes("zahlungsbedingungen") &&
-          name.includes("zahlungsbedingungen")) ||
-        (path?.includes("versandbedingungen") &&
-          name.toLowerCase().includes("versandbedingungen")) ||
-        (path?.includes("datenschutzerklaerung") &&
-          name.includes("datenschutzer"))
-      );
-    });
-
-    if (matchedItem) {
+    if (matchedItem && matchedItem.id !== openAccordion) {
       setOpenAccordion(matchedItem.id);
-      // setCurrentPolicyItem(0)
     }
-  }, [pathname, filteredPolicies]);
+  }, [activePolicyKey, filteredPolicies, openAccordion, pathname]);
 
   useEffect(() => {
     setIsNavigating(false);
@@ -113,18 +100,27 @@ const ListPolicy = ({
 
   // tìm current policy dựa trên accordion đang mở
   const currentPolicy =
-    filteredPolicies.find((p) => p.id === openAccordion) || filteredPolicies[0];
+    filteredPolicies.find((p) => p.id === openAccordion) ??
+    findPolicyByRouteKey(filteredPolicies, activePolicyKey) ??
+    (activePolicyKey ? undefined : filteredPolicies[0]);
 
   if (isLoading && filteredPolicies.length === 0)
     return (
-      <div className="">
-        <Loader2 className="animate-spin" />
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-secondary" />
       </div>
     );
   if (!versionId) return <></>;
+  if (!currentPolicy)
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4 text-center text-gray-500">
+        Keine passende Richtlinie gefunden. Bitte legen Sie den passenden
+        Rechtstext im Admin-Bereich an.
+      </div>
+    );
 
   return (
-    <div className="flex lg:pt-12 pt-3 pb-4 gap-6">
+    <div className="flex min-h-screen lg:pt-12 pt-3 pb-4 gap-6">
       {/* Sidebar bên trái */}
       <div className="hidden lg:block w-1/3 border-r sticky top-10">
         <div className="sticky top-42 max-h-[calc(100vh-2.5rem)] overflow-y-auto">
@@ -148,7 +144,7 @@ const ListPolicy = ({
                     if (isAdmin) {
                       setOpenAccordion(item.id);
                     } else {
-                      const href = getPolicyHref(item.name);
+                      const href = getPolicyHrefByName(item.name);
                       if (isSamePolicyRoute(href)) {
                         setOpenAccordion(item.id);
                         setIsNavigating(false);
@@ -301,16 +297,18 @@ const ListPolicy = ({
         </div> */}
 
         {/* Version section */}
-        <div className="flex flex-col items-end col-span-12 lg:mt-12 mt-4 mb-3 lg:mb-0">
-          <div
-            className={`text-secondary cursor-pointer ${
-              versionData[0].id === currentVersion ? "font-bold" : ""
-            }`}
-            onClick={() => setCurrentVersion(versionData[0].id)}
-          >
-            Stand: {formatDate(versionData[0].created_at)}
+        {versionData[0] && (
+          <div className="flex flex-col items-end col-span-12 lg:mt-12 mt-4 mb-3 lg:mb-0">
+            <div
+              className={`text-secondary cursor-pointer ${
+                versionData[0].id === currentVersion ? "font-bold" : ""
+              }`}
+              onClick={() => setCurrentVersion(versionData[0].id)}
+            >
+              Stand: {formatDate(versionData[0].created_at)}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

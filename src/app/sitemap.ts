@@ -144,6 +144,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    {
+      url: "https://www.prestige-home.de/de/versandbedingungen",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: "https://www.prestige-home.de/de/zahlungsbedingungen",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: "https://www.prestige-home.de/de/rueckgabe-und-erstattung",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // {
     //   url: "https://www.prestige-home.de/de/privacy-policy",
     //   lastModified: new Date(),
