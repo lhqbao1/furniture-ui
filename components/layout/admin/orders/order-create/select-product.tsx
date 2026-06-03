@@ -93,9 +93,15 @@ const SelectOrderItems = ({
   };
 
   const handleQuantityChange = (id: string, value: number) => {
+    const nextQuantity = Number.isFinite(value)
+      ? Math.max(1, Math.floor(value))
+      : 1;
+
     setListProducts((prev) =>
       prev.map((item) =>
-        item.product.id === id ? { ...item, quantity: value } : item,
+        item.product.id === id
+          ? { ...item, quantity: nextQuantity }
+          : item,
       ),
     );
   };
@@ -141,7 +147,7 @@ const SelectOrderItems = ({
       fromMarketplace === "bader" && listProducts.length >= 2;
     const items = listProducts.map((item) => ({
       id_provider: item.product.id_provider,
-      quantity: item.quantity,
+      quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)),
       title: item.product.name,
       sku: item.product.sku ?? "",
       final_price: roundPrice(item.final_price),
@@ -279,8 +285,8 @@ const SelectOrderItems = ({
 
                 <Input
                   type="number"
-                  min={0}
-                  step="0.01"
+                  min={1}
+                  step={1}
                   value={quantity}
                   onChange={(e) =>
                     handleQuantityChange(product.id, Number(e.target.value))
