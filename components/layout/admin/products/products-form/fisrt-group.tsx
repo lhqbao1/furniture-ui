@@ -281,7 +281,7 @@ const ProductDetailInputs = ({
                   {...field}
                   value={field.value ?? ""}
                   onChange={(e) => {
-                    const next = e.target.value;
+                    const next = e.target.value.toUpperCase();
                     field.onChange(next === "" ? null : next);
                   }}
                 />

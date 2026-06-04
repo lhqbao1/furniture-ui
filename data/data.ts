@@ -6,6 +6,159 @@ import { PreOrderProduct, Product } from "@/types/products";
 import { Bed, Sofa, Table } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+export type AffiliateIconConfig = {
+  code: string;
+  aliases?: string[];
+  label: string;
+  imageUrl?: string;
+  background: string;
+  foreground: string;
+  ring: string;
+};
+
+const getFaviconUrl = (domain: string) =>
+  `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+const getSimpleIconUrl = (slug: string, color: string) =>
+  `https://cdn.simpleicons.org/${slug}/${color}`;
+
+export const affiliateIconConfigs: AffiliateIconConfig[] = [
+  {
+    code: "GH",
+    aliases: ["geizhals"],
+    label: "GH",
+    imageUrl: getFaviconUrl("geizhals.de"),
+    background: "#ffe8ec",
+    foreground: "#d71920",
+    ring: "#fecdd3",
+  },
+  {
+    code: "GM",
+    aliases: ["google merchant", "google merchant center", "merchant center"],
+    label: "G",
+    imageUrl: "https://www.google.com/images/branding/product/2x/merchant_center_48dp.png",
+    background: "#eef2ff",
+    foreground: "#2563eb",
+    ring: "#c7d2fe",
+  },
+  {
+    code: "M24",
+    aliases: ["moebel24", "möbel24"],
+    label: "M24",
+    imageUrl: getFaviconUrl("moebel24.de"),
+    background: "#fff7ed",
+    foreground: "#ea580c",
+    ring: "#fed7aa",
+  },
+  {
+    code: "C24",
+    aliases: ["check24"],
+    label: "C24",
+    imageUrl: getFaviconUrl("check24.de"),
+    background: "#eff6ff",
+    foreground: "#1d4ed8",
+    ring: "#bfdbfe",
+  },
+  {
+    code: "PIN-0",
+    aliases: ["pin", "pin-o", "pinterest", "pinterest organic"],
+    label: "P",
+    imageUrl: getSimpleIconUrl("pinterest", "BD081C"),
+    background: "#fef2f2",
+    foreground: "#dc2626",
+    ring: "#fecaca",
+  },
+  {
+    code: "Instg-0",
+    aliases: ["ins", "instg-o", "instagram", "instagram organic"],
+    label: "IG",
+    imageUrl: getSimpleIconUrl("instagram", "E4405F"),
+    background: "#fdf2f8",
+    foreground: "#db2777",
+    ring: "#fbcfe8",
+  },
+  {
+    code: "YT-0",
+    aliases: ["yt", "yt-o", "youtube", "youtube organic"],
+    label: "YT",
+    imageUrl: getSimpleIconUrl("youtube", "FF0000"),
+    background: "#fff1f2",
+    foreground: "#e11d48",
+    ring: "#fecdd3",
+  },
+  {
+    code: "GG-0",
+    aliases: ["gg", "gg-o", "google", "google organic"],
+    label: "G",
+    imageUrl: getSimpleIconUrl("google", "4285F4"),
+    background: "#ecfdf5",
+    foreground: "#047857",
+    ring: "#a7f3d0",
+  },
+  {
+    code: "IDE",
+    aliases: ["idealo"],
+    label: "IDE",
+    imageUrl: getFaviconUrl("idealo.de"),
+    background: "#f0fdfa",
+    foreground: "#0f766e",
+    ring: "#99f6e4",
+  },
+  {
+    code: "AWIN",
+    aliases: ["awin"],
+    label: "AW",
+    imageUrl: getSimpleIconUrl("awin", "F28C00"),
+    background: "#fffbeb",
+    foreground: "#d97706",
+    ring: "#fde68a",
+  },
+  {
+    code: "TT-0",
+    aliases: ["tt", "tt-o", "tiktok", "tiktok organic"],
+    label: "TT",
+    imageUrl: getSimpleIconUrl("tiktok", "000000"),
+    background: "#f8fafc",
+    foreground: "#0f172a",
+    ring: "#cbd5e1",
+  },
+  {
+    code: "FB-0",
+    aliases: ["fb", "fb-o", "facebook", "facebook organic"],
+    label: "FB",
+    imageUrl: getSimpleIconUrl("facebook", "1877F2"),
+    background: "#eff6ff",
+    foreground: "#1877f2",
+    ring: "#bfdbfe",
+  },
+];
+
+export const getAffiliateIconConfig = (
+  code?: string | null,
+  name?: string | null,
+) => {
+  const normalizedCode = code?.trim().toLowerCase();
+  const normalizedName = name?.trim().toLowerCase();
+
+  return (
+    affiliateIconConfigs.find((item) => {
+      const itemCode = item.code.toLowerCase();
+      const aliases = item.aliases?.map((alias) => alias.toLowerCase()) ?? [];
+      return (
+        itemCode === normalizedCode ||
+        itemCode === normalizedName ||
+        aliases.includes(normalizedCode ?? "") ||
+        aliases.includes(normalizedName ?? "")
+      );
+    }) ?? {
+      code: code ?? "",
+      label: (code || name || "?").trim().slice(0, 3).toUpperCase(),
+      background: "#f8fafc",
+      foreground: "#475569",
+      ring: "#e2e8f0",
+    }
+  );
+};
+
 export const Categories: Category[] = [
   {
     id: 1,

@@ -233,6 +233,7 @@ export function useGetProductById(id: string) {
     queryFn: () => getProductById(id),
     enabled: !!id,
     retry: false,
+    refetchOnWindowFocus: false,
   });
 }
 

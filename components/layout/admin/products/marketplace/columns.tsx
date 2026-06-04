@@ -14,6 +14,8 @@ import RemoveFromMarketplaceDialog from "./remove-dialog";
 import SyncToAmazonForm from "./ync-to-amazon-form";
 import EditProductDrawer from "./edit-product-drawer";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
+import { getIncomingDisplayItems } from "@/lib/product-incoming-stock";
 
 const MARKETPLACES = ["kaufland", "ebay", "amazon"] as const;
 type Marketplace = (typeof MARKETPLACES)[number];
@@ -350,6 +352,44 @@ export const baseColumns = (
         )}
       </div>
     ),
+  },
+  {
+    id: "incoming_stock",
+    header: () => <div className="text-center uppercase">Incoming stock</div>,
+    cell: ({ row }) => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const incomingItems = getIncomingDisplayItems(row.original);
+
+      if (!incomingItems.length) {
+        return <div className="text-center">—</div>;
+      }
+
+      return (
+        <div className="space-y-1.5 text-center text-sm">
+          {incomingItems.map((item) => {
+            const date = item.date;
+            const sixWeeksFromNow = new Date(today);
+            sixWeeksFromNow.setDate(sixWeeksFromNow.getDate() + 42);
+            const isSoon =
+              date &&
+              !Number.isNaN(date.getTime()) &&
+              date > today &&
+              date <= sixWeeksFromNow;
+
+            return (
+              <div
+                key={item.id}
+                className={isSoon ? "text-secondary" : undefined}
+              >
+                {formatIncomingStockEntry(item.quantity, date)}
+              </div>
+            );
+          })}
+        </div>
+      );
+    },
   },
 ];
 

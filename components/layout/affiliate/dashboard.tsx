@@ -61,6 +61,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import AffiliateChannelIcon from "./affiliate-channel-icon";
+import { getAffiliateIconConfig } from "@/data/data";
 
 const emptySteps: AffiliateFunnelSteps = {
   clicks: 0,
@@ -96,6 +98,14 @@ const affiliateOutputChartConfig = {
     color: "#f97316",
   },
 } satisfies ChartConfig;
+
+type AffiliateChartTickProps = {
+  x?: number;
+  y?: number;
+  payload?: {
+    value?: string;
+  };
+};
 
 const funnelStages = [
   {
@@ -256,6 +266,7 @@ const AffiliateDashboard = () => {
       .map((row) => ({
         name: row.affiliate.name || row.affiliate.code || "Affiliate",
         code: row.affiliate.code,
+        iconName: row.affiliate.name,
         clicks: row.funnel.steps.clicks,
         orders: row.funnel.steps.orders,
         conversions: row.funnel.steps.conversions,
@@ -455,13 +466,13 @@ const AffiliateDashboard = () => {
               ) : chartData.length ? (
                 <ChartContainer
                   config={affiliateOutputChartConfig}
-                  className="h-72 w-full aspect-auto"
+                  className="h-[430px] w-full aspect-auto"
                 >
                   <BarChart
                     data={chartData}
                     barGap={4}
                     barCategoryGap={24}
-                    margin={{ top: 12, right: 8, left: -16, bottom: 8 }}
+                    margin={{ top: 12, right: 8, left: -16, bottom: 58 }}
                   >
                     <CartesianGrid
                       vertical={false}
@@ -471,7 +482,9 @@ const AffiliateDashboard = () => {
                       dataKey="code"
                       tickLine={false}
                       axisLine={false}
-                      tickMargin={12}
+                      tick={<AffiliateChartTick />}
+                      tickMargin={14}
+                      height={36}
                     />
                     <YAxis
                       tickLine={false}
@@ -488,7 +501,12 @@ const AffiliateDashboard = () => {
                         />
                       }
                     />
-                    <ChartLegend content={<ChartLegendContent />} />
+                    <ChartLegend
+                      verticalAlign="bottom"
+                      content={
+                        <ChartLegendContent className="mt-8 justify-center" />
+                      }
+                    />
                     <Bar
                       dataKey="clicks"
                       fill="var(--color-clicks)"
@@ -562,7 +580,12 @@ const AffiliateDashboard = () => {
                       .map((row) => (
                         <TableRow key={row.affiliate.id}>
                           <TableCell>
-                            <div className="flex flex-col">
+                            <div className="flex items-center gap-3">
+                              <AffiliateChannelIcon
+                                code={row.affiliate.code}
+                                name={row.affiliate.name}
+                                size="sm"
+                              />
                               <span className="font-medium">
                                 {row.affiliate.name}
                               </span>
@@ -595,6 +618,25 @@ const AffiliateDashboard = () => {
         </Card>
       </div>
     </main>
+  );
+};
+
+const AffiliateChartTick = ({ x = 0, y = 0, payload }: AffiliateChartTickProps) => {
+  const icon = getAffiliateIconConfig(payload?.value);
+
+  if (!icon.imageUrl) return null;
+
+  return (
+    <g transform={`translate(${x},${y + 8})`}>
+      <image
+        href={icon.imageUrl}
+        x={-12}
+        y={0}
+        width={24}
+        height={24}
+        preserveAspectRatio="xMidYMid meet"
+      />
+    </g>
   );
 };
 

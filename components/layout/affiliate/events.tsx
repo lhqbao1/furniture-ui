@@ -64,6 +64,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import AffiliateChannelIcon from "./affiliate-channel-icon";
 
 const emptyAffiliates: AffiliateResponse[] = [];
 
@@ -232,15 +233,36 @@ const AffiliateEventsPage = () => {
                       iconColor="#047857"
                       placeholderColor
                     >
-                      <SelectValue placeholder="Select channel" />
+                      {selectedAffiliate ? (
+                        <span className="flex min-w-0 items-center gap-2">
+                          <AffiliateChannelIcon
+                            code={selectedAffiliate.code}
+                            name={selectedAffiliate.name}
+                            size="sm"
+                          />
+                          <span className="truncate">
+                            {selectedAffiliate.name || selectedAffiliate.code}
+                          </span>
+                        </span>
+                      ) : (
+                        <SelectValue placeholder="Select channel" />
+                      )}
                     </SelectTrigger>
                     <SelectContent className="rounded-2xl">
                       {affiliates.map((affiliate) => (
                         <SelectItem
                           key={affiliate.id}
                           value={affiliate.id}
+                          textValue={affiliate.name || affiliate.code}
                         >
-                          {affiliate.name || affiliate.code}
+                          <span className="flex items-center gap-2">
+                            <AffiliateChannelIcon
+                              code={affiliate.code}
+                              name={affiliate.name}
+                              size="sm"
+                            />
+                            <span>{affiliate.name || affiliate.code}</span>
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>
