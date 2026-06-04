@@ -102,6 +102,8 @@ export function useGetAllProducts({
 
 export function useGetAllProductAndSold({
   search,
+  from_date,
+  to_date,
   sort_by_stock,
   page,
   page_size,
@@ -111,6 +113,8 @@ export function useGetAllProductAndSold({
     queryKey: [
       "products-and-sold",
       search,
+      from_date,
+      to_date,
       sort_by_stock,
       page,
       page_size,
@@ -119,6 +123,8 @@ export function useGetAllProductAndSold({
     queryFn: () =>
       getAllProductAndSold({
         search,
+        from_date,
+        to_date,
         sort_by_stock,
         page,
         page_size,

@@ -68,6 +68,8 @@ const normalizeBundleItemInventory = (
 
 export interface GetAllProductAndSoldParams {
   search?: string | string[];
+  from_date?: string;
+  to_date?: string;
   sort_by_stock?: "asc" | "desc" | string;
   page?: number;
   page_size?: number;
@@ -215,6 +217,8 @@ export async function getAllProductAndSold(
       ...(typeof normalizedSearch === "string" && normalizedSearch
         ? { search: normalizedSearch }
         : {}),
+      ...(params?.from_date !== undefined && { from_date: params.from_date }),
+      ...(params?.to_date !== undefined && { to_date: params.to_date }),
       ...(params?.sort_by_stock !== undefined && {
         sort_by_stock: params.sort_by_stock,
       }),

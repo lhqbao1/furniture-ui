@@ -23,6 +23,7 @@ import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
+  CalendarIcon,
   Download,
   Loader2,
   Search,
@@ -41,6 +42,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import type { DateRange } from "react-day-picker";
 
 const STOCK_PAGE_SIZE = 20;
 type SoldStockSort = "asc" | "desc";
@@ -94,6 +102,46 @@ const toApiDateTime = (value: string) => {
   const withSeconds =
     normalized.length === 16 ? `${normalized}:00` : normalized;
   return withSeconds.replace(/Z$/, "");
+};
+
+const toApiDateRangeParam = (
+  value: Date | undefined,
+  boundary: "start" | "end",
+) => {
+  if (!value) return undefined;
+
+  const date = new Date(value);
+  if (boundary === "start") {
+    date.setHours(0, 0, 0, 0);
+  } else {
+    date.setHours(23, 59, 59, 999);
+  }
+
+  return format(date, "yyyy-MM-dd'T'HH:mm:ss.SSS");
+};
+
+const formatRangeLabel = (range: DateRange | undefined) => {
+  if (!range?.from) return "Select date range";
+  if (!range.to) return format(range.from, "dd MMM yyyy");
+
+  return `${format(range.from, "dd MMM yyyy")} - ${format(
+    range.to,
+    "dd MMM yyyy",
+  )}`;
+};
+
+const isSameCalendarDay = (left: Date, right: Date) =>
+  left.getFullYear() === right.getFullYear() &&
+  left.getMonth() === right.getMonth() &&
+  left.getDate() === right.getDate();
+
+const isAfterCalendarDay = (left: Date, right: Date) => {
+  const normalizedLeft = new Date(left);
+  const normalizedRight = new Date(right);
+  normalizedLeft.setHours(0, 0, 0, 0);
+  normalizedRight.setHours(0, 0, 0, 0);
+
+  return normalizedLeft.getTime() > normalizedRight.getTime();
 };
 
 const getSoldStockValue = (product: ProductAndSoldItem): number | null => {
@@ -265,6 +313,93 @@ function IncomingStockDisplay({ product }: { product: ProductAndSoldItem }) {
   );
 }
 
+function StockDateRangePicker({
+  range,
+  onRangeChange,
+}: {
+  range: DateRange | undefined;
+  onRangeChange: (range: DateRange | undefined) => void;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const hasRange = Boolean(range?.from || range?.to);
+  const today = React.useMemo(() => {
+    const current = new Date();
+    current.setHours(0, 0, 0, 0);
+    return current;
+  }, []);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-10 w-full justify-between gap-3 border-secondary/25 bg-white text-left font-normal md:w-[280px]"
+        >
+          <span
+            className={hasRange ? "text-slate-900" : "text-muted-foreground"}
+          >
+            {formatRangeLabel(range)}
+          </span>
+          <CalendarIcon className="h-4 w-4 shrink-0 text-secondary" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        className="w-auto rounded-2xl border-secondary/20 bg-white p-3 shadow-xl"
+      >
+        <div className="mb-2 flex items-center justify-between gap-3 px-1">
+          <div>
+            <div className="text-sm font-semibold text-slate-900">
+              Filter sold date
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Select a date range for units sold.
+            </div>
+          </div>
+          {hasRange ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-xs"
+              onClick={() => onRangeChange(undefined)}
+            >
+              Clear
+            </Button>
+          ) : null}
+        </div>
+        <Calendar
+          mode="range"
+          selected={range}
+          disabled={{ after: today }}
+          onSelect={(value) => {
+            if (
+              value?.from &&
+              (isAfterCalendarDay(value.from, today) ||
+                (value.to && isAfterCalendarDay(value.to, today)))
+            ) {
+              return;
+            }
+
+            if (value?.from && value?.to && isSameCalendarDay(value.from, value.to)) {
+              onRangeChange({ from: value.from, to: undefined });
+              return;
+            }
+
+            onRangeChange(value);
+            if (value?.from && value?.to) setOpen(false);
+          }}
+          numberOfMonths={2}
+          captionLayout="dropdown"
+          className="[--cell-size:2.35rem] rounded-xl"
+          buttonVariant="ghost"
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export default function ProductAnalyticsPage() {
   const [stockPage, setStockPage] = React.useState(1);
   const [searchInput, setSearchInput] = React.useState("");
@@ -275,6 +410,9 @@ export default function ProductAnalyticsPage() {
     React.useState(false);
   const [isEconeloFilter, setIsEconeloFilter] =
     React.useState<EconeloFilterValue>("all");
+  const [stockDateRange, setStockDateRange] = React.useState<
+    DateRange | undefined
+  >(undefined);
   const [revenueFromDate, setRevenueFromDate] = React.useState("");
   const [revenueToDate, setRevenueToDate] = React.useState("");
   const [revenueCustomerType, setRevenueCustomerType] =
@@ -331,19 +469,38 @@ export default function ProductAnalyticsPage() {
   }, [isEconeloFilter]);
 
   const stockQueryParams = React.useMemo(
-    () => ({
-      ...(stockSearchParam ? { search: stockSearchParam } : {}),
-      ...(stockIsEconeloParam !== undefined
-        ? { is_econelo: stockIsEconeloParam }
-        : {}),
-      sort_by_stock: soldStockSort,
-    }),
-    [stockSearchParam, stockIsEconeloParam, soldStockSort],
+    () => {
+      const fromDate = toApiDateRangeParam(stockDateRange?.from, "start");
+      const toDate = toApiDateRangeParam(stockDateRange?.to, "end");
+
+      return {
+        ...(stockSearchParam ? { search: stockSearchParam } : {}),
+        ...(fromDate ? { from_date: fromDate } : {}),
+        ...(toDate ? { to_date: toDate } : {}),
+        ...(stockIsEconeloParam !== undefined
+          ? { is_econelo: stockIsEconeloParam }
+          : {}),
+        sort_by_stock: soldStockSort,
+      };
+    },
+    [
+      stockDateRange?.from,
+      stockDateRange?.to,
+      stockSearchParam,
+      stockIsEconeloParam,
+      soldStockSort,
+    ],
   );
 
   React.useEffect(() => {
     setStockPage(1);
-  }, [stockSearchParam, soldStockSort, stockIsEconeloParam]);
+  }, [
+    stockSearchParam,
+    soldStockSort,
+    stockIsEconeloParam,
+    stockDateRange?.from,
+    stockDateRange?.to,
+  ]);
 
   const {
     data: productsData,
@@ -547,6 +704,11 @@ export default function ProductAnalyticsPage() {
                 </div>
 
                 <div className="flex w-full flex-col gap-2 md:w-auto md:flex-row md:items-center">
+                  <StockDateRangePicker
+                    range={stockDateRange}
+                    onRangeChange={setStockDateRange}
+                  />
+
                   <Select
                     value={isEconeloFilter}
                     onValueChange={(value: EconeloFilterValue) =>
