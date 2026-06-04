@@ -65,19 +65,33 @@ type GermanCurrencyInputProps = Omit<
   "type" | "value" | "onChange"
 > & {
   value: unknown;
+  isDirty?: boolean;
   onValueChange: (value: number | null) => void;
 };
 
 function GermanCurrencyInput({
   value,
+  isDirty = false,
   onValueChange,
   onBlur,
   onFocus,
   ...props
 }: GermanCurrencyInputProps) {
   const [isFocused, setIsFocused] = useState(false);
-  const [draftValue, setDraftValue] = useState("");
-  const displayValue = isFocused ? draftValue : formatGermanNumber(value);
+  const [draftValue, setDraftValue] = useState(() =>
+    formatGermanNumber(value),
+  );
+  const displayValue =
+    isFocused || isDirty ? draftValue : formatGermanNumber(value);
+
+  useEffect(() => {
+    if (isFocused) return;
+
+    const formattedValue = formatGermanNumber(value);
+    if (!isDirty || draftValue === "") {
+      setDraftValue(formattedValue);
+    }
+  }, [draftValue, isDirty, isFocused, value]);
 
   return (
     <Input
@@ -86,7 +100,9 @@ function GermanCurrencyInput({
       inputMode="decimal"
       value={displayValue}
       onFocus={(event) => {
-        setDraftValue(formatGermanNumber(value));
+        setDraftValue((currentDraft) =>
+          isDirty && currentDraft ? currentDraft : formatGermanNumber(value),
+        );
         setIsFocused(true);
         onFocus?.(event);
       }}
@@ -163,7 +179,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
         <FormField
           control={form.control}
           name="cost"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem className="flex flex-col">
               <FormLabel className="text-black font-semibold text-sm">
                 {isDsp ? "Purchase Price" : "Purchase Cost"}
@@ -175,6 +191,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                     ref={field.ref}
                     className="pl-7"
                     value={field.value}
+                    isDirty={fieldState.isDirty}
                     disabled={hasBundles}
                     aria-disabled={hasBundles}
                     onBlur={field.onBlur}
@@ -193,7 +210,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
         <FormField
           control={form.control}
           name="delivery_cost"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem className="flex flex-col">
               <FormLabel className="text-black font-semibold text-sm">
                 Delivery cost
@@ -205,6 +222,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                     ref={field.ref}
                     className="pl-7"
                     value={field.value}
+                    isDirty={fieldState.isDirty}
                     onBlur={field.onBlur}
                     onValueChange={field.onChange}
                   />
@@ -234,7 +252,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
         <FormField
           control={form.control}
           name="return_cost"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem className="flex flex-col lg:col-span-3 col-span-12">
               <FormLabel className="text-black font-semibold text-sm">
                 Return cost
@@ -246,6 +264,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                     ref={field.ref}
                     className="pl-7"
                     value={field.value}
+                    isDirty={fieldState.isDirty}
                     onBlur={field.onBlur}
                     onValueChange={field.onChange}
                   />
@@ -267,7 +286,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
             <FormField
               control={form.control}
               name="price"
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="text-black font-semibold text-sm">
                     UVP
@@ -279,6 +298,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                         ref={field.ref}
                         className="pl-7"
                         value={field.value}
+                        isDirty={fieldState.isDirty}
                         onBlur={field.onBlur}
                         onValueChange={field.onChange}
                       />
@@ -296,7 +316,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
             <FormField
               control={form.control}
               name="final_price"
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="text-black font-semibold text-sm">
                     Sale Price
@@ -308,6 +328,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                         ref={field.ref}
                         className="pl-7"
                         value={field.value}
+                        isDirty={fieldState.isDirty}
                         onBlur={field.onBlur}
                         onValueChange={field.onChange}
                       />

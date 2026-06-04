@@ -3,15 +3,82 @@ import {
   aggregatePackages,
   calcDeliveryCost,
 } from "@/lib/shipping/delivery-cost";
+import { ProductInput } from "@/lib/schema/product";
+import { ProductItem } from "@/types/products";
+import { UseFormReturn } from "react-hook-form";
 
-function cleanPackages(packages?: any[]) {
+type ProductFormMutation = {
+  mutate: (
+    payload: unknown,
+    options: {
+      onSuccess: () => void;
+      onError: (error: unknown) => void;
+    },
+  ) => void;
+};
+
+type ProductFormRouter = {
+  push: (href: string, options?: { locale: string }) => void;
+};
+
+type SubmitProductArgs = {
+  values: ProductInput;
+  productValues?: Partial<ProductItem>;
+  productValuesClone?: Partial<ProductItem>;
+  addProductMutation: ProductFormMutation;
+  editProductMutation: ProductFormMutation;
+  router: ProductFormRouter;
+  locale: string;
+  form: UseFormReturn<ProductInput>;
+  onSaved?: () => void;
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const getErrorDetail = (error: unknown) => {
+  if (!isRecord(error)) return "";
+
+  const response = isRecord(error.response) ? error.response : null;
+  const data = response && isRecord(response.data) ? response.data : null;
+  const message = typeof error.message === "string" ? error.message : "";
+
+  return data?.detail ?? data?.message ?? message;
+};
+
+const getFirstErrorDescription = (detail: unknown, fallback: string) => {
+  if (!isRecord(detail) || !Array.isArray(detail.errors)) return fallback;
+
+  const firstError = detail.errors[0];
+  if (!isRecord(firstError)) return fallback;
+
+  return (
+    (typeof firstError.message === "string" && firstError.message) ||
+    (typeof firstError.detail === "string" && firstError.detail) ||
+    fallback
+  );
+};
+
+const omitPayloadKeys = (
+  payload: Record<string, unknown>,
+  keys: string[],
+) => {
+  const blockedKeys = new Set(keys);
+  return Object.fromEntries(
+    Object.entries(payload).filter(([key]) => !blockedKeys.has(key)),
+  );
+};
+
+function cleanPackages(packages?: unknown[]) {
   if (!Array.isArray(packages)) return undefined;
 
   return packages
+    .filter(isRecord)
     .filter((pkg) =>
-      ["length", "width", "height", "weight"].every(
-        (key) => pkg[key] !== null && pkg[key] !== undefined,
-      ),
+      ["length", "width", "height", "weight"].every((key) => {
+        const value = pkg[key];
+        return value !== null && value !== undefined;
+      }),
     )
     .map((pkg) => ({
       length: pkg.length,
@@ -22,7 +89,7 @@ function cleanPackages(packages?: any[]) {
 }
 
 export const submitProduct = async ({
-  values,
+  values: submittedValues,
   productValues,
   productValuesClone,
   addProductMutation,
@@ -30,7 +97,9 @@ export const submitProduct = async ({
   router,
   locale,
   form,
-}: any) => {
+  onSaved,
+}: SubmitProductArgs) => {
+  void submittedValues;
   let loadingToastId: string | number | undefined;
   const startLoadingToast = (message: string) => {
     loadingToastId = toast.loading(message);
@@ -44,16 +113,12 @@ export const submitProduct = async ({
   const showSuccessToast = (message: string) => {
     toast.success(message, { id: loadingToastId });
   };
-  const getErrorMessage = (error: any) => {
+  const getErrorMessage = (error: unknown) => {
     const fallback = "Something went wrong. Please try again.";
 
     if (!error) return { message: fallback };
 
-    const detail =
-      error?.response?.data?.detail ??
-      error?.response?.data?.message ??
-      error?.message ??
-      "";
+    const detail = getErrorDetail(error);
 
     if (typeof detail === "string") {
       const lower = detail.toLowerCase();
@@ -92,11 +157,10 @@ export const submitProduct = async ({
       return { message: "Failed to save product", description: detail };
     }
 
-    if (Array.isArray(detail?.errors) && detail.errors.length > 0) {
+    if (isRecord(detail) && Array.isArray(detail.errors) && detail.errors.length > 0) {
       return {
         message: "Failed to save product",
-        description:
-          detail.errors[0]?.message ?? detail.errors[0]?.detail ?? fallback,
+        description: getFirstErrorDescription(detail, fallback),
       };
     }
 
@@ -145,7 +209,7 @@ export const submitProduct = async ({
       ? productValues.stock
       : latestValues.stock;
 
-  const payload = {
+  const payload: Record<string, unknown> = {
     ...latestValues, // 👈 Thay values bằng latestValues
     packages:
       cleanedPackages && cleanedPackages.length > 0
@@ -194,10 +258,13 @@ export const submitProduct = async ({
   // }
 
   if (productValuesClone) {
-    const { marketplace_products, ...cleanPayload } = payload;
-
-    const { url_key, meta_title, meta_description, meta_keywords, ...rest } =
-      cleanPayload;
+    const cleanPayload = omitPayloadKeys(payload, ["marketplace_products"]);
+    const rest = omitPayloadKeys(cleanPayload, [
+      "url_key",
+      "meta_title",
+      "meta_description",
+      "meta_keywords",
+    ]);
 
     const finalPayload = {
       ...rest,
@@ -208,10 +275,11 @@ export const submitProduct = async ({
     addProductMutation.mutate(finalPayload, {
       onSuccess: () => {
         showSuccessToast("Product add successfully");
+        onSaved?.();
         form.reset();
         router.push("/admin/products/list", { locale });
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         const { message, description } = getErrorMessage(error);
         showErrorToast(message, description);
       },
@@ -226,9 +294,10 @@ export const submitProduct = async ({
       {
         onSuccess: () => {
           showSuccessToast("Updated product successfully");
+          onSaved?.();
           form.reset(latestValues);
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
           const { message, description } = getErrorMessage(error);
           showErrorToast(message, description);
         },
@@ -241,9 +310,10 @@ export const submitProduct = async ({
   addProductMutation.mutate(payload, {
     onSuccess: () => {
       showSuccessToast("Add product successfully");
+      onSaved?.();
       form.reset();
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const { message, description } = getErrorMessage(error);
       showErrorToast(message, description);
     },

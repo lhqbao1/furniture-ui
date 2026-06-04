@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   Popover,
@@ -77,6 +77,8 @@ const SelectBundleComponent = ({
   const [listProducts, setListProducts] = useState<SelectedProduct[]>([]);
   const [queryParams, setQueryParams] = useState("");
   const [open, setOpen] = useState(false);
+  const hasUnsavedBundleDraftRef = useRef(false);
+  const lastProductIdRef = useRef<string | null>(null);
 
   const {
     data: products,
@@ -92,6 +94,7 @@ const SelectBundleComponent = ({
 
     setListProducts((prev) => {
       if (prev.some((p) => p.product.id === product.id)) return prev;
+      hasUnsavedBundleDraftRef.current = true;
       return [
         ...prev,
         {
@@ -108,6 +111,7 @@ const SelectBundleComponent = ({
 
   const handleAmountChange = (id: string, value: number) => {
     const normalizedValue = Number.isFinite(value) && value > 0 ? value : 1;
+    hasUnsavedBundleDraftRef.current = true;
     setListProducts((prev) =>
       prev.map((item) =>
         item.product.id === id ? { ...item, amount: normalizedValue } : item,
@@ -116,6 +120,7 @@ const SelectBundleComponent = ({
   };
 
   const handleRemoveProduct = (id: string) => {
+    hasUnsavedBundleDraftRef.current = true;
     setListProducts((prev) => prev.filter((p) => p.product.id !== id));
   };
 
@@ -143,6 +148,16 @@ const SelectBundleComponent = ({
 
   // ✅ Khởi tạo listProducts từ currentProduct.bundles (nếu có)
   useEffect(() => {
+    const currentProductId = currentProduct?.id ?? null;
+    const isDifferentProduct = lastProductIdRef.current !== currentProductId;
+
+    if (isDifferentProduct) {
+      hasUnsavedBundleDraftRef.current = false;
+      lastProductIdRef.current = currentProductId;
+    }
+
+    if (hasUnsavedBundleDraftRef.current) return;
+
     if (currentProduct?.bundles?.length) {
       const initialBundles: SelectedProduct[] = currentProduct.bundles.map(
         (b) => {
@@ -160,7 +175,10 @@ const SelectBundleComponent = ({
       );
 
       setListProducts(initialBundles);
+      return;
     }
+
+    setListProducts([]);
   }, [currentProduct]);
 
   // ✅ Cập nhật vào form mỗi khi listProducts thay đổi
@@ -174,7 +192,10 @@ const SelectBundleComponent = ({
       weight: item.weight,
       cost: item.product.cost,
     }));
-    setValue("bundles", bundles);
+    setValue("bundles", bundles, {
+      shouldDirty: hasUnsavedBundleDraftRef.current,
+      shouldValidate: hasUnsavedBundleDraftRef.current,
+    });
   }, [listProducts, setValue]);
 
   useEffect(() => {

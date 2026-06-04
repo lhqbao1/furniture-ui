@@ -1,11 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useFormContext } from "react-hook-form";
 import { FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Upload, Loader2 } from "lucide-react";
 import { useUploadStaticFile } from "@/features/file/hook";
+
+type ProductManualFile = {
+  title: string;
+  url: string;
+};
 
 const MANUAL_SECTIONS = [
   { key: "Benutzerhandbuch", label: "User Manual" },
@@ -17,19 +22,12 @@ const ProductManual = () => {
   const form = useFormContext();
   const uploadFileMutation = useUploadStaticFile();
 
-  const pdfFiles = form.watch("pdf_files") || [];
-  const [removedFiles, setRemovedFiles] = useState<any[]>([]);
+  const pdfFiles = (form.watch("pdf_files") || []) as ProductManualFile[];
   // ============================
   // UPLOAD NEW FILE (Replace old one)
   // ============================
   const handleUpload = async (files: File[], title: string) => {
     const prevFiles = [...pdfFiles];
-    const existing = prevFiles.find((file) => file.title === title);
-
-    // Remove old file (store it to delete later if needed)
-    if (existing) {
-      setRemovedFiles((prev) => [...prev, existing]);
-    }
 
     const file = files[0];
     const sanitizedName = file.name.replace(/\s+/g, "-");
@@ -50,7 +48,10 @@ const ProductManual = () => {
     // Replace file for this section
     const updated = [...prevFiles.filter((f) => f.title !== title), newItem];
 
-    form.setValue("pdf_files", updated, { shouldValidate: true });
+    form.setValue("pdf_files", updated, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   };
 
   // ============================
@@ -58,20 +59,12 @@ const ProductManual = () => {
   // ============================
   const removeFile = (title: string) => {
     const prevFiles = [...pdfFiles];
-    const existing = prevFiles.find((f) => f.title === title);
-
-    if (existing) {
-      setRemovedFiles((prev) => [...prev, existing]);
-    }
 
     const updated = prevFiles.filter((f) => f.title !== title);
-    form.reset(
-      {
-        ...form.getValues(),
-        pdf_files: updated,
-      },
-      { keepDirty: true, keepTouched: true },
-    );
+    form.setValue("pdf_files", updated, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   };
 
   return (
@@ -84,7 +77,7 @@ const ProductManual = () => {
         <div className="grid lg:grid-cols-3 grid-cols-1 gap-6">
           {MANUAL_SECTIONS.map((section) => {
             const filesOfSection = pdfFiles.filter(
-              (item: any) => item.title === section.key,
+              (item) => item.title === section.key,
             );
 
             const currentFile = filesOfSection[0];

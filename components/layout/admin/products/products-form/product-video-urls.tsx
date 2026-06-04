@@ -7,7 +7,6 @@ import { useAddProductVideoUrls } from "@/features/products/hook";
 import { ProductVideoUrl } from "@/types/products";
 import { ExternalLink, Loader2, Plus, Trash2, Youtube } from "lucide-react";
 import { toast } from "sonner";
-import { url } from "inspector";
 
 type ProductVideoUrlsProps = {
   productId?: string | null;
@@ -103,13 +102,16 @@ const ProductVideoUrls = ({ productId, videoUrls }: ProductVideoUrlsProps) => {
   const [inputValue, setInputValue] = useState("");
   const [urls, setUrls] = useState<string[]>(initialUrls);
   const [savedUrls, setSavedUrls] = useState<string[]>(initialUrls);
+  const hasUnsavedVideoDraft = useMemo(
+    () => inputValue.trim().length > 0 || !isSameList(urls, savedUrls),
+    [inputValue, urls, savedUrls],
+  );
 
   useEffect(() => {
+    if (hasUnsavedVideoDraft) return;
     setUrls(initialUrls);
     setSavedUrls(initialUrls);
-  }, [initialUrls]);
-
-  console.log(urls);
+  }, [hasUnsavedVideoDraft, initialUrls]);
 
   const previewItems = useMemo(
     () =>
