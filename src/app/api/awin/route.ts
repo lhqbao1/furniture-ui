@@ -62,6 +62,11 @@ export async function GET() {
               .map((opt) => opt.label)
               .join(", ") || "";
           const stock = calculateAvailableStock(p);
+          const brandName = p.brand?.name ?? "Prestige Home";
+          const productUrl =
+            brandName.toLowerCase() === "econelo"
+              ? `https://econelo.de/produkt/${p.url_key}?utm_source=AWIN&aff=Q70yam8MNR`
+              : `https://prestige-home.de/de/product/${p.url_key}?utm_source=AWIN&aff=Q70yam8MNR`;
 
           return [
             `
@@ -72,13 +77,7 @@ export async function GET() {
     <pid>${escapeXml(p.id_provider || p.id)}</pid>
     <desc><![CDATA[${escapeCDATA(cleanDescription(p.description ?? ""))}]]></desc>
     <category>${escapeXml(categories)}</category>
-    <purl>${
-      p.brand
-        ? p.brand.name.toLowerCase() === "econelo"
-          ? `https://econelo.de/produkt/${p.url_key}?utm_source=AWIN&aff=Q70yam8MNR`
-          : `https://prestige-home.de/de/product/${p.url_key}?utm_source=AWIN&aff=Q70yam8MNR`
-        : `https://prestige-home.de/de/product/${p.url_key}?utm_source=AWIN&aff=Q70yam8MNR`
-    }</purl>
+    <purl>${escapeXml(encodeURI(productUrl))}</purl>
     <imgurl>${escapeXml(encodeURI(largeImage))}</imgurl>
     <price>
       ${p.final_price.toFixed(2)}
@@ -88,11 +87,11 @@ export async function GET() {
     <isbn/>
     <mpn>${escapeXml(p.id_provider)}</mpn>
     <parentpid>${escapeXml(p.parent_id ?? "")}</parentpid>
-    <brand>${escapeXml(p.brand ? p.brand.name : "Prestige Home")}</brand>
+    <brand>${escapeXml(brandName)}</brand>
     <colour>${escapeXml(colors)}</colour>
     <condition>new</condition>
     <keywords>${escapeXml(
-      [p.name, p.brand, colors].filter(Boolean).join(", "),
+      [p.name, brandName, colors].filter(Boolean).join(", "),
     )}</keywords>
     <lang>DE</lang>
     <ptype>${escapeXml(p.categories?.[0]?.name || "Product")}</ptype>
