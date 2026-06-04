@@ -436,11 +436,13 @@ const ProductForm = ({
               </Accordion>
             </div>
 
-            <div className="lg:col-span-3 flex flex-col items-end gap-4">
+            <div className="lg:col-span-3 flex min-w-0 flex-col items-end gap-4">
               <div
                 className={cn(
-                  "grid grid-cols-2 gap-2 justify-end z-20",
-                  isDrawer ? "sticky top-4 self-end" : "fixed top-24",
+                  "grid min-w-0 grid-cols-2 gap-2 justify-end z-20",
+                  isDrawer
+                    ? "sticky top-4 self-end w-full"
+                    : "fixed right-4 top-24 w-[23rem] max-w-[calc(100vw-2rem)] xl:right-[7.5rem]",
                 )}
               >
                 <Button
@@ -514,19 +516,19 @@ const ProductForm = ({
                     />
                   </div>
                 )}
-                <div className="col-span-2 lg:mt-4">
+                <div className="col-span-2 min-w-0 lg:mt-4">
                   <FormField
                     control={form.control}
                     name="note"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col w-full">
+                      <FormItem className="flex w-full min-w-0 flex-col">
                         <FormLabel className="text-black font-semibold text-sm">
                           Note
                         </FormLabel>
                         <FormControl>
                           <Textarea
                             placeholder="Write product description..."
-                            className="min-h-[120px] resize-none"
+                            className="min-h-[120px] w-full max-w-full resize-none whitespace-pre-wrap break-words"
                             value={field.value ?? ""} // null → empty string
                             onChange={(e) =>
                               field.onChange(
