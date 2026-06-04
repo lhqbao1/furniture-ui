@@ -41,6 +41,7 @@ import {
   normalizeB2BInvoicePartyInfo,
   resolveB2BInvoicePartyInfo,
 } from "@/lib/b2b-invoice";
+import { filterMainCheckoutForInvoice } from "@/lib/checkout-filter";
 
 interface B2BInvoiceDrawerProps {
   open: boolean;
@@ -121,6 +122,11 @@ const getCheckoutCartItems = (checkout: CheckOutMain["checkouts"][number] | unde
   return checkout.cart?.items ?? [];
 };
 
+const normalizeInvoiceOrders = (orders: CheckOutMain[]) =>
+  orders
+    .map((order) => filterMainCheckoutForInvoice(order))
+    .filter((order): order is CheckOutMain => Boolean(order));
+
 const resolveRefNumber = ({
   order,
   item,
@@ -149,8 +155,12 @@ export default function B2BInvoiceDrawer({
   marketplace,
   selectedOrders,
 }: B2BInvoiceDrawerProps) {
+  const filteredSelectedOrders = useMemo(
+    () => normalizeInvoiceOrders(selectedOrders),
+    [selectedOrders],
+  );
   const [invoiceOrders, setInvoiceOrders] =
-    useState<CheckOutMain[]>(selectedOrders);
+    useState<CheckOutMain[]>(filteredSelectedOrders);
   const [invoiceId, setInvoiceId] = useState("");
   const [invoiceIdError, setInvoiceIdError] = useState(false);
   const [servicePeriod, setServicePeriod] = useState("");
@@ -170,7 +180,7 @@ export default function B2BInvoiceDrawer({
     () =>
       resolveB2BInvoicePartyInfo({
         marketplace,
-        order: selectedOrders[0],
+        order: filteredSelectedOrders[0],
       }),
   );
   const [isInvoicePartyEdited, setIsInvoicePartyEdited] = useState(false);
@@ -193,12 +203,12 @@ export default function B2BInvoiceDrawer({
 
   useEffect(() => {
     if (!open) {
-      setInvoiceOrders(selectedOrders);
+      setInvoiceOrders(filteredSelectedOrders);
       setIsConfirmDialogOpen(false);
       setConfirmExportFormat(null);
       setIsCreatingInvoice(false);
     }
-  }, [selectedOrders, open]);
+  }, [filteredSelectedOrders, open]);
 
   useEffect(() => {
     if (servicePeriodRange?.from && servicePeriodRange?.to) {
@@ -264,65 +274,10 @@ export default function B2BInvoiceDrawer({
     const invoiceTaxId = normalizedInvoicePartyInfo.tax_id;
 
     const rawRows = invoiceOrders.flatMap((order) => {
-      const primaryCheckoutItems = getCheckoutCartItems(order.checkouts?.[0]);
       const orderItems = (order.checkouts ?? []).flatMap((checkout) =>
         getCheckoutCartItems(checkout),
       );
-      const normalizedChannel = String(order.from_marketplace ?? "")
-        .trim()
-        .toLowerCase();
-      const isBaderWithMultiItems =
-        normalizedChannel === "bader" && primaryCheckoutItems.length >= 2;
       const orderShippingGross = Number(order.total_shipping) || 0;
-
-      if (isBaderWithMultiItems) {
-        return primaryCheckoutItems.map((item, itemIndex) => {
-          const quantity = Number(item?.quantity) || 1;
-          const unitGross =
-            Number(
-              item?.item_price ??
-                item?.purchased_products?.final_price ??
-                item?.products?.final_price ??
-                item?.final_price ??
-                0,
-            ) || 0;
-          const shippingGross = itemIndex === 0 ? orderShippingGross : 0;
-          const taxValue =
-            item?.purchased_products?.tax ?? item?.products?.tax ?? null;
-
-          const unitVatCalculation = calculateProductVAT(
-            unitGross,
-            taxValue,
-            invoiceCountry,
-            invoiceTaxId,
-          );
-          const shippingVatCalculation = calculateProductVAT(
-            shippingGross,
-            taxValue,
-            invoiceCountry,
-            invoiceTaxId,
-          );
-
-          const unitNet = Number(unitVatCalculation.net) || 0;
-          const rowNet = unitNet * quantity;
-          const shippingNet = Number(shippingVatCalculation.net) || 0;
-
-          return {
-            "Ref.-Nr .": resolveRefNumber({
-              order,
-              item,
-              itemCount: primaryCheckoutItems.length,
-            }),
-            Produktname:
-              item?.purchased_products?.name ?? item?.products?.name ?? "-",
-            Menge: quantity,
-            Versand: formatEur(shippingNet),
-            "E.-Preis": formatEur(unitNet),
-            "USt.": formatTaxPercent(taxValue),
-            "G.-Preis": formatEur(rowNet),
-          };
-        });
-      }
 
       const firstItem = orderItems[0];
       const quantity =
@@ -363,7 +318,7 @@ export default function B2BInvoiceDrawer({
           "Ref.-Nr .": resolveRefNumber({
             order,
             item: firstItem,
-            itemCount: primaryCheckoutItems.length || orderItems.length,
+            itemCount: orderItems.length,
           }),
           Produktname:
             firstItem?.purchased_products?.name ??
