@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState, type ComponentProps } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import {
   FormField,
@@ -18,6 +18,89 @@ import { BundleInput } from "@/lib/schema/product";
 
 interface ProductPricingFieldsProps {
   isDsp?: boolean;
+}
+
+const germanNumberFormatter = new Intl.NumberFormat("de-DE", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const germanCurrencyFormatter = new Intl.NumberFormat("de-DE", {
+  style: "currency",
+  currency: "EUR",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const formatGermanNumber = (value: unknown) => {
+  if (value === null || value === undefined || value === "") return "";
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return "";
+
+  return germanNumberFormatter.format(numericValue);
+};
+
+const parseGermanCurrencyInput = (value: string) => {
+  const cleanedValue = value.replace(/[€\s\u00a0]/g, "").trim();
+  if (!cleanedValue) return null;
+
+  let normalizedValue = cleanedValue;
+  if (normalizedValue.includes(",")) {
+    normalizedValue = normalizedValue.replace(/\./g, "").replace(",", ".");
+  } else {
+    const dotCount = (normalizedValue.match(/\./g) ?? []).length;
+    const looksLikeGermanThousands = /^\d{1,3}\.\d{3}$/.test(normalizedValue);
+
+    if (dotCount > 1 || looksLikeGermanThousands) {
+      normalizedValue = normalizedValue.replace(/\./g, "");
+    }
+  }
+
+  const parsedValue = Number(normalizedValue);
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+};
+
+type GermanCurrencyInputProps = Omit<
+  ComponentProps<typeof Input>,
+  "type" | "value" | "onChange"
+> & {
+  value: unknown;
+  onValueChange: (value: number | null) => void;
+};
+
+function GermanCurrencyInput({
+  value,
+  onValueChange,
+  onBlur,
+  onFocus,
+  ...props
+}: GermanCurrencyInputProps) {
+  const [isFocused, setIsFocused] = useState(false);
+  const [draftValue, setDraftValue] = useState("");
+  const displayValue = isFocused ? draftValue : formatGermanNumber(value);
+
+  return (
+    <Input
+      {...props}
+      type="text"
+      inputMode="decimal"
+      value={displayValue}
+      onFocus={(event) => {
+        setDraftValue(formatGermanNumber(value));
+        setIsFocused(true);
+        onFocus?.(event);
+      }}
+      onBlur={(event) => {
+        setIsFocused(false);
+        onBlur?.(event);
+      }}
+      onChange={(event) => {
+        const nextValue = event.target.value;
+        setDraftValue(nextValue);
+        onValueChange(parseGermanCurrencyInput(nextValue));
+      }}
+    />
+  );
 }
 
 export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
@@ -87,20 +170,15 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
               </FormLabel>
               <FormControl>
                 <div className="relative flex items-center w-full">
-                  <Input
-                    {...field}
-                    type="number"
-                    min={0}
+                  <GermanCurrencyInput
+                    name={field.name}
+                    ref={field.ref}
                     className="pl-7"
-                    step="0.01"
-                    value={field.value ?? ""}
+                    value={field.value}
                     disabled={hasBundles}
                     aria-disabled={hasBundles}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value === "" ? null : e.target.valueAsNumber,
-                      )
-                    }
+                    onBlur={field.onBlur}
+                    onValueChange={field.onChange}
                   />
                   <span className="absolute left-3 text-gray-500">€</span>
                 </div>
@@ -122,19 +200,13 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
               </FormLabel>
               <FormControl>
                 <div className="relative flex items-center w-full">
-                  <Input
-                    {...field}
-                    type="number"
-                    // min={0}
+                  <GermanCurrencyInput
+                    name={field.name}
+                    ref={field.ref}
                     className="pl-7"
-                    step="0.01" // hoặc "any" để cho phép mọi số thập phân
-                    inputMode="decimal" // hint cho bàn phím mobile
-                    value={field.value ?? ""} // tránh uncontrolled / NaN
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value === "" ? null : e.target.valueAsNumber,
-                      )
-                    }
+                    value={field.value}
+                    onBlur={field.onBlur}
+                    onValueChange={field.onChange}
                   />
                   <span className="absolute left-3 text-gray-500">€</span>
                 </div>
@@ -149,7 +221,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                 {error
                   ? error
                   : cost != null
-                    ? `Suggested: €${cost}`
+                    ? `Suggested: ${germanCurrencyFormatter.format(cost)}`
                     : "Suggested: —"}
               </p>
               <FormMessage />
@@ -169,19 +241,13 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
               </FormLabel>
               <FormControl>
                 <div className="relative flex items-center w-full">
-                  <Input
-                    {...field}
-                    type="number"
-                    // min={0}
+                  <GermanCurrencyInput
+                    name={field.name}
+                    ref={field.ref}
                     className="pl-7"
-                    step="0.01" // hoặc "any" để cho phép mọi số thập phân
-                    inputMode="decimal" // hint cho bàn phím mobile
-                    value={field.value ?? ""} // tránh uncontrolled / NaN
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value === "" ? null : e.target.valueAsNumber,
-                      )
-                    }
+                    value={field.value}
+                    onBlur={field.onBlur}
+                    onValueChange={field.onChange}
                   />
                   <span className="absolute left-3 text-gray-500">€</span>
                 </div>
@@ -208,20 +274,13 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                   </FormLabel>
                   <FormControl>
                     <div className="relative flex items-center">
-                      <Input
-                        {...field}
-                        type="number"
-                        min={0}
+                      <GermanCurrencyInput
+                        name={field.name}
+                        ref={field.ref}
                         className="pl-7"
-                        step="0.01"
-                        value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value === ""
-                              ? null
-                              : e.target.valueAsNumber,
-                          )
-                        }
+                        value={field.value}
+                        onBlur={field.onBlur}
+                        onValueChange={field.onChange}
                       />
                       <span className="absolute left-3 text-gray-500">€</span>
                     </div>
@@ -244,20 +303,13 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                   </FormLabel>
                   <FormControl>
                     <div className="relative flex items-center">
-                      <Input
-                        {...field}
-                        type="number"
-                        min={0}
+                      <GermanCurrencyInput
+                        name={field.name}
+                        ref={field.ref}
                         className="pl-7"
-                        step="0.01"
-                        value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value === ""
-                              ? null
-                              : e.target.valueAsNumber,
-                          )
-                        }
+                        value={field.value}
+                        onBlur={field.onBlur}
+                        onValueChange={field.onChange}
                       />
                       <span className="absolute left-3 text-gray-500">€</span>
                     </div>

@@ -63,6 +63,20 @@ import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 
 const PRESTIGE_OWNER_VALUE = "__PRESTIGE__";
 
+const germanCurrencyFormatter = new Intl.NumberFormat("de-DE", {
+  style: "currency",
+  currency: "EUR",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const formatGermanCurrency = (value: unknown) => {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return "—";
+
+  return germanCurrencyFormatter.format(numericValue);
+};
+
 const sortByHasValue = (
   rowA: Row<ProductItem>,
   rowB: Row<ProductItem>,
@@ -846,8 +860,10 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
         />
       ) : (
         <div className="cursor-pointer" onClick={() => setEditing(true)}>
-          {product.final_price ? (
-            <div className="text-right">€{product.final_price?.toFixed(2)}</div>
+          {product.final_price !== null && product.final_price !== undefined ? (
+            <div className="text-right">
+              {formatGermanCurrency(product.final_price)}
+            </div>
           ) : (
             <div className="text-center">—</div>
           )}
@@ -939,8 +955,10 @@ function EditableCostCell({ product }: { product: ProductItem }) {
             if (!hasBundles) setEditing(true);
           }}
         >
-          {product.cost ? (
-            <div className="text-right">€{product.cost?.toFixed(2)}</div>
+          {product.cost !== null && product.cost !== undefined ? (
+            <div className="text-right">
+              {formatGermanCurrency(product.cost)}
+            </div>
           ) : (
             <div className="text-center">—</div>
           )}
@@ -1022,9 +1040,10 @@ function EditableDeliveryCostCell({ product }: { product: ProductItem }) {
         />
       ) : (
         <div className="cursor-pointer" onClick={() => setEditing(true)}>
-          {product.delivery_cost ? (
+          {product.delivery_cost !== null &&
+          product.delivery_cost !== undefined ? (
             <div className="text-right">
-              €{product.delivery_cost?.toFixed(2)}
+              {formatGermanCurrency(product.delivery_cost)}
             </div>
           ) : (
             <div className="text-center">—</div>
