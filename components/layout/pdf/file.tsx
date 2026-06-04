@@ -19,6 +19,7 @@ import {
   calculateProductVAT,
 } from "@/lib/caculate-vat";
 import { parseTaxRate } from "@/lib/parse-tax";
+import { filterInvoiceCheckouts } from "@/lib/checkout-filter";
 
 Font.register({
   family: "Roboto",
@@ -160,19 +161,23 @@ export const InvoicePDF = ({
   refundProducts = [],
 }: InvoicePDFProps) => {
   const isRefundInvoice = variant === "refund";
+  const filteredCheckoutCheckouts = useMemo(
+    () => filterInvoiceCheckouts(checkout?.checkouts),
+    [checkout?.checkouts],
+  );
+  const filteredInvoiceCheckouts = useMemo(
+    () => filterInvoiceCheckouts(invoice?.main_checkout?.checkouts),
+    [invoice?.main_checkout?.checkouts],
+  );
 
   const flattenedCartItems = useMemo(() => {
-    const checkouts = invoice?.main_checkout?.checkouts;
-    if (!checkouts) return [];
+    const checkouts =
+      filteredInvoiceCheckouts.length > 0
+        ? filteredInvoiceCheckouts
+        : filteredCheckoutCheckouts;
 
     return (
       checkouts
-        // ❌ Loại checkout có status "exchange" hoặc "cancel_exchange"
-        .filter((checkout) => {
-          const status = checkout.status?.toLowerCase();
-          return status !== "exchange" && status !== "cancel_exchange";
-        })
-
         // ✔ Flatten items
         .flatMap((checkout) => {
           // Nếu checkout.cart là array (CartResponse)
@@ -184,7 +189,7 @@ export const InvoicePDF = ({
           return checkout.cart?.items ?? [];
         })
     );
-  }, [invoice]);
+  }, [filteredCheckoutCheckouts, filteredInvoiceCheckouts]);
 
   const normalizedRefundProducts = useMemo(
     () =>
@@ -195,7 +200,8 @@ export const InvoicePDF = ({
   );
 
   const primaryCheckout =
-    checkout?.checkouts?.[0] ?? invoice?.main_checkout?.checkouts?.[0];
+    filteredCheckoutCheckouts[0] ?? filteredInvoiceCheckouts[0];
+  const primaryShippingAddress = primaryCheckout?.shipping_address;
   const useShippingAddressForInvoice =
     (
       checkout?.from_marketplace ??
@@ -215,7 +221,7 @@ export const InvoicePDF = ({
       primaryCheckout?.invoice_address?.recipient_name?.trim() ?? "";
     const taxIdFromOrder = primaryCheckout?.user?.tax_id?.trim() ?? "";
     const taxIdFromInvoice =
-      invoice?.main_checkout?.checkouts?.[0]?.user?.tax_id?.trim() ?? "";
+      filteredInvoiceCheckouts[0]?.user?.tax_id?.trim() ?? "";
     const taxId = taxIdFromOrder || taxIdFromInvoice;
 
     const shouldUseInvoiceAddressForVat =
@@ -229,14 +235,14 @@ export const InvoicePDF = ({
         : shippingCountryCode || invoiceCountryCode || "DE",
       taxId,
     };
-  }, [invoice?.main_checkout?.checkouts, primaryCheckout]);
+  }, [filteredInvoiceCheckouts, primaryCheckout]);
   const paymentTermDays = Number(invoice?.payment_term);
   const resolvedPaymentTermDays =
     Number.isFinite(paymentTermDays) && paymentTermDays > 0
       ? String(paymentTermDays)
       : "XX";
   const shipperDateRaw =
-    checkout?.checkouts?.[0]?.shipment?.shipper_date?.trim();
+    primaryCheckout?.shipment?.shipper_date?.trim();
   const hasServicePeriod = Boolean(shipperDateRaw);
   const servicePeriodValue = hasServicePeriod
     ? formatDateToNum(shipperDateRaw ?? "") || shipperDateRaw || ""
@@ -516,7 +522,7 @@ export const InvoicePDF = ({
                   : "",
               )}
             </Text>
-            <Text>{checkout?.checkouts?.[0]?.user?.tax_id ?? ""}</Text>
+            <Text>{primaryCheckout?.user?.tax_id ?? ""}</Text>
           </View>
           <View
             style={{
@@ -1059,34 +1065,30 @@ export const InvoicePDF = ({
           <Text style={{ marginBottom: 2, fontSize: 9 }}>Lieferadresse:</Text>
           <Text style={{ fontSize: 9 }}>
             {normalizeRecipientName(
-              invoice.main_checkout.checkouts?.[0]?.shipping_address
-                ?.recipient_name,
+              primaryShippingAddress?.recipient_name,
             )}
           </Text>
 
           <Text style={{ fontSize: 9 }}>
-            {checkout?.checkouts?.[0]?.shipping_address?.address_line?.trim()
-              ? checkout?.checkouts?.[0]?.shipping_address?.address_line
+            {primaryShippingAddress?.address_line?.trim()
+              ? primaryShippingAddress.address_line
               : ""}
           </Text>
           <Text style={{ fontSize: 9 }}>
-            {checkout?.checkouts?.[0]?.shipping_address?.additional_address_line?.trim()
-              ? checkout?.checkouts?.[0]?.shipping_address
-                  ?.additional_address_line
+            {primaryShippingAddress?.additional_address_line?.trim()
+              ? primaryShippingAddress.additional_address_line
               : ""}
           </Text>
           <Text style={{ fontSize: 9 }}>
-            {checkout?.checkouts?.[0]?.shipping_address?.postal_code?.trim()
-              ? checkout?.checkouts?.[0]?.shipping_address?.postal_code
+            {primaryShippingAddress?.postal_code?.trim()
+              ? primaryShippingAddress.postal_code
               : ""}{" "}
-            {checkout?.checkouts?.[0]?.shipping_address?.city?.trim()
-              ? checkout?.checkouts?.[0]?.shipping_address?.city
-              : ""}
+            {primaryShippingAddress?.city?.trim() ? primaryShippingAddress.city : ""}
           </Text>
           <Text style={{ fontSize: 9 }}>
             {getCountryName(
-              checkout?.checkouts?.[0]?.shipping_address?.country?.trim()
-                ? checkout?.checkouts?.[0]?.shipping_address?.country
+              primaryShippingAddress?.country?.trim()
+                ? primaryShippingAddress.country
                 : "",
             )}
           </Text>

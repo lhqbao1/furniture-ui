@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useDeleteCheckoutPdfFile } from "@/features/checkout/hook";
 import { CheckOutMain } from "@/types/checkout";
 import B2BInvoiceDrawer from "../../order-list/b2b-invoice-drawer";
+import { filterMainCheckoutForInvoice } from "@/lib/checkout-filter";
 
 interface DownloadInvoiceProps {
   checkoutId: string;
@@ -57,9 +58,13 @@ const DownloadInvoice = ({
   const needsGeneratedDocument = !isB2BInvoiceOrder;
   const effectiveMainCheckoutId = mainCheckoutId || checkoutId;
   const isDeletingPackageSlip = deleteCheckoutPdfFileMutation.isPending;
-  const selectedB2BOrders = React.useMemo(
-    () => (order ? [order] : []),
+  const filteredOrder = React.useMemo(
+    () => filterMainCheckoutForInvoice(order),
     [order],
+  );
+  const selectedB2BOrders = React.useMemo(
+    () => (filteredOrder ? [filteredOrder] : []),
+    [filteredOrder],
   );
 
   const { data: checkout, isLoading: isCheckoutLoading } = useQuery({
@@ -74,6 +79,22 @@ const DownloadInvoice = ({
     enabled: !!checkoutId && needsGeneratedDocument,
     retry: false,
   });
+
+  const filteredCheckout = React.useMemo(
+    () => filterMainCheckoutForInvoice(checkout),
+    [checkout],
+  );
+
+  const filteredInvoice = React.useMemo(() => {
+    if (!invoice) return undefined;
+
+    return {
+      ...invoice,
+      main_checkout:
+        filterMainCheckoutForInvoice(invoice.main_checkout) ??
+        invoice.main_checkout,
+    };
+  }, [invoice]);
 
   const { data: productRefundData, isLoading: isProductRefundLoading } =
     useQuery({
@@ -197,7 +218,12 @@ const DownloadInvoice = ({
   const renderPackageSampleDownloadButton = () => {
     if (!isPackageType) return null;
 
-    if (isCheckoutLoading || isInvoiceLoading || !checkout || !invoice) {
+    if (
+      isCheckoutLoading ||
+      isInvoiceLoading ||
+      !filteredCheckout ||
+      !filteredInvoice
+    ) {
       return (
         <Button
           variant="outline"
@@ -216,10 +242,16 @@ const DownloadInvoice = ({
       <Button variant="outline" size="sm" type="button" className="gap-1.5">
         <PDFDownloadLink
           document={
-            checkout.from_marketplace?.toLowerCase() === "bauhaus" ? (
-              <BauhausReturnSlipPdf checkout={checkout} invoice={invoice} />
+            filteredCheckout.from_marketplace?.toLowerCase() === "bauhaus" ? (
+              <BauhausReturnSlipPdf
+                checkout={filteredCheckout}
+                invoice={filteredInvoice}
+              />
             ) : (
-              <PackageSlipPdf checkout={checkout} invoice={invoice} />
+              <PackageSlipPdf
+                checkout={filteredCheckout}
+                invoice={filteredInvoice}
+              />
             )
           }
           fileName={defaultGeneratedFileName}
@@ -294,8 +326,8 @@ const DownloadInvoice = ({
       ) : isCheckoutLoading ||
         isInvoiceLoading ||
         (isRefundInvoiceType && isProductRefundLoading) ||
-        !checkout ||
-        !invoice ? (
+        !filteredCheckout ||
+        !filteredInvoice ? (
         <Button variant={"outline"} disabled>
           <Loader2 className="h-4 w-4 animate-spin" />
         </Button>
@@ -305,8 +337,8 @@ const DownloadInvoice = ({
             <PDFDownloadLink
               document={
                 <InvoicePDF
-                  checkout={checkout}
-                  invoice={invoice}
+                  checkout={filteredCheckout}
+                  invoice={filteredInvoice}
                   variant="refund"
                   refundProducts={normalizedProductRefundData}
                 />
@@ -325,7 +357,12 @@ const DownloadInvoice = ({
             </PDFDownloadLink>
           ) : (
             <PDFDownloadLink
-              document={<InvoicePDF checkout={checkout} invoice={invoice} />}
+              document={
+                <InvoicePDF
+                  checkout={filteredCheckout}
+                  invoice={filteredInvoice}
+                />
+              }
               fileName={defaultGeneratedFileName}
             >
               {({ loading }) =>

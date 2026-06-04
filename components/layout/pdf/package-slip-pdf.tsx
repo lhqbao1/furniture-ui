@@ -1,4 +1,5 @@
 import { formatDateToNum } from "@/lib/ios-to-num";
+import { filterInvoiceCheckouts } from "@/lib/checkout-filter";
 import { CheckOutMain } from "@/types/checkout";
 import { InvoiceResponse } from "@/types/invoice";
 import {
@@ -114,18 +115,18 @@ interface InvoicePDFProps {
 }
 
 export const PackageSlipPdf = ({ checkout, invoice }: InvoicePDFProps) => {
+  const filteredCheckouts = useMemo(
+    () =>
+      filterInvoiceCheckouts(
+        invoice?.main_checkout?.checkouts ?? checkout?.checkouts,
+      ),
+    [checkout?.checkouts, invoice?.main_checkout?.checkouts],
+  );
+  const firstCheckout = filteredCheckouts[0];
+
   const flattenedCartItems = useMemo(() => {
-    const checkouts = invoice?.main_checkout?.checkouts;
-    if (!checkouts) return [];
-
     return (
-      checkouts
-        // ❌ Loại checkout có status "exchange" hoặc "cancel_exchange"
-        .filter((checkout) => {
-          const status = checkout.status?.toLowerCase();
-          return status !== "exchange" && status !== "cancel_exchange";
-        })
-
+      filteredCheckouts
         // ✔ Flatten items
         .flatMap((checkout) => {
           // Nếu checkout.cart là array (CartResponse)
@@ -137,7 +138,7 @@ export const PackageSlipPdf = ({ checkout, invoice }: InvoicePDFProps) => {
           return checkout.cart?.items ?? [];
         })
     );
-  }, [invoice]);
+  }, [filteredCheckouts]);
 
   const transformCartItems = (cartItems: CartItem[]): CartItem[] => {
     return cartItems.flatMap((item) => {
@@ -184,52 +185,48 @@ export const PackageSlipPdf = ({ checkout, invoice }: InvoicePDFProps) => {
               Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
             </Text>
             <Text>
-              {checkout?.checkouts?.[0]?.user.company_name
-                ? checkout?.checkouts?.[0]?.user.company_name
-                : checkout?.checkouts?.[0]?.shipping_address?.recipient_name
-                  ? checkout?.checkouts?.[0]?.shipping_address?.recipient_name
-                  : `${checkout?.checkouts?.[0]?.user?.first_name ?? ""} ${
-                      checkout?.checkouts?.[0]?.user?.last_name ?? ""
+              {firstCheckout?.user.company_name
+                ? firstCheckout.user.company_name
+                : firstCheckout?.shipping_address?.recipient_name
+                  ? firstCheckout.shipping_address.recipient_name
+                  : `${firstCheckout?.user?.first_name ?? ""} ${
+                      firstCheckout?.user?.last_name ?? ""
                     }`}
             </Text>
 
             <Text>
-              {checkout?.checkouts?.[0]?.shipping_address?.address_line?.trim()
-                ? checkout?.checkouts?.[0]?.shipping_address?.address_line
-                : checkout?.checkouts?.[0]?.invoice_address?.address_line}
+              {firstCheckout?.shipping_address?.address_line?.trim()
+                ? firstCheckout.shipping_address.address_line
+                : firstCheckout?.invoice_address?.address_line}
             </Text>
             <Text>
-              {checkout?.checkouts?.[0]?.shipping_address?.additional_address_line?.trim()
-                ? checkout?.checkouts?.[0]?.shipping_address
-                    ?.additional_address_line
-                : checkout?.checkouts?.[0]?.invoice_address
-                    ?.additional_address_line}
+              {firstCheckout?.shipping_address?.additional_address_line?.trim()
+                ? firstCheckout.shipping_address.additional_address_line
+                : firstCheckout?.invoice_address?.additional_address_line}
             </Text>
             <Text>
-              {checkout?.checkouts?.[0]?.shipping_address?.postal_code?.trim()
-                ? checkout?.checkouts?.[0]?.shipping_address?.postal_code
-                : checkout?.checkouts?.[0]?.invoice_address?.postal_code}{" "}
-              {checkout?.checkouts?.[0]?.shipping_address?.city?.trim()
-                ? checkout?.checkouts?.[0]?.shipping_address?.city
-                : checkout?.checkouts?.[0]?.invoice_address?.city}
+              {firstCheckout?.shipping_address?.postal_code?.trim()
+                ? firstCheckout.shipping_address.postal_code
+                : firstCheckout?.invoice_address?.postal_code}{" "}
+              {firstCheckout?.shipping_address?.city?.trim()
+                ? firstCheckout.shipping_address.city
+                : firstCheckout?.invoice_address?.city}
             </Text>
             <Text>
               {getCountryName(
-                checkout?.checkouts?.[0]?.shipping_address?.country?.trim()
-                  ? checkout?.checkouts?.[0]?.shipping_address?.country
-                  : (checkout?.checkouts?.[0]?.invoice_address?.country ?? ""),
+                firstCheckout?.shipping_address?.country?.trim()
+                  ? firstCheckout.shipping_address.country
+                  : (firstCheckout?.invoice_address?.country ?? ""),
               )}
             </Text>
 
-            {checkout?.checkouts?.[0]?.shipping_address?.email ? (
-              <Text>
-                Email: {checkout?.checkouts?.[0]?.shipping_address?.email}
-              </Text>
+            {firstCheckout?.shipping_address?.email ? (
+              <Text>Email: {firstCheckout.shipping_address.email}</Text>
             ) : (
               ""
             )}
             <Text>
-              Tel: {checkout?.checkouts?.[0]?.shipping_address.phone_number}
+              Tel: {firstCheckout?.shipping_address.phone_number}
             </Text>
           </View>
           <View

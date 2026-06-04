@@ -13,6 +13,7 @@ import {
 } from "@react-pdf/renderer";
 import { useMemo } from "react";
 import { getCountryName } from "@/lib/country-name";
+import { filterInvoiceCheckouts } from "@/lib/checkout-filter";
 
 Font.register({
   family: "Roboto",
@@ -253,14 +254,11 @@ export const BauhausReturnSlipPdf = ({
   invoice,
 }: BauhausReturnSlipProps) => {
   const flattenedCartItems = useMemo(() => {
-    const checkouts =
-      invoice?.main_checkout?.checkouts ?? checkout?.checkouts ?? [];
+    const checkouts = filterInvoiceCheckouts(
+      invoice?.main_checkout?.checkouts ?? checkout?.checkouts,
+    );
 
     return checkouts
-      .filter((c) => {
-        const status = c.status?.toLowerCase();
-        return status !== "exchange" && status !== "cancel_exchange";
-      })
       .flatMap((c) => {
         if (Array.isArray(c.cart)) {
           return c.cart.flatMap((cartItem) => cartItem.items ?? []);
@@ -270,7 +268,8 @@ export const BauhausReturnSlipPdf = ({
   }, [checkout, invoice]);
 
   const firstCheckout =
-    invoice?.main_checkout?.checkouts?.[0] ?? checkout?.checkouts?.[0];
+    filterInvoiceCheckouts(invoice?.main_checkout?.checkouts)[0] ??
+    filterInvoiceCheckouts(checkout?.checkouts)[0];
   const user = firstCheckout?.user;
   const invoiceAddress = firstCheckout?.invoice_address;
   const shippingAddress = firstCheckout?.shipping_address;

@@ -16,6 +16,10 @@ import {
   normalizeB2BInvoicePartyInfo,
   resolveB2BInvoicePartyInfo,
 } from "@/lib/b2b-invoice";
+import {
+  filterInvoiceCheckouts,
+  filterMainCheckoutForInvoice,
+} from "@/lib/checkout-filter";
 
 Font.register({
   family: "Figtree",
@@ -165,14 +169,17 @@ export const B2BInvoicePDFFile = ({
   orders,
   invoicePartyInfo,
 }: B2BInvoicePDFFileProps) => {
+  const filteredOrders = orders
+    .map((order) => filterMainCheckoutForInvoice(order))
+    .filter((order): order is CheckOutMain => Boolean(order));
   const selectedMarketplace =
-    orders?.[0]?.from_marketplace?.toLowerCase() ?? "";
+    filteredOrders?.[0]?.from_marketplace?.toLowerCase() ?? "";
   const isBaderChannel = selectedMarketplace === "bader";
   const refColumnWidth = isBaderChannel ? "15%" : "12%";
   const productNameColumnWidth = isBaderChannel ? "34%" : "37%";
   const fallbackInvoicePartyInfo = resolveB2BInvoicePartyInfo({
     marketplace: selectedMarketplace,
-    order: orders?.[0],
+    order: filteredOrders?.[0],
   });
   const resolvedInvoicePartyInfo = invoicePartyInfo
     ? normalizeB2BInvoicePartyInfo(invoicePartyInfo)
@@ -209,12 +216,15 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
     ? paymentNote
     : defaultPaymentText;
   const paymentLines = resolvedPaymentNote.replace(/\r\n/g, "\n").split("\n");
-  const displayRows = orders
+  const displayRows = filteredOrders
     .flatMap((order) => {
-      const firstCheckout = order.checkouts?.[0];
-      const firstCheckoutItems = getCheckoutCartItems(firstCheckout);
+      const filteredCheckouts = filterInvoiceCheckouts(order.checkouts);
+      const orderItems = filteredCheckouts.flatMap((checkout) =>
+        getCheckoutCartItems(checkout),
+      );
+      const invoiceItems = orderItems;
 
-      if (firstCheckoutItems.length === 0) {
+      if (invoiceItems.length === 0) {
         return [
           {
             rowKey: `${order.id}-empty`,
@@ -240,7 +250,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
 
       const orderShippingGross = Number(order.total_shipping) || 0;
 
-      return firstCheckoutItems.map((item, itemIndex) => {
+      return invoiceItems.map((item, itemIndex) => {
         const quantity = Number(item?.quantity) || 1;
         const unitGross =
           Number(
@@ -284,7 +294,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
           refNumber: resolveRefNumber({
             order,
             item,
-            itemCount: firstCheckoutItems.length,
+            itemCount: invoiceItems.length,
           }),
           quantity,
           unitNet,

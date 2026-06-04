@@ -55,29 +55,10 @@ import {
   Upload,
 } from "lucide-react";
 import { StaticFile } from "@/types/products";
+import { extractInvoiceCartItemsFromMain } from "@/lib/checkout-filter";
 
 function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
-  if (!checkOutMain?.checkouts) return [];
-
-  return (
-    checkOutMain.checkouts
-      // lọc bỏ exchange + cancel_exchange
-      .filter((checkout) => {
-        const status = checkout.status?.toLowerCase();
-        return (
-          status !== "exchange" &&
-          status !== "cancel_exchange" &&
-          status !== "exchange_stock_reserved" &&
-          status !== "exchange_shipped" &&
-          status !== "exchange_preparation_shipping" &&
-          status !== "exchange_cancel_no_stock"
-        );
-      })
-      // sau đó mới lấy cart items
-      .flatMap((checkout) =>
-        checkout.cart.items.flatMap((cartGroup) => cartGroup),
-      )
-  );
+  return extractInvoiceCartItemsFromMain(checkOutMain);
 }
 
 function isImageUrl(url: string) {
