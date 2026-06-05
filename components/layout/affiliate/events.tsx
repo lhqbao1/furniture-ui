@@ -199,14 +199,14 @@ const AffiliateEventsPage = () => {
   return (
     <main className="min-h-screen bg-[#f6f8f4] px-4 py-6 text-slate-950 md:px-8">
       <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
-        <section className="overflow-hidden rounded-[2rem] border border-emerald-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
-          <div className="relative isolate overflow-hidden border-b border-emerald-100 px-6 py-8 md:px-8">
-            <div className="absolute -right-24 -top-32 -z-10 h-80 w-80 rounded-full bg-emerald-100 blur-3xl" />
+        <section className="overflow-hidden rounded-[2rem] border border-secondary/20 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
+          <div className="relative isolate overflow-hidden border-b border-secondary/20 px-6 py-8 md:px-8">
+            <div className="absolute -right-24 -top-32 -z-10 h-80 w-80 rounded-full bg-secondary/10 blur-3xl" />
             <div className="absolute right-36 top-10 -z-10 h-36 w-36 rounded-full bg-orange-100 blur-2xl" />
 
             <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
               <div className="max-w-3xl">
-                <Badge className="border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50">
+                <Badge className="border border-secondary/20 bg-secondary/10 text-secondary hover:bg-secondary/10">
                   Affiliate events
                 </Badge>
                 <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-5xl">
@@ -219,7 +219,7 @@ const AffiliateEventsPage = () => {
                 </p>
               </div>
 
-              <div className="grid gap-3 rounded-[1.6rem] border border-emerald-100 bg-white/85 p-3 shadow-[0_18px_45px_rgba(16,185,129,0.14)] backdrop-blur lg:grid-cols-[minmax(15rem,1.3fr)_minmax(11rem,1fr)_minmax(11rem,1fr)_auto]">
+              <div className="grid gap-3 rounded-[1.6rem] border border-secondary/20 bg-white/85 p-3 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur lg:grid-cols-[minmax(15rem,1.3fr)_minmax(11rem,1fr)_minmax(11rem,1fr)_auto]">
                 <div className="flex flex-col gap-2">
                   <span className="px-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                     Channel
@@ -229,8 +229,8 @@ const AffiliateEventsPage = () => {
                     onValueChange={handleAffiliateChange}
                   >
                     <SelectTrigger
-                      className="h-[4.25rem] rounded-2xl border-emerald-100 bg-white px-4 text-slate-950 shadow-sm hover:bg-emerald-50"
-                      iconColor="#047857"
+                      className="h-[4.25rem] rounded-2xl border-secondary/20 bg-white px-4 text-slate-950 shadow-sm hover:bg-secondary/10"
+                      iconColor="var(--color-secondary)"
                       placeholderColor
                     >
                       {selectedAffiliate ? (
@@ -281,7 +281,7 @@ const AffiliateEventsPage = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="mt-auto h-[4.25rem] rounded-2xl border-emerald-100 bg-white px-6 text-slate-700 shadow-sm hover:bg-emerald-50 hover:text-emerald-800"
+                  className="mt-auto h-[4.25rem] rounded-2xl border-secondary/20 bg-white px-6 text-slate-700 shadow-sm hover:bg-secondary/10 hover:text-secondary"
                   onClick={handleResetFilters}
                 >
                   <RefreshCcw className="size-4" />
@@ -420,7 +420,7 @@ const EventTab = ({
   return (
     <TabsTrigger
       value={value}
-      className="rounded-full border border-slate-200 bg-white px-4 py-2 data-[state=active]:border-emerald-200 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-800"
+      className="rounded-full border border-slate-200 bg-white px-4 py-2 data-[state=active]:border-secondary/30 data-[state=active]:bg-secondary/10 data-[state=active]:text-secondary"
     >
       {label}
       <Badge
@@ -455,7 +455,7 @@ const MetricCard = ({
             <CardTitle className="mt-2 text-3xl">{value}</CardTitle>
           )}
         </div>
-        <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-700">
+        <div className="rounded-2xl bg-secondary/10 p-3 text-secondary">
           <Icon className="size-5" />
         </div>
       </CardHeader>
@@ -636,7 +636,7 @@ const ConversionTable = ({ rows }: { rows: AffiliateConversionEvent[] }) => {
             >
               {formatMoney(row.revenue_amount)}
             </TableCell>
-            <TableCell className="text-right font-semibold text-emerald-700">
+            <TableCell className="text-right font-semibold text-secondary">
               {formatMoney(row.commission_amount)}
             </TableCell>
             <TableCell className="text-right font-medium">
@@ -686,19 +686,19 @@ const DatePickerField = ({
           <Button
             type="button"
             variant="outline"
-            className="h-[4.25rem] justify-between rounded-2xl border-emerald-100 bg-white px-4 text-left shadow-sm hover:bg-emerald-50 hover:text-emerald-900"
+            className="h-[4.25rem] justify-between rounded-2xl border-secondary/20 bg-white px-4 text-left shadow-sm hover:bg-secondary/10 hover:text-secondary"
           >
             <span className="text-lg font-semibold text-slate-950">
               {formatDateLabel(date)}
             </span>
-            <span className="rounded-xl bg-emerald-50 p-2 text-emerald-700">
+            <span className="rounded-xl bg-secondary/10 p-2 text-secondary">
               <CalendarIcon className="size-5" />
             </span>
           </Button>
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className="w-auto rounded-3xl border-emerald-100 bg-white p-2 shadow-[0_24px_70px_rgba(15,23,42,0.18)]"
+          className="w-auto rounded-3xl border-secondary/20 bg-white p-2 shadow-[0_24px_70px_rgba(15,23,42,0.18)]"
         >
           <Calendar
             mode="single"
