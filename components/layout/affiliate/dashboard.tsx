@@ -62,7 +62,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import AffiliateChannelIcon from "./affiliate-channel-icon";
-import { getAffiliateIconConfig } from "@/data/data";
 
 const emptySteps: AffiliateFunnelSteps = {
   clicks: 0,
@@ -87,7 +86,7 @@ const emptyAffiliates: AffiliateResponse[] = [];
 const affiliateOutputChartConfig = {
   clicks: {
     label: "Clicks",
-    color: "#10b981",
+    color: "var(--color-secondary)",
   },
   orders: {
     label: "Orders",
@@ -113,14 +112,14 @@ const funnelStages = [
     label: "Clicks",
     description: "Affiliate link traffic",
     icon: MousePointerClick,
-    color: "bg-emerald-500",
+    color: "bg-secondary",
   },
   {
     key: "sessions",
     label: "Sessions",
     description: "Tracked browser sessions",
     icon: Users,
-    color: "bg-teal-500",
+    color: "bg-secondary/80",
   },
   {
     key: "page_views",
@@ -266,7 +265,6 @@ const AffiliateDashboard = () => {
       .map((row) => ({
         name: row.affiliate.name || row.affiliate.code || "Affiliate",
         code: row.affiliate.code,
-        iconName: row.affiliate.name,
         clicks: row.funnel.steps.clicks,
         orders: row.funnel.steps.orders,
         conversions: row.funnel.steps.conversions,
@@ -297,14 +295,14 @@ const AffiliateDashboard = () => {
   return (
     <main className="min-h-screen bg-[#f6f8f4] px-4 py-6 text-slate-950 md:px-8">
       <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
-        <section className="overflow-hidden rounded-[2rem] border border-emerald-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
-          <div className="relative isolate overflow-hidden border-b border-emerald-100 px-6 py-8 md:px-8">
-            <div className="absolute -right-24 -top-32 -z-10 h-80 w-80 rounded-full bg-emerald-100 blur-3xl" />
+        <section className="overflow-hidden rounded-[2rem] border border-secondary/20 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
+          <div className="relative isolate overflow-hidden border-b border-secondary/20 px-6 py-8 md:px-8">
+            <div className="absolute -right-24 -top-32 -z-10 h-80 w-80 rounded-full bg-secondary/10 blur-3xl" />
             <div className="absolute right-36 top-10 -z-10 h-36 w-36 rounded-full bg-orange-100 blur-2xl" />
 
             <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
               <div className="max-w-3xl">
-                <Badge className="border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50">
+                <Badge className="border border-secondary/20 bg-secondary/10 text-secondary hover:bg-secondary/10">
                   Affiliate workspace
                 </Badge>
                 <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-5xl">
@@ -312,7 +310,7 @@ const AffiliateDashboard = () => {
                 </h1>
               </div>
 
-              <div className="grid gap-3 rounded-[1.6rem] border border-emerald-100 bg-white/85 p-3 shadow-[0_18px_45px_rgba(16,185,129,0.14)] backdrop-blur md:grid-cols-[minmax(13rem,1fr)_minmax(13rem,1fr)_auto]">
+              <div className="grid gap-3 rounded-[1.6rem] border border-secondary/20 bg-white/85 p-3 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur md:grid-cols-[minmax(13rem,1fr)_minmax(13rem,1fr)_auto]">
                 <DatePickerField
                   label="From"
                   date={fromDate}
@@ -326,7 +324,7 @@ const AffiliateDashboard = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="mt-auto h-[4.25rem] rounded-2xl border-emerald-100 bg-white px-6 text-slate-700 shadow-sm hover:bg-emerald-50 hover:text-emerald-800"
+                  className="mt-auto h-[4.25rem] rounded-2xl border-secondary/20 bg-white px-6 text-slate-700 shadow-sm hover:bg-secondary/10 hover:text-secondary"
                   onClick={handleResetFilters}
                 >
                   <RefreshCcw className="size-4" />
@@ -356,7 +354,7 @@ const AffiliateDashboard = () => {
                         </CardTitle>
                       )}
                     </div>
-                    <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-700">
+                    <div className="rounded-2xl bg-secondary/10 p-3 text-secondary">
                       <Icon className="size-5" />
                     </div>
                   </CardHeader>
@@ -493,7 +491,10 @@ const AffiliateDashboard = () => {
                       allowDecimals={false}
                     />
                     <ChartTooltip
-                      cursor={{ fill: "rgba(16, 185, 129, 0.08)" }}
+                      cursor={{
+                        fill:
+                          "color-mix(in srgb, var(--color-secondary) 8%, transparent)",
+                      }}
                       content={
                         <ChartTooltipContent
                           indicator="dot"
@@ -621,21 +622,18 @@ const AffiliateDashboard = () => {
   );
 };
 
-const AffiliateChartTick = ({ x = 0, y = 0, payload }: AffiliateChartTickProps) => {
-  const icon = getAffiliateIconConfig(payload?.value);
-
-  if (!icon.imageUrl) return null;
-
+const AffiliateChartTick = ({
+  x = 0,
+  y = 0,
+  payload,
+}: AffiliateChartTickProps) => {
   return (
     <g transform={`translate(${x},${y + 8})`}>
-      <image
-        href={icon.imageUrl}
-        x={-12}
-        y={0}
-        width={24}
-        height={24}
-        preserveAspectRatio="xMidYMid meet"
-      />
+      <foreignObject x={-14} y={0} width={28} height={28}>
+        <div className="flex h-7 w-7 items-center justify-center">
+          <AffiliateChannelIcon code={payload?.value} size="md" />
+        </div>
+      </foreignObject>
     </g>
   );
 };
@@ -680,21 +678,21 @@ const DatePickerField = ({
           <Button
             type="button"
             variant="outline"
-            className="h-[3.75rem] justify-between rounded-2xl border-emerald-100 bg-white px-4 text-left shadow-sm hover:bg-emerald-50 hover:text-emerald-900"
+            className="h-[3.75rem] justify-between rounded-2xl border-secondary/20 bg-white px-4 text-left shadow-sm hover:bg-secondary/10 hover:text-secondary"
           >
             <span className="flex flex-col gap-1">
               <span className="text-lg font-semibold text-slate-950">
                 {formatDateLabel(date)}
               </span>
             </span>
-            <span className="rounded-xl bg-emerald-50 p-2 text-emerald-700">
+            <span className="rounded-xl bg-secondary/10 p-2 text-secondary">
               <CalendarIcon className="size-5" />
             </span>
           </Button>
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className="w-auto rounded-3xl border-emerald-100 bg-white p-2 shadow-[0_24px_70px_rgba(15,23,42,0.18)]"
+          className="w-auto rounded-3xl border-secondary/20 bg-white p-2 shadow-[0_24px_70px_rgba(15,23,42,0.18)]"
         >
           <Calendar
             mode="single"
