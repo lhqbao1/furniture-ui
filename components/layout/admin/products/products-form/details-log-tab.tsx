@@ -97,7 +97,7 @@ const DetailsLogTab = ({ productId }: DetailsLogTabProps) => {
         <div className="grid grid-cols-[minmax(140px,180px)_minmax(220px,300px)_minmax(260px,1fr)_minmax(260px,1fr)_minmax(150px,190px)] gap-x-6 gap-y-2">
           <div className="font-semibold uppercase">Field:</div>
           <div className="font-semibold uppercase">User Email:</div>
-          <div className="font-semibold uppercase">Changed Value:</div>
+          <div className="font-semibold uppercase">New Value:</div>
           <div className="font-semibold uppercase">Old Value:</div>
           <div className="font-semibold uppercase">Updated At:</div>
           <div className="col-span-5 mb-1.5 border-b-2 border-gray-400" />

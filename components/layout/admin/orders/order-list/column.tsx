@@ -252,10 +252,15 @@ const buildOrderTagBadges = (order: CheckOutMain) => {
   });
 };
 
-const formatPostalCity = (postalCode?: string | null, city?: string | null) => {
+const formatPostalCityCountry = (
+  postalCode?: string | null,
+  city?: string | null,
+  country?: string | null,
+) => {
   const postal = String(postalCode ?? "").trim();
   const cityName = String(city ?? "").trim();
-  return [postal, cityName].filter(Boolean).join(" ");
+  const countryCode = String(country ?? "").trim().toUpperCase();
+  return [postal, cityName, countryCode].filter(Boolean).join(" ");
 };
 
 const getOrderCustomerEmail = (
@@ -878,9 +883,10 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
       const user = primaryCheckout?.user;
       const shippingAddress = primaryCheckout?.shipping_address;
       const invoiceAddress = primaryCheckout?.invoice_address;
-      const postalCity = formatPostalCity(
+      const postalCity = formatPostalCityCountry(
         shippingAddress?.postal_code,
         shippingAddress?.city,
+        shippingAddress?.country,
       );
       const displayName =
         shippingAddress?.recipient_name?.trim() ||
@@ -1090,9 +1096,10 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
     cell: ({ row }) => {
       const primaryCheckout = row.original.checkouts?.[0];
       const shippingAddress = primaryCheckout?.shipping_address;
-      const postalCity = formatPostalCity(
+      const postalCity = formatPostalCityCountry(
         shippingAddress?.postal_code,
         shippingAddress?.city,
+        shippingAddress?.country,
       );
       const firstName = primaryCheckout?.user?.first_name ?? "";
       const lastName = primaryCheckout?.user?.last_name ?? "";
