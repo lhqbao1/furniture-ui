@@ -81,6 +81,8 @@ export interface AffiliateOrderEvent {
   created_at: string;
   device_type: string | null;
   country: string | null;
+  id_1: string | null;
+  checkout_code: string | null;
 }
 
 export interface AffiliateClickEvent {
