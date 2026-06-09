@@ -1,6 +1,7 @@
 import { apiAdmin, apiPublic } from "@/lib/axios";
 import {
   AffiliateCreateInput,
+  AffiliateOwnerResponse,
   AffiliateResponse,
   AffiliateUpdateInput,
 } from "@/types/affiliate";
@@ -137,6 +138,7 @@ export interface AffiliateFunnelSteps {
   page_views: number;
   orders: number;
   conversions: number;
+  revenue: number;
 }
 
 export interface AffiliateFunnelConversionRates {
@@ -153,6 +155,26 @@ export interface AffiliateFunnelResponse {
 
 export async function getAffiliates() {
   const { data } = await apiAdmin.get("/affiliate/all", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return data as AffiliateResponse[];
+}
+
+export async function getAffiliateOwners() {
+  const { data } = await apiAdmin.get("/affiliate/get_all_affiliate_owner", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return data as AffiliateOwnerResponse[];
+}
+
+export async function getAffiliatesByOwner(ownerId: string) {
+  const { data } = await apiAdmin.get(`/affiliate/get_by_owner/${ownerId}`, {
     headers: {
       "Content-Type": "application/json",
     },

@@ -15,6 +15,7 @@ import {
   SignUpInput,
   forgotPassword,
   resetPassword,
+  loginAffiliate,
   loginAdmin,
   checkMailExist,
   loginOtp,
@@ -121,6 +122,12 @@ export function useSendOtp() {
 export function useSendOtpAdmin() {
   return useMutation({
     mutationFn: (username: string) => loginAdmin(username),
+  });
+}
+
+export function useSendOtpAffiliate() {
+  return useMutation({
+    mutationFn: (username: string) => loginAffiliate(username),
   });
 }
 

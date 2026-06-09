@@ -290,7 +290,7 @@ const SelectBundleComponent = ({
               key={product.id}
               className="grid grid-cols-5 gap-3 items-center border rounded-md p-2"
             >
-              <div className="flex items-center gap-3 col-span-3">
+              <div className="flex items-center gap-3 col-span-3 select-text">
                 <Image
                   src={product.static_files?.[0]?.url ?? "/product-placeholder.png"}
                   width={50}
@@ -299,7 +299,10 @@ const SelectBundleComponent = ({
                   className="rounded-sm !h-[40px] object-cover"
                   unoptimized
                 />
-                <div>
+                <div
+                  className="min-w-0 cursor-text select-text"
+                  onPointerDown={(event) => event.stopPropagation()}
+                >
                   <div className="font-medium">{product.name}</div>
                   <div className="text-xs text-muted-foreground">
                     ID: {product.id_provider ?? "-"} | SKU:{" "}

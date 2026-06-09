@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
+import { useAtomValue } from "jotai";
 import { useSearchParams } from "next/navigation";
 import {
   CalendarIcon,
@@ -23,9 +24,10 @@ import type {
 } from "@/features/affiliate/api";
 import {
   useGetAffiliateEventGroups,
-  useGetAffiliates,
+  useGetAffiliatesByOwner,
 } from "@/features/affiliate/hook";
 import type { AffiliateResponse } from "@/types/affiliate";
+import { adminIdAtom } from "@/store/auth";
 import { useRouter } from "@/src/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -125,13 +127,17 @@ const AffiliateEventsPage = () => {
   const [toDate, setToDate] = useState<Date>();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const ownerId = useAtomValue(adminIdAtom);
 
-  const affiliateQuery = useGetAffiliates();
+  const affiliateQuery = useGetAffiliatesByOwner(ownerId ?? undefined);
   const affiliates = affiliateQuery.data ?? emptyAffiliates;
   const affiliateIdFromUrl = searchParams.get("affiliate_id") ?? "";
 
   useEffect(() => {
-    if (affiliates.length === 0) return;
+    if (affiliates.length === 0) {
+      setSelectedAffiliateId("");
+      return;
+    }
 
     const urlAffiliateExists = affiliates.some(
       (affiliate) => affiliate.id === affiliateIdFromUrl,
@@ -142,9 +148,18 @@ const AffiliateEventsPage = () => {
       return;
     }
 
-    if (selectedAffiliateId) return;
+    const selectedAffiliateExists = affiliates.some(
+      (affiliate) => affiliate.id === selectedAffiliateId,
+    );
+
+    if (selectedAffiliateExists) return;
     setSelectedAffiliateId(affiliates[0].id);
   }, [affiliateIdFromUrl, affiliates, selectedAffiliateId]);
+
+  const selectedAffiliateAllowed = useMemo(
+    () => affiliates.some((affiliate) => affiliate.id === selectedAffiliateId),
+    [affiliates, selectedAffiliateId],
+  );
 
   const selectedAffiliate = useMemo(
     () =>
@@ -166,7 +181,7 @@ const AffiliateEventsPage = () => {
   const eventQueries = useGetAffiliateEventGroups(
     selectedAffiliateId,
     eventParams,
-    Boolean(selectedAffiliateId),
+    Boolean(selectedAffiliateId) && selectedAffiliateAllowed,
   );
 
   const clicks = (eventQueries[0]?.data ?? []) as AffiliateClickEvent[];

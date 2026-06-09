@@ -142,6 +142,19 @@ export async function loginAdmin(username: string) {
   return data;
 }
 
+export async function loginAffiliate(username: string) {
+  const { data } = await apiPublic.post(
+    "/login-affiliate",
+    qs.stringify({ username }),
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    },
+  );
+  return data;
+}
+
 export async function sendOtpDSP(email: string) {
   const { data } = await apiPublic.post(
     "/supplier/login",

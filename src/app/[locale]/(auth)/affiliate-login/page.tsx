@@ -16,7 +16,7 @@ const AffiliateLoginPage = () => {
   return (
     <div className="grid h-screen w-screen grid-cols-12">
       <div className="col-span-12 flex items-start justify-center lg:col-span-5 lg:items-center">
-        <LoginForm isAdmin redirectTo="/affiliate" />
+        <LoginForm isAffiliate redirectTo="/affiliate" />
       </div>
       <div className="relative hidden lg:col-span-7 lg:block">
         <Image

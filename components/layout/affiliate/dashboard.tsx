@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useAtomValue } from "jotai";
 import {
   Bar,
   BarChart,
@@ -12,6 +13,7 @@ import {
   BarChart3,
   CalendarIcon,
   CalendarDays,
+  Euro,
   Eye,
   MousePointerClick,
   RefreshCcw,
@@ -25,10 +27,11 @@ import type {
   AffiliateFunnelSteps,
 } from "@/features/affiliate/api";
 import {
-  useGetAffiliates,
+  useGetAffiliatesByOwner,
   useGetAffiliateFunnels,
 } from "@/features/affiliate/hook";
 import type { AffiliateResponse } from "@/types/affiliate";
+import { adminIdAtom } from "@/store/auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -61,6 +64,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import AffiliateChannelIcon from "./affiliate-channel-icon";
 
 const emptySteps: AffiliateFunnelSteps = {
@@ -69,6 +77,7 @@ const emptySteps: AffiliateFunnelSteps = {
   page_views: 0,
   orders: 0,
   conversions: 0,
+  revenue: 0,
 };
 
 const emptyFunnel: AffiliateFunnelResponse = {
@@ -144,6 +153,44 @@ const funnelStages = [
   },
 ] as const;
 
+const summaryCards = [
+  {
+    key: "clicks",
+    label: "Clicks",
+    description: "Affiliate link traffic",
+    icon: MousePointerClick,
+    format: "number",
+  },
+  {
+    key: "sessions",
+    label: "Sessions",
+    description: "Tracked browser sessions",
+    icon: Users,
+    format: "number",
+  },
+  {
+    key: "page_views",
+    label: "Page views",
+    description: "Tracked page visits",
+    icon: Eye,
+    format: "number",
+  },
+  {
+    key: "revenue",
+    label: "Revenue",
+    description: "Total affiliate revenue",
+    icon: Euro,
+    format: "money",
+  },
+  {
+    key: "conversions",
+    label: "Conversions",
+    description: "Completed checkouts",
+    icon: Target,
+    format: "number",
+  },
+] as const;
+
 type AffiliateDashboardRow = {
   affiliate: AffiliateResponse;
   funnel: AffiliateFunnelResponse;
@@ -151,6 +198,13 @@ type AffiliateDashboardRow = {
 
 const formatNumber = (value: number) => {
   return new Intl.NumberFormat("de-DE").format(value || 0);
+};
+
+const formatMoney = (value: number) => {
+  return new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+  }).format(value || 0);
 };
 
 const padDatePart = (value: number) => value.toString().padStart(2, "0");
@@ -194,6 +248,7 @@ const normalizeFunnel = (
       page_views: funnel?.steps?.page_views ?? 0,
       orders: funnel?.steps?.orders ?? 0,
       conversions: funnel?.steps?.conversions ?? 0,
+      revenue: funnel?.steps?.revenue ?? 0,
     },
     conversion_rates: {
       click_to_session: funnel?.conversion_rates?.click_to_session ?? 0,
@@ -212,6 +267,7 @@ const sumSteps = (rows: AffiliateDashboardRow[]): AffiliateFunnelSteps => {
       page_views: acc.page_views + row.funnel.steps.page_views,
       orders: acc.orders + row.funnel.steps.orders,
       conversions: acc.conversions + row.funnel.steps.conversions,
+      revenue: acc.revenue + row.funnel.steps.revenue,
     }),
     { ...emptySteps },
   );
@@ -220,8 +276,9 @@ const sumSteps = (rows: AffiliateDashboardRow[]): AffiliateFunnelSteps => {
 const AffiliateDashboard = () => {
   const [fromDate, setFromDate] = useState<Date>();
   const [toDate, setToDate] = useState<Date>();
+  const ownerId = useAtomValue(adminIdAtom);
 
-  const affiliateQuery = useGetAffiliates();
+  const affiliateQuery = useGetAffiliatesByOwner(ownerId ?? undefined);
   const affiliates = affiliateQuery.data ?? emptyAffiliates;
   const affiliateIds = useMemo(
     () => affiliates.map((affiliate) => affiliate.id).filter(Boolean),
@@ -335,8 +392,9 @@ const AffiliateDashboard = () => {
           </div>
 
           <div className="grid gap-4 p-6 md:grid-cols-2 md:p-8 xl:grid-cols-5">
-            {funnelStages.map((stage) => {
+            {summaryCards.map((stage) => {
               const Icon = stage.icon;
+              const value = totals[stage.key];
 
               return (
                 <Card
@@ -350,7 +408,9 @@ const AffiliateDashboard = () => {
                         <Skeleton className="mt-2 h-8 w-24" />
                       ) : (
                         <CardTitle className="mt-2 text-3xl">
-                          {formatNumber(totals[stage.key])}
+                          {stage.format === "money"
+                            ? formatMoney(value)
+                            : formatNumber(value)}
                         </CardTitle>
                       )}
                     </div>
@@ -561,8 +621,18 @@ const AffiliateDashboard = () => {
                       <TableHead className="text-right">Clicks</TableHead>
                       <TableHead className="text-right">Sessions</TableHead>
                       <TableHead className="text-right">Page views</TableHead>
-                      <TableHead className="text-right">Orders</TableHead>
+                      <TableHead className="text-right">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="cursor-help">Orders</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Orders include both paid and unpaid orders.
+                          </TooltipContent>
+                        </Tooltip>
+                      </TableHead>
                       <TableHead className="text-right">Conversions</TableHead>
+                      <TableHead className="text-right">Revenue</TableHead>
                       <TableHead className="text-right">
                         View to order
                       </TableHead>
@@ -602,6 +672,9 @@ const AffiliateDashboard = () => {
                           <NumberCell value={row.funnel.steps.page_views} />
                           <NumberCell value={row.funnel.steps.orders} />
                           <NumberCell value={row.funnel.steps.conversions} />
+                          <TableCell className="text-right font-medium">
+                            {formatMoney(row.funnel.steps.revenue)}
+                          </TableCell>
                           <TableCell className="text-right font-medium">
                             {formatRate(
                               row.funnel.conversion_rates.view_to_order,

@@ -27,6 +27,35 @@ interface DownloadInvoiceProps {
   mainCheckoutId?: string;
 }
 
+const getUploadedFileNameFromUrl = (url: string) => {
+  const parseLastPathSegment = (value: string) => {
+    const fileName = value.split("/").filter(Boolean).pop() ?? "";
+
+    try {
+      return decodeURIComponent(fileName);
+    } catch {
+      return fileName;
+    }
+  };
+
+  try {
+    return parseLastPathSegment(new URL(url).pathname);
+  } catch {
+    return parseLastPathSegment(url.split("?")[0]?.split("#")[0] ?? "");
+  }
+};
+
+const ensurePdfFileName = (fileName: string, fallbackFileName: string) => {
+  const normalizedFileName = (fileName.trim() || fallbackFileName).replace(
+    /[\\/:*?"<>|]/g,
+    "-",
+  );
+
+  return /\.pdf$/i.test(normalizedFileName)
+    ? normalizedFileName
+    : `${normalizedFileName}.pdf`;
+};
+
 const DownloadInvoice = ({
   checkoutId,
   type,
@@ -132,19 +161,25 @@ const DownloadInvoice = ({
   ) => {
     try {
       const response = await fetch(url, { mode: "cors" });
+      if (!response.ok) throw new Error("Failed to download file");
+
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = blobUrl;
       const suffix = typeof fileIndex === "number" ? `-${fileIndex + 1}` : "";
-      a.download = `package-slip-${effectiveMainCheckoutId}${suffix}.pdf`;
+      const fallbackFileName = `package-slip-${effectiveMainCheckoutId}${suffix}.pdf`;
+      a.download = ensurePdfFileName(
+        getUploadedFileNameFromUrl(url),
+        fallbackFileName,
+      );
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(blobUrl);
     } catch {
-      toast.error("Failed to download invoice PDF");
+      toast.error("Failed to download pack slip PDF");
     }
   };
 

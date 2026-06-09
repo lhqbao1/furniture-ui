@@ -17,6 +17,7 @@ import {
   useCheckMailExist,
   useLogin,
   useLoginOtp,
+  useSendOtpAffiliate,
   useSendOtp,
   useSendOtpAdmin,
 } from "@/features/auth/hook";
@@ -33,11 +34,13 @@ import { adminIdAtom, userIdAtom } from "@/store/auth";
 
 interface LoginFormProps {
   isAdmin?: boolean;
+  isAffiliate?: boolean;
   redirectTo?: string;
 }
 
 export default function LoginForm({
   isAdmin = false,
+  isAffiliate = false,
   redirectTo,
 }: LoginFormProps) {
   const [userId, setUserId] = useAtom(userIdAtom);
@@ -81,13 +84,15 @@ export default function LoginForm({
   }, [seePassword, canResend]);
 
   const loginAdminMutation = useSendOtpAdmin();
+  const loginAffiliateMutation = useSendOtpAffiliate();
   const syncLocalCartMutation = useSyncLocalCart();
   const sendOtpMutation = useSendOtp();
   const submitOtpMutation = useLoginOtp();
   const checkMailExistMutation = useCheckMailExist();
+  const isAdminOrAffiliate = isAdmin || isAffiliate;
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    if (!seePassword && !isAdmin) {
+    if (!seePassword && !isAdminOrAffiliate) {
       checkMailExistMutation.mutate(values.username, {
         onSuccess: (data) => {
           if (data === true) {
@@ -108,8 +113,12 @@ export default function LoginForm({
           console.log(error);
         },
       });
-    } else if (isAdmin && !seePassword) {
-      loginAdminMutation.mutate(values.username, {
+    } else if (isAdminOrAffiliate && !seePassword) {
+      const loginMutation = isAffiliate
+        ? loginAffiliateMutation
+        : loginAdminMutation;
+
+      loginMutation.mutate(values.username, {
         onSuccess: () => {
           toast.success(t("sendedEmail"));
           setSeePassword(true);
@@ -118,7 +127,7 @@ export default function LoginForm({
           toast.error(t("invalidEmail"));
         },
       });
-    } else if (seePassword && !isAdmin) {
+    } else if (seePassword && !isAdminOrAffiliate) {
       submitOtpMutation.mutate(
         {
           email: values.username,
@@ -142,7 +151,7 @@ export default function LoginForm({
           },
         },
       );
-    } else if (seePassword && isAdmin) {
+    } else if (seePassword && isAdminOrAffiliate) {
       submitOtpMutation.mutate(
         {
           email: values.username,
@@ -170,7 +179,7 @@ export default function LoginForm({
   const handleAutoSubmitOtp = (code: string) => {
     if (code.length !== 6) return;
 
-    if (!isAdmin) {
+    if (!isAdminOrAffiliate) {
       submitOtpMutation.mutate(
         {
           email: form.getValues("username"),
