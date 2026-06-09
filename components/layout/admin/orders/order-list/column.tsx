@@ -600,6 +600,7 @@ const ActionCellChild = ({
   checkout,
   items,
   checkoutId,
+  checkoutMainCode,
   isSupplier = false,
   expandedRowId,
   setExpandedRowId,
@@ -611,6 +612,7 @@ const ActionCellChild = ({
   checkout: CheckOut;
   items: CartItem[];
   checkoutId: string;
+  checkoutMainCode?: string | null;
   isSupplier?: boolean;
   expandedRowId?: string | null;
   setExpandedRowId?: (id: string | null) => void;
@@ -676,9 +678,14 @@ const ActionCellChild = ({
 
   const handleDownloadXml = () => {
     const marketplace = (checkout?.from_marketplace ?? "").toLowerCase();
-    const userName =
-      `${checkout?.user?.first_name ?? ""} ${checkout?.user?.last_name ?? ""}`.trim();
+    const orderReference =
+      checkoutMainCode?.trim() ||
+      checkout?.checkout_code ||
+      checkout?.shipment?.ship_code ||
+      "";
     const shippingAddress = checkout?.shipping_address;
+    const customerName = shippingAddress?.recipient_name ?? "";
+    const warehouseName = checkout?.ware_house ?? "";
     const positions = normalizedItems;
 
     const positionsXml = positions
@@ -718,10 +725,10 @@ const ActionCellChild = ({
       "<Lieferauftrag>",
       "    <Kopfdaten>",
       "        <Mandant>243</Mandant>",
-      `        <Auftrag>${escapeXml(checkout?.shipment?.ship_code ?? "")}</Auftrag>`,
-      "        <Lager>Amm GmbH</Lager>",
+      `        <Auftrag>${escapeXml(orderReference)}</Auftrag>`,
+      `        <Lager>${escapeXml(warehouseName)}</Lager>`,
       `        <Auftraggeber>${escapeXml(marketplace)}</Auftraggeber>`,
-      `        <Kunde>${escapeXml(userName)}</Kunde>`,
+      `        <Kunde>${escapeXml(customerName)}</Kunde>`,
       `        <Versandname1>${escapeXml(shippingAddress?.recipient_name ?? "")}</Versandname1>`,
       "        <Versandname2/>",
       `        <Versandstrasse>${escapeXml(shippingAddress?.address_line ?? "")}</Versandstrasse>`,
@@ -1248,7 +1255,9 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
   },
 ];
 
-export const orderChildColumns: ColumnDef<CheckOut>[] = [
+export const getOrderChildColumns = (
+  checkoutMainCode?: string | null,
+): ColumnDef<CheckOut>[] => [
   {
     accessorKey: "id",
     header: "DELIVERY ORDER ID",
@@ -1418,6 +1427,7 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
       <ActionCellChild
         checkout={row.original}
         checkoutId={row.original.id}
+        checkoutMainCode={checkoutMainCode}
         items={row.original.cart.items}
         expandedRowId={table.options.meta?.expandedRowId || null}
         setExpandedRowId={table.options.meta?.setExpandedRowId || (() => {})}
@@ -1429,3 +1439,5 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     ),
   },
 ];
+
+export const orderChildColumns = getOrderChildColumns();

@@ -4,7 +4,7 @@ import React from "react";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import { CheckOut, CheckOutMain } from "@/types/checkout";
 import { CartItem } from "@/types/cart";
-import { orderChildColumns } from "./column";
+import { getOrderChildColumns } from "./column";
 import { orderListExpandColumns } from "./product-columns";
 import { ProductItem } from "@/types/products";
 import { cn } from "@/lib/utils";
@@ -172,6 +172,10 @@ const OrderExpandTable = ({ row }: { row: { original: CheckOutMain } }) => {
   const deliveryOrders: CheckOut[] = Array.isArray(checkout.checkouts)
     ? checkout.checkouts
     : [];
+  const deliveryOrderColumns = React.useMemo(
+    () => getOrderChildColumns(checkout.checkout_code),
+    [checkout.checkout_code],
+  );
 
   const incomingByProduct = React.useMemo(
     () =>
@@ -270,7 +274,7 @@ const OrderExpandTable = ({ row }: { row: { original: CheckOutMain } }) => {
       <div className="mt-4">
         <ProductTable<CheckOut, unknown>
           data={deliveryOrders}
-          columns={orderChildColumns}
+          columns={deliveryOrderColumns}
           page={1}
           pageSize={100}
           setPage={() => {}}
