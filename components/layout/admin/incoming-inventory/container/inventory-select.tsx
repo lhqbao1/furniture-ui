@@ -101,8 +101,10 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
   const updateStockMutation = useUpdateProductStockFromInventoryPo();
   const editProductMutation = useEditProduct();
   const productDetailsCacheRef = React.useRef<Record<string, ProductItem>>({});
-  const skipBlurCostSyncRef = React.useRef<Record<string, boolean>>({});
   const [syncingCostByProductId, setSyncingCostByProductId] = useState<
+    Record<string, boolean>
+  >({});
+  const [syncingInventoryCostById, setSyncingInventoryCostById] = useState<
     Record<string, boolean>
   >({});
 
@@ -438,6 +440,72 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
     [editProductMutation, getProductDetailsForCostUpdate, items, syncingCostByProductId],
   );
 
+  const handleUpdateInventoryCost = React.useCallback(
+    async (index: number) => {
+      const item = items[index];
+
+      if (!item?.inventory_po_id || !item.product_id) {
+        toast.error("Save this inventory item before updating its cost.");
+        return;
+      }
+
+      const nextCost = Number(item.unit_cost);
+      if (!Number.isFinite(nextCost) || nextCost <= 0) {
+        toast.error("Unit cost must be greater than 0.");
+        return;
+      }
+
+      if (syncingInventoryCostById[item.inventory_po_id]) return;
+
+      setSyncingInventoryCostById((prev) => ({
+        ...prev,
+        [item.inventory_po_id!]: true,
+      }));
+      const toastId = toast.loading("Updating inventory cost...");
+
+      try {
+        await updateInventoryPo(item.inventory_po_id, {
+          container_id: containerId,
+          product_id: item.product_id,
+          quantity: item.quantity,
+          unit_cost: nextCost,
+          total_cost: item.total_cost,
+          description: item.description,
+        });
+
+        setItems((prev) =>
+          prev.map((entry, itemIndex) =>
+            itemIndex === index
+              ? {
+                  ...entry,
+                  original: {
+                    quantity: entry.quantity,
+                    unit_cost: entry.unit_cost,
+                    total_cost: entry.total_cost,
+                    description: entry.description ?? "",
+                  },
+                }
+              : entry,
+          ),
+        );
+
+        toast.success("Inventory cost updated", { id: toastId });
+      } catch {
+        toast.error("Failed to update inventory cost", {
+          id: toastId,
+          description: "Please try again.",
+        });
+      } finally {
+        setSyncingInventoryCostById((prev) => {
+          const next = { ...prev };
+          delete next[item.inventory_po_id!];
+          return next;
+        });
+      }
+    },
+    [containerId, items, syncingInventoryCostById],
+  );
+
   const handleOpenConfirmStock = (index: number) => {
     const item = items[index];
     if (!item || !item.inventory_po_id) {
@@ -604,7 +672,6 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                 <th className="p-2">Qty</th>
                 <th className="p-2">Unit cost</th>
                 <th className="p-2">Total</th>
-                <th className="p-2">Actions</th>
               </tr>
             </thead>
 
@@ -675,8 +742,17 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                         value={item.unit_cost}
                         disabled={
                           !item.isEditing ||
-                          (!!item.product_id && syncingCostByProductId[item.product_id])
+                          (!!item.product_id &&
+                            syncingCostByProductId[item.product_id]) ||
+                          (!!item.inventory_po_id &&
+                            syncingInventoryCostById[item.inventory_po_id])
                         }
+                        onKeyDown={(e) => {
+                          if (e.key !== "Enter") return;
+
+                          e.preventDefault();
+                          void handleUpdateInventoryCost(index);
+                        }}
                         onChange={(e) => {
                           const unit_cost = Number(e.target.value);
                           setItems((prev) =>
@@ -692,20 +768,6 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                             ),
                           );
                         }}
-                        onBlur={async () => {
-                          if (!item.product_id) return;
-                          if (skipBlurCostSyncRef.current[item.product_id]) {
-                            skipBlurCostSyncRef.current[item.product_id] = false;
-                            return;
-                          }
-                          await handleSyncProductCost(index);
-                        }}
-                        onKeyDown={async (e) => {
-                          if (e.key !== "Enter" || !item.product_id) return;
-                          e.preventDefault();
-                          skipBlurCostSyncRef.current[item.product_id] = true;
-                          await handleSyncProductCost(index);
-                        }}
                       />
                     </td>
 
@@ -714,38 +776,6 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                         style: "currency",
                         currency: "EUR",
                       })}
-                    </td>
-
-                    <td className="p-2 text-right flex justify-end gap-1 h-full">
-                      {/* EDIT */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() =>
-                          setItems((prev) =>
-                            prev.map((p, i) =>
-                              i === index
-                                ? { ...p, isEditing: !p.isEditing }
-                                : p,
-                            ),
-                          )
-                        }
-                      >
-                        {item.isEditing ? (
-                          <PencilOffIcon className="h-4 w-4 text-primary" />
-                        ) : (
-                          <Pencil className="h-4 w-4 text-primary" />
-                        )}
-                      </Button>
-
-                      {/* DELETE */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteItem(item, index)}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
                     </td>
                   </tr>
 
@@ -756,7 +786,76 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                         : "bg-muted/20 border-t"
                     }
                   >
-                    <td colSpan={5} className="px-2 py-2">
+                    <td colSpan={4} className="px-3 py-2">
+                      <div className="flex items-center justify-end gap-2">
+                        {(item.costSyncPending ||
+                          (!!item.product_id &&
+                            syncingCostByProductId[item.product_id])) && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 whitespace-nowrap px-3"
+                            disabled={
+                              !item.isEditing ||
+                              !item.product_id ||
+                              (!!item.product_id &&
+                                syncingCostByProductId[item.product_id])
+                            }
+                            onClick={() => void handleSyncProductCost(index)}
+                          >
+                            {item.product_id &&
+                            syncingCostByProductId[item.product_id] ? (
+                              <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                            )}
+                            Update product cost
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={
+                            item.isEditing ? "Stop editing item" : "Edit item"
+                          }
+                          onClick={() =>
+                            setItems((prev) =>
+                              prev.map((p, i) =>
+                                i === index
+                                  ? { ...p, isEditing: !p.isEditing }
+                                  : p,
+                              ),
+                            )
+                          }
+                        >
+                          {item.isEditing ? (
+                            <PencilOffIcon className="h-4 w-4 text-primary" />
+                          ) : (
+                            <Pencil className="h-4 w-4 text-primary" />
+                          )}
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Delete item"
+                          onClick={() => handleDeleteItem(item, index)}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr
+                    className={
+                      item.updated_stock === true
+                        ? "bg-emerald-50/40 border-t"
+                        : "bg-muted/20 border-t"
+                    }
+                  >
+                    <td colSpan={4} className="px-2 py-2">
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 text-sm">
                           <span className="font-medium text-muted-foreground">
@@ -797,7 +896,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                         : "bg-muted/40"
                     }
                   >
-                    <td colSpan={5} className="p-2 pt-0">
+                    <td colSpan={4} className="p-2 pt-0">
                       <textarea
                         className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm
              focus:outline-none focus:ring-2 focus:ring-ring
