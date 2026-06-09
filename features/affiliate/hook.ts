@@ -11,8 +11,10 @@ import {
   generateAffiliateLink,
   GenerateAffiliateLinkInput,
   getAffiliateById,
+  getAffiliatesByOwner,
   getAffiliateEvents,
   getAffiliateFunnel,
+  getAffiliateOwners,
   getAffiliates,
   AffiliateEventType,
   GetAffiliateEventsParams,
@@ -32,6 +34,24 @@ export function useGetAffiliates(enabled = true) {
     queryKey: ["affiliates"],
     queryFn: getAffiliates,
     enabled,
+    retry: false,
+  });
+}
+
+export function useGetAffiliateOwners(enabled = true) {
+  return useQuery({
+    queryKey: ["affiliate-owners"],
+    queryFn: getAffiliateOwners,
+    enabled,
+    retry: false,
+  });
+}
+
+export function useGetAffiliatesByOwner(ownerId?: string, enabled = true) {
+  return useQuery({
+    queryKey: ["affiliates-by-owner", ownerId ?? null],
+    queryFn: () => getAffiliatesByOwner(ownerId!),
+    enabled: Boolean(ownerId) && enabled,
     retry: false,
   });
 }

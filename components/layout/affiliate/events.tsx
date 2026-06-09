@@ -2,6 +2,8 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
+import { useAtomValue } from "jotai";
+import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import {
   CalendarIcon,
@@ -23,10 +25,12 @@ import type {
 } from "@/features/affiliate/api";
 import {
   useGetAffiliateEventGroups,
-  useGetAffiliates,
+  useGetAffiliatesByOwner,
 } from "@/features/affiliate/hook";
 import type { AffiliateResponse } from "@/types/affiliate";
+import { adminIdAtom } from "@/store/auth";
 import { useRouter } from "@/src/i18n/navigation";
+import { useGetUserByIdAdmin } from "@/features/users/hook";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -125,13 +129,20 @@ const AffiliateEventsPage = () => {
   const [toDate, setToDate] = useState<Date>();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const locale = useLocale();
+  const ownerId = useAtomValue(adminIdAtom);
 
-  const affiliateQuery = useGetAffiliates();
+  const affiliateQuery = useGetAffiliatesByOwner(ownerId ?? undefined);
+  const currentUserQuery = useGetUserByIdAdmin(ownerId ?? "");
   const affiliates = affiliateQuery.data ?? emptyAffiliates;
+  const isCurrentUserAdmin = currentUserQuery.data?.is_admin === true;
   const affiliateIdFromUrl = searchParams.get("affiliate_id") ?? "";
 
   useEffect(() => {
-    if (affiliates.length === 0) return;
+    if (affiliates.length === 0) {
+      setSelectedAffiliateId("");
+      return;
+    }
 
     const urlAffiliateExists = affiliates.some(
       (affiliate) => affiliate.id === affiliateIdFromUrl,
@@ -142,9 +153,18 @@ const AffiliateEventsPage = () => {
       return;
     }
 
-    if (selectedAffiliateId) return;
+    const selectedAffiliateExists = affiliates.some(
+      (affiliate) => affiliate.id === selectedAffiliateId,
+    );
+
+    if (selectedAffiliateExists) return;
     setSelectedAffiliateId(affiliates[0].id);
   }, [affiliateIdFromUrl, affiliates, selectedAffiliateId]);
+
+  const selectedAffiliateAllowed = useMemo(
+    () => affiliates.some((affiliate) => affiliate.id === selectedAffiliateId),
+    [affiliates, selectedAffiliateId],
+  );
 
   const selectedAffiliate = useMemo(
     () =>
@@ -166,7 +186,7 @@ const AffiliateEventsPage = () => {
   const eventQueries = useGetAffiliateEventGroups(
     selectedAffiliateId,
     eventParams,
-    Boolean(selectedAffiliateId),
+    Boolean(selectedAffiliateId) && selectedAffiliateAllowed,
   );
 
   const clicks = (eventQueries[0]?.data ?? []) as AffiliateClickEvent[];
@@ -364,7 +384,7 @@ const AffiliateEventsPage = () => {
               <TableSkeleton />
             ) : (
               <Tabs defaultValue="click">
-                <TabsList className="mb-4 flex-wrap gap-2 border-b-0">
+                <TabsList className="mb-4 grid h-auto grid-cols-2 gap-2 border-b-0 sm:flex sm:flex-wrap">
                   <EventTab value="click" label="Clicks" count={clicks.length} />
                   <EventTab
                     value="page_view"
@@ -394,7 +414,11 @@ const AffiliateEventsPage = () => {
                   <SessionTable rows={sessions} />
                 </TabsContent>
                 <TabsContent value="order">
-                  <OrderTable rows={orders} />
+                  <OrderTable
+                    rows={orders}
+                    canOpenCheckout={isCurrentUserAdmin}
+                    locale={locale}
+                  />
                 </TabsContent>
                 <TabsContent value="conversion">
                   <ConversionTable rows={conversions} />
@@ -568,7 +592,15 @@ const SessionTable = ({ rows }: { rows: AffiliateSessionEvent[] }) => {
   );
 };
 
-const OrderTable = ({ rows }: { rows: AffiliateOrderEvent[] }) => {
+const OrderTable = ({
+  rows,
+  canOpenCheckout,
+  locale,
+}: {
+  rows: AffiliateOrderEvent[];
+  canOpenCheckout: boolean;
+  locale: string;
+}) => {
   if (!rows.length) return <EmptyState label="No order events found." />;
 
   return (
@@ -597,7 +629,20 @@ const OrderTable = ({ rows }: { rows: AffiliateOrderEvent[] }) => {
             </TableCell>
             <TableCell>{getText(row.device_type)}</TableCell>
             <TableCell>{getText(row.country)}</TableCell>
-            <TableCell className="font-mono text-xs">{row.id}</TableCell>
+            <TableCell className="font-mono text-xs">
+              {canOpenCheckout && row.id_1 ? (
+                <a
+                  href={`/${locale}/admin/orders/${row.id_1}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-semibold text-secondary underline-offset-4 hover:underline"
+                >
+                  {getText(row.checkout_code)}
+                </a>
+              ) : (
+                getText(row.checkout_code)
+              )}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -619,7 +664,6 @@ const ConversionTable = ({ rows }: { rows: AffiliateConversionEvent[] }) => {
           <TableHead className="text-right">Revenue</TableHead>
           <TableHead className="text-right">Commission</TableHead>
           <TableHead className="text-right">Rate</TableHead>
-          <TableHead>Conversion ID</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -641,9 +685,6 @@ const ConversionTable = ({ rows }: { rows: AffiliateConversionEvent[] }) => {
             </TableCell>
             <TableCell className="text-right font-medium">
               {row.commission_rate}%
-            </TableCell>
-            <TableCell className="font-mono text-xs">
-              {row.id}
             </TableCell>
           </TableRow>
         ))}
