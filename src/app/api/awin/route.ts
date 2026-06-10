@@ -63,10 +63,7 @@ export async function GET() {
               .join(", ") || "";
           const stock = calculateAvailableStock(p);
           const brandName = p.brand?.name ?? "Prestige Home";
-          const productUrl =
-            brandName.toLowerCase() === "econelo"
-              ? `https://econelo.de/produkt/${p.url_key}?utm_source=AWIN&aff=Q70yam8MNR`
-              : `https://prestige-home.de/de/product/${p.url_key}?utm_source=AWIN&aff=Q70yam8MNR`;
+          const productUrl = `https://prestige-home.de/de/product/${p.url_key}?utm_source=AWIN&aff=Q70yam8MNR`;
 
           return [
             `
