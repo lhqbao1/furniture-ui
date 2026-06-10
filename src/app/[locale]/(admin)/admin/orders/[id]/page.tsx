@@ -990,10 +990,7 @@ const OrderDetails = () => {
             Delivery orders
           </h3>
         </div>
-        <OrderDeliveryOrder
-          data={order.checkouts}
-          checkoutMainCode={order.checkout_code}
-        />
+        <OrderDeliveryOrder data={order.checkouts} />
       </section>
     </div>
   );

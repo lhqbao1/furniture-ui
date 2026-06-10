@@ -600,7 +600,6 @@ const ActionCellChild = ({
   checkout,
   items,
   checkoutId,
-  checkoutMainCode,
   isSupplier = false,
   expandedRowId,
   setExpandedRowId,
@@ -612,7 +611,6 @@ const ActionCellChild = ({
   checkout: CheckOut;
   items: CartItem[];
   checkoutId: string;
-  checkoutMainCode?: string | null;
   isSupplier?: boolean;
   expandedRowId?: string | null;
   setExpandedRowId?: (id: string | null) => void;
@@ -678,11 +676,7 @@ const ActionCellChild = ({
 
   const handleDownloadXml = () => {
     const marketplace = (checkout?.from_marketplace ?? "").toLowerCase();
-    const orderReference =
-      checkoutMainCode?.trim() ||
-      checkout?.checkout_code ||
-      checkout?.shipment?.ship_code ||
-      "";
+    const orderReference = checkout?.shipment?.ship_code ?? "";
     const shippingAddress = checkout?.shipping_address;
     const customerName = shippingAddress?.recipient_name ?? "";
     const warehouseName = checkout?.ware_house ?? "";
@@ -1255,9 +1249,7 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
   },
 ];
 
-export const getOrderChildColumns = (
-  checkoutMainCode?: string | null,
-): ColumnDef<CheckOut>[] => [
+export const orderChildColumns: ColumnDef<CheckOut>[] = [
   {
     accessorKey: "id",
     header: "DELIVERY ORDER ID",
@@ -1427,7 +1419,6 @@ export const getOrderChildColumns = (
       <ActionCellChild
         checkout={row.original}
         checkoutId={row.original.id}
-        checkoutMainCode={checkoutMainCode}
         items={row.original.cart.items}
         expandedRowId={table.options.meta?.expandedRowId || null}
         setExpandedRowId={table.options.meta?.setExpandedRowId || (() => {})}
@@ -1439,5 +1430,3 @@ export const getOrderChildColumns = (
     ),
   },
 ];
-
-export const orderChildColumns = getOrderChildColumns();
