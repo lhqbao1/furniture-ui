@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { ProductTable } from "../../products/products-list/product-table";
 import { CheckOut, CheckOutShipmentProductReturn } from "@/types/checkout";
-import { getOrderChildColumns } from "../order-list/column";
+import { orderChildColumns } from "../order-list/column";
 import { ColumnDef } from "@tanstack/react-table";
 import { formatDateTimeString } from "@/lib/date-formated";
 import { CartItem } from "@/types/cart";
@@ -61,7 +61,6 @@ const shipmentProductColumns: ColumnDef<ShipmentProductRow>[] = [
 
 interface OrderDeliveryOrderProps {
   data: CheckOut[];
-  checkoutMainCode?: string | null;
 }
 
 const shipmentProductReturnColumns: ColumnDef<CheckOutShipmentProductReturn>[] =
@@ -103,16 +102,9 @@ const shipmentProductReturnColumns: ColumnDef<CheckOutShipmentProductReturn>[] =
     },
   ];
 
-const OrderDeliveryOrder = ({
-  data,
-  checkoutMainCode,
-}: OrderDeliveryOrderProps) => {
+const OrderDeliveryOrder = ({ data }: OrderDeliveryOrderProps) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(100);
-  const deliveryOrderColumns = React.useMemo(
-    () => getOrderChildColumns(checkoutMainCode),
-    [checkoutMainCode],
-  );
 
   const transformCartItems = useCallback(
     (checkout: CheckOut): ShipmentProductRow[] => {
@@ -206,7 +198,7 @@ const OrderDeliveryOrder = ({
     <ProductTable
       hasHeaderBackGround
       data={data ? data : []}
-      columns={deliveryOrderColumns}
+      columns={orderChildColumns}
       page={page}
       setPage={setPage}
       pageSize={pageSize}
