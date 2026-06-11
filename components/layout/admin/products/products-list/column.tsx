@@ -1690,7 +1690,6 @@ function ActionsCell({ product }: { product: ProductItem }) {
           <HoverCardContent className="w-80 rounded-2xl border border-slate-200 bg-white p-0 text-slate-950 shadow-2xl">
             <div className="border-b border-slate-100 px-4 py-3">
               <div className="text-sm font-semibold">Product note</div>
-              <div className="text-xs text-slate-500">Note</div>
             </div>
             <div className="p-4">
               {noteText ? (
