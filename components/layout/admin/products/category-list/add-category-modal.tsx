@@ -263,7 +263,7 @@ export default function AddCategoryDrawer({
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent
-                        className="w-[420px] max-w-[calc(92vw-2rem)] p-0 z-[80]"
+                        className="w-[420px] max-w-[calc(92vw-2rem)] p-0 z-[80] pointer-events-auto"
                         align="start"
                       >
                         {isLoading ? (
@@ -275,9 +275,17 @@ export default function AddCategoryDrawer({
                             Error loading categories
                           </div>
                         ) : (
-                          <Command>
+                          <Command className="w-full">
                             <CommandInput placeholder="Search categories..." />
-                            <CommandList className="max-h-[320px]">
+                            <CommandList
+                              className="max-h-[320px] overflow-y-auto overscroll-contain touch-pan-y"
+                              onWheelCapture={(event) =>
+                                event.stopPropagation()
+                              }
+                              onTouchMoveCapture={(event) =>
+                                event.stopPropagation()
+                              }
+                            >
                               <CommandEmpty>
                                 No categories found.
                               </CommandEmpty>

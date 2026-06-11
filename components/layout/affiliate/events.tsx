@@ -19,12 +19,15 @@ import {
 import type {
   AffiliateClickEvent,
   AffiliateConversionEvent,
+  AffiliateEventsPayload,
+  AffiliateEventType,
   AffiliateOrderEvent,
   AffiliatePageViewEvent,
   AffiliateSessionEvent,
 } from "@/features/affiliate/api";
 import {
   useGetAffiliateEventGroups,
+  useGetAffiliateFunnel,
   useGetAffiliatesByOwner,
 } from "@/features/affiliate/hook";
 import type { AffiliateResponse } from "@/types/affiliate";
@@ -123,6 +126,53 @@ const getText = (value?: string | number | null) => {
   return String(value);
 };
 
+const getEventRows = <TEvent,>(
+  payload?: TEvent[] | {
+    items?: TEvent[];
+    results?: TEvent[];
+    data?: TEvent[];
+  },
+) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.results)) return payload.results;
+  if (Array.isArray(payload?.data)) return payload.data;
+
+  return [];
+};
+
+const getEventTotal = <TEvent,>(
+  payload: TEvent[] | {
+    items?: TEvent[];
+    results?: TEvent[];
+    data?: TEvent[];
+    pagination?: { total_items?: number };
+    total?: number;
+    total_items?: number;
+    count?: number;
+  } | undefined,
+  rows: TEvent[],
+) => {
+  if (!payload || Array.isArray(payload)) return rows.length;
+
+  const total =
+    payload.pagination?.total_items ??
+    payload.total_items ??
+    payload.total ??
+    payload.count;
+
+  return Number.isFinite(total) ? Number(total) : rows.length;
+};
+
+const useEventData = <TType extends AffiliateEventType>(
+  payload?: AffiliateEventsPayload<TType>,
+) => {
+  const rows = getEventRows(payload);
+  const total = getEventTotal(payload, rows);
+
+  return { rows, total };
+};
+
 const AffiliateEventsPage = () => {
   const [selectedAffiliateId, setSelectedAffiliateId] = useState("");
   const [fromDate, setFromDate] = useState<Date>();
@@ -188,18 +238,45 @@ const AffiliateEventsPage = () => {
     eventParams,
     Boolean(selectedAffiliateId) && selectedAffiliateAllowed,
   );
+  const funnelQuery = useGetAffiliateFunnel(
+    selectedAffiliateId
+      ? {
+          affiliate_id: selectedAffiliateId,
+          ...(fromDate && { from_date: formatDateForApi(fromDate) }),
+          ...(toDate && { to_date: formatDateForApi(toDate) }),
+        }
+      : undefined,
+    Boolean(selectedAffiliateId) && selectedAffiliateAllowed,
+  );
 
-  const clicks = (eventQueries[0]?.data ?? []) as AffiliateClickEvent[];
-  const pageViews = (eventQueries[1]?.data ?? []) as AffiliatePageViewEvent[];
-  const sessions = (eventQueries[2]?.data ?? []) as AffiliateSessionEvent[];
-  const orders = (eventQueries[3]?.data ?? []) as AffiliateOrderEvent[];
-  const conversions = (eventQueries[4]?.data ??
-    []) as AffiliateConversionEvent[];
+  const clickEvents = useEventData<"click">(eventQueries[0]?.data);
+  const pageViewEvents = useEventData<"page_view">(eventQueries[1]?.data);
+  const sessionEvents = useEventData<"session">(eventQueries[2]?.data);
+  const orderEvents = useEventData<"order">(eventQueries[3]?.data);
+  const conversionEvents = useEventData<"conversion">(eventQueries[4]?.data);
 
-  const isLoading =
+  const clicks = clickEvents.rows as AffiliateClickEvent[];
+  const pageViews = pageViewEvents.rows as AffiliatePageViewEvent[];
+  const sessions = sessionEvents.rows as AffiliateSessionEvent[];
+  const orders = orderEvents.rows as AffiliateOrderEvent[];
+  const conversions = conversionEvents.rows as AffiliateConversionEvent[];
+
+  const metrics = {
+    clicks: funnelQuery.data?.steps.clicks ?? clickEvents.total,
+    pageViews: funnelQuery.data?.steps.page_views ?? pageViewEvents.total,
+    sessions: funnelQuery.data?.steps.sessions ?? sessionEvents.total,
+    orders: funnelQuery.data?.steps.orders ?? orderEvents.total,
+    conversions:
+      funnelQuery.data?.steps.conversions ?? conversionEvents.total,
+  };
+
+  const isEventsLoading =
     affiliateQuery.isLoading || eventQueries.some((query) => query.isLoading);
+  const isMetricsLoading = affiliateQuery.isLoading || funnelQuery.isLoading;
   const hasError =
-    affiliateQuery.isError || eventQueries.some((query) => query.isError);
+    affiliateQuery.isError ||
+    funnelQuery.isError ||
+    eventQueries.some((query) => query.isError);
 
   const handleResetFilters = () => {
     setFromDate(undefined);
@@ -314,33 +391,33 @@ const AffiliateEventsPage = () => {
           <div className="grid gap-4 p-6 md:grid-cols-2 md:p-8 xl:grid-cols-5">
             <MetricCard
               label="Clicks"
-              value={clicks.length}
+              value={metrics.clicks}
               icon={MousePointerClick}
-              loading={isLoading}
+              loading={isMetricsLoading}
             />
             <MetricCard
               label="Page views"
-              value={pageViews.length}
+              value={metrics.pageViews}
               icon={Eye}
-              loading={isLoading}
+              loading={isMetricsLoading}
             />
             <MetricCard
               label="Sessions"
-              value={sessions.length}
+              value={metrics.sessions}
               icon={Users}
-              loading={isLoading}
+              loading={isMetricsLoading}
             />
             <MetricCard
               label="Orders"
-              value={orders.length}
+              value={metrics.orders}
               icon={ShoppingCart}
-              loading={isLoading}
+              loading={isMetricsLoading}
             />
             <MetricCard
               label="Conversions"
-              value={conversions.length}
+              value={metrics.conversions}
               icon={Target}
-              loading={isLoading}
+              loading={isMetricsLoading}
             />
           </div>
         </section>
@@ -380,27 +457,35 @@ const AffiliateEventsPage = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
+            {isEventsLoading ? (
               <TableSkeleton />
             ) : (
               <Tabs defaultValue="click">
                 <TabsList className="mb-4 grid h-auto grid-cols-2 gap-2 border-b-0 sm:flex sm:flex-wrap">
-                  <EventTab value="click" label="Clicks" count={clicks.length} />
+                  <EventTab
+                    value="click"
+                    label="Clicks"
+                    count={metrics.clicks}
+                  />
                   <EventTab
                     value="page_view"
                     label="Page views"
-                    count={pageViews.length}
+                    count={metrics.pageViews}
                   />
                   <EventTab
                     value="session"
                     label="Sessions"
-                    count={sessions.length}
+                    count={metrics.sessions}
                   />
-                  <EventTab value="order" label="Orders" count={orders.length} />
+                  <EventTab
+                    value="order"
+                    label="Orders"
+                    count={metrics.orders}
+                  />
                   <EventTab
                     value="conversion"
                     label="Conversions"
-                    count={conversions.length}
+                    count={metrics.conversions}
                   />
                 </TabsList>
 

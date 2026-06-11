@@ -5,6 +5,7 @@ import {
   AffiliateResponse,
   AffiliateUpdateInput,
 } from "@/types/affiliate";
+import { Pagination } from "@/types/pagination";
 
 export interface GenerateAffiliateLinkInput {
   affiliate_id: string;
@@ -131,8 +132,20 @@ export type AffiliateEventResponseByType = {
   conversion: AffiliateConversionEvent[];
 };
 
-export type GetAffiliateEventsResponse =
-  AffiliateEventResponseByType[AffiliateEventType];
+export type AffiliateEventsPayload<TType extends AffiliateEventType> =
+  | AffiliateEventResponseByType[TType]
+  | {
+      items?: AffiliateEventResponseByType[TType];
+      results?: AffiliateEventResponseByType[TType];
+      data?: AffiliateEventResponseByType[TType];
+      pagination?: Pagination;
+      total?: number;
+      total_items?: number;
+      count?: number;
+    };
+
+export type GetAffiliateEventsResponse<TType extends AffiliateEventType> =
+  AffiliateEventsPayload<TType>;
 
 export interface AffiliateFunnelSteps {
   clicks: number;
@@ -220,7 +233,7 @@ export async function getAffiliateEvents<
     },
   );
 
-  return data as AffiliateEventResponseByType[TType];
+  return data as GetAffiliateEventsResponse<TType>;
 }
 
 export async function getAffiliateFunnel(params: GetAffiliateFunnelParams) {
