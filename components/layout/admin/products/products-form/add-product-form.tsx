@@ -52,8 +52,12 @@ function getFirstErrorMessage(
   return undefined;
 }
 
-const MARKETPLACES = ["kaufland", "ebay", "amazon"] as const;
-type Marketplace = (typeof MARKETPLACES)[number];
+type Marketplace = "kaufland" | "ebay" | "amazon";
+const MARKETPLACE_ACTIONS: Marketplace[] = [
+  "kaufland",
+  "ebay",
+  // "amazon",
+];
 const MARKETPLACE_REFETCH_COOLDOWN_MS = 1800;
 
 function MarketplaceAction({
@@ -162,7 +166,7 @@ function MarketplaceActions({
 }) {
   return (
     <div className="space-y-2">
-      {MARKETPLACES.map((marketplace) => (
+      {MARKETPLACE_ACTIONS.map((marketplace) => (
         <MarketplaceAction
           key={marketplace}
           product={product}
