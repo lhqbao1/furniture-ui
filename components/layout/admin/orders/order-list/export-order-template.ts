@@ -7,9 +7,33 @@ import { CheckOutMain } from "@/types/checkout";
 import { formatDateDDMMYYYY } from "@/lib/date-formated";
 import { calculateProductVAT } from "@/lib/caculate-vat";
 
+const EXCLUDED_EXCHANGE_CHECKOUT_STATUSES = new Set([
+  "exchange",
+  "cancel_exchange",
+  "exchange_stock_reserved",
+  "exchange_shipped",
+  "exchange_preparation_shipping",
+  "exchange_cancel_no_stock",
+]);
+
+function isExcludedExchangeCheckoutStatus(status?: string | null) {
+  return EXCLUDED_EXCHANGE_CHECKOUT_STATUSES.has(
+    String(status ?? "")
+      .toLowerCase()
+      .trim(),
+  );
+}
+
+function getExportableCheckouts(order: CheckOutMain) {
+  if (!Array.isArray(order.checkouts)) return [];
+  return order.checkouts.filter(
+    (checkout) => !isExcludedExchangeCheckoutStatus(checkout.status),
+  );
+}
+
 function getPrimaryCheckout(order: CheckOutMain) {
-  if (!Array.isArray(order.checkouts)) return undefined;
-  return order.checkouts.find((checkout) => checkout.invoice_address) ?? order.checkouts[0];
+  const checkouts = getExportableCheckouts(order);
+  return checkouts.find((checkout) => checkout.invoice_address) ?? checkouts[0];
 }
 
 function clean(val: unknown) {
@@ -23,7 +47,9 @@ function calculateOrderNetValues(order: CheckOutMain) {
     checkout?.invoice_address?.country ??
     "DE";
   const taxId = checkout?.user?.tax_id ?? "";
-  const allItems = order.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [];
+  const allItems = getExportableCheckouts(order).flatMap(
+    (c) => c.cart?.items ?? [],
+  );
   const linePricings = allItems.map((item) => {
     const quantity = Number(item?.quantity) || 0;
     const unitGross =
@@ -111,11 +137,15 @@ function calculateOrderNetValues(order: CheckOutMain) {
 
 export function mapOrderListTemplateRows(data: CheckOutMain[]) {
   return data.flatMap((order) => {
+    const hasChildCheckouts = Array.isArray(order.checkouts) && order.checkouts.length > 0;
+    const exportableCheckouts = getExportableCheckouts(order);
+    if (hasChildCheckouts && exportableCheckouts.length === 0) return [];
+
     const checkout = getPrimaryCheckout(order);
     const invoice = checkout?.invoice_address;
     const shipping = checkout?.shipping_address;
     const user = checkout?.user;
-    const allItems = order.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [];
+    const allItems = exportableCheckouts.flatMap((c) => c.cart?.items ?? []);
     const { netAmount, shippingNet } = calculateOrderNetValues(order);
 
     const buyerAddressRow = {
@@ -196,6 +226,8 @@ export function exportOrderListTemplateToExcel(
   if (!Array.isArray(data) || data.length === 0) return;
 
   const rows = mapOrderListTemplateRows(data);
+  if (rows.length === 0) return;
+
   const worksheet = XLSX.utils.json_to_sheet(rows);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
