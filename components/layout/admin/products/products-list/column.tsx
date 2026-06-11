@@ -3,7 +3,7 @@
 import { ColumnDef, Row } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Check, CopyCheck, Eye, Loader2, Pencil, Upload } from "lucide-react";
+import { BookOpen, Check, Eye, Loader2, Pencil, Upload } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductItem } from "@/types/products";
 import { useEffect, useMemo, useState } from "react";
@@ -1624,6 +1624,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
   const productPackages = Array.isArray(product.packages)
     ? product.packages
     : [];
+  const noteText = product.note?.trim();
 
   return (
     <>
@@ -1675,11 +1676,35 @@ function ActionsCell({ product }: { product: ProductItem }) {
             <Eye className="w-4 h-4 text-secondary" />
           </Button>
         </Link>
-        <Link href={`/admin/products/${product.id}/clone`} prefetch={true}>
-          <Button variant="ghost" size="icon">
-            <CopyCheck className="w-4 h-4 text-secondary" />
-          </Button>
-        </Link>
+        <HoverCard openDelay={100} closeDelay={100}>
+          <HoverCardTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              type="button"
+              aria-label="View product note"
+            >
+              <BookOpen className="w-4 h-4 text-secondary" />
+            </Button>
+          </HoverCardTrigger>
+          <HoverCardContent className="w-80 rounded-2xl border border-slate-200 bg-white p-0 text-slate-950 shadow-2xl">
+            <div className="border-b border-slate-100 px-4 py-3">
+              <div className="text-sm font-semibold">Product note</div>
+              <div className="text-xs text-slate-500">Note</div>
+            </div>
+            <div className="p-4">
+              {noteText ? (
+                <div className="max-h-40 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm whitespace-pre-wrap break-words">
+                  {noteText}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">
+                  No note.
+                </div>
+              )}
+            </div>
+          </HoverCardContent>
+        </HoverCard>
       </div>
 
       <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>

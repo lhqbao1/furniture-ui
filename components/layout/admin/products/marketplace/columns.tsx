@@ -17,8 +17,12 @@ import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 import { getIncomingDisplayItems } from "@/lib/product-incoming-stock";
 
-const MARKETPLACES = ["kaufland", "ebay", "amazon"] as const;
-type Marketplace = (typeof MARKETPLACES)[number];
+type Marketplace = "kaufland" | "ebay" | "amazon";
+const MARKETPLACE_COLUMN_ORDER: Marketplace[] = [
+  "kaufland",
+  "ebay",
+  // "amazon",
+];
 
 function ToggleProductStatus({ product }: { product: ProductItem }) {
   const editProductMutation = useEditProduct();
@@ -399,7 +403,7 @@ const MARKETPLACE_ICONS: Record<Marketplace, string> = {
   ebay: "/ebay.png",
 };
 
-const marketplaceColumns: ColumnDef<ProductItem>[] = MARKETPLACES.map(
+const marketplaceColumns: ColumnDef<ProductItem>[] = MARKETPLACE_COLUMN_ORDER.map(
   (marketplace) => ({
     id: marketplace,
     header: () => (
