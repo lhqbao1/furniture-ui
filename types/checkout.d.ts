@@ -130,6 +130,18 @@ export interface CheckOutMain {
   created_at: Date;
   updated_at: Date;
 }
+
+export interface CheckoutLog {
+  id: string;
+  action: string;
+  old_value: string | null;
+  new_value: string | null;
+  user: User;
+  main_checkout_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface CheckOutMainResponse {
   items: CheckOutMain[];
   pagination: Pagination;

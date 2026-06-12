@@ -29,6 +29,7 @@ import {
   getCheckOutByUserId,
   getCheckOutDashboard,
   getCheckOutDashboardEconeloAndRest,
+  getCheckoutLogsByMainCheckoutId,
   getCheckOutMain,
   getCheckOutMainByUserIdAdmin,
   getProductRefundByMainCheckoutId,
@@ -146,6 +147,15 @@ export function useGetMainCheckOutByMainCheckOutId(main_checkout_id: string) {
   return useQuery({
     queryKey: ["checkout-main-id", main_checkout_id],
     queryFn: () => getMainCheckOutByMainCheckOutId(main_checkout_id),
+    enabled: !!main_checkout_id,
+    retry: false,
+  });
+}
+
+export function useGetCheckoutLogsByMainCheckoutId(main_checkout_id: string) {
+  return useQuery({
+    queryKey: ["checkout-log", main_checkout_id],
+    queryFn: () => getCheckoutLogsByMainCheckoutId(main_checkout_id),
     enabled: !!main_checkout_id,
     retry: false,
   });
