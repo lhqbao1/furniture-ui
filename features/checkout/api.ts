@@ -6,6 +6,7 @@ import { CreateRefundMainCheckoutPayload } from "@/lib/schema/refund";
 import {
   CheckoutBrandTypeOverviewResponse,
   CheckOut,
+  CheckoutLog,
   CheckoutDashboardResponse,
   CheckOutMain,
   CheckOutMainResponse,
@@ -270,6 +271,15 @@ export async function getMainCheckOutByMainCheckOutId(
     `/checkout/main-checkout/details/${main_checkout_id}`,
   );
   return data as CheckOutMain;
+}
+
+export async function getCheckoutLogsByMainCheckoutId(
+  main_checkout_id: string,
+) {
+  const { data } = await apiAdmin.get(
+    `/checkout_log/checkout/${main_checkout_id}`,
+  );
+  return data as CheckoutLog[];
 }
 
 export async function getCheckOutByUserId(user_id: string) {

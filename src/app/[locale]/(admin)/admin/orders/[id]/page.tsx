@@ -2,6 +2,7 @@
 export const ssr = false;
 
 import DocumentTable from "@/components/layout/admin/orders/order-details/document/document-table";
+import OrderCheckoutLog from "@/components/layout/admin/orders/order-details/order-checkout-log";
 import OrderDeliveryOrder from "@/components/layout/admin/orders/order-details/order-delivery-order";
 import OrderSummary from "@/components/layout/admin/orders/order-details/order-summary";
 import OrderDetailOverView from "@/components/layout/admin/orders/order-details/order-overview";
@@ -101,7 +102,7 @@ const OrderDetails = () => {
   >(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const params = useParams<{ id: string }>(); // type-safe
-  const checkoutId = params?.id;
+  const checkoutId = params?.id ?? "";
   const updateNoteMutation = useUpdateNoteForMainCheckout();
   const uploadStaticFileMutation = useUploadStaticFile();
   const uploadCheckoutFilesMutation = useUploadCheckoutFiles();
@@ -992,6 +993,7 @@ const OrderDetails = () => {
         </div>
         <OrderDeliveryOrder data={order.checkouts} />
       </section>
+      <OrderCheckoutLog mainCheckoutId={checkoutId} />
     </div>
   );
 };
