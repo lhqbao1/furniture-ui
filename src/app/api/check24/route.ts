@@ -17,11 +17,30 @@ const hasCsvFieldValue = (value: unknown): boolean => {
   return String(value).trim().length > 0;
 };
 
+const REQUIRED_CSV_FIELD_INDEXES = [
+  0, // EAN (GTIN14)
+  1, // offer_id
+  2, // name
+  3, // description
+  4, // deeplink
+  5, // brand
+  6, // color
+  12, // material
+  13, // Bildlink_1
+  23, // delivery_includes
+  24, // stock_amount
+  25, // price
+  26, // delivery_time
+  27, // shipping_mode
+  28, // shipping_cost
+];
+
 export async function GET() {
   try {
     const products = await getAllProductsSelect({
       is_econelo: false,
       all_products: true,
+      supplier_id: "prestige_home",
     });
 
     const formatEuro = (value: number) => value.toFixed(2).replace(".", ",");
@@ -82,10 +101,6 @@ export async function GET() {
       p.name.trim().length > 0 &&
       typeof p.url_key === "string" &&
       p.url_key.trim().length > 0 &&
-      typeof p.color === "string" &&
-      p.color.trim().length > 0 &&
-      typeof p.materials === "string" &&
-      p.materials.trim().length > 0 &&
       !!p.brand &&
       typeof p.brand.name === "string" &&
       p.brand.name.trim().length > 0 &&
@@ -93,7 +108,8 @@ export async function GET() {
       p.component.trim().length > 0 &&
       typeof p.carrier === "string" &&
       p.carrier.trim().length > 0 &&
-      Array.isArray(p.static_files);
+      Array.isArray(p.static_files) &&
+      p.static_files.some((file) => hasCsvFieldValue(file?.url));
 
     let skippedProducts = 0;
 
@@ -123,6 +139,10 @@ export async function GET() {
         const size = `${p.height} x ${p.width} x ${p.length} cm`;
         const lyingSurface = `${p.width} x ${p.length} cm`;
         const color = p.color.replace(/\s+(and|und)\s+/gi, "/");
+        const imageUrls = (p.static_files ?? [])
+          .map((file) => String(file?.url ?? "").trim())
+          .filter(Boolean)
+          .slice(0, 10);
 
         const rowValues: Array<string | number> = [
           p.ean ?? "",
@@ -144,16 +164,16 @@ export async function GET() {
           p.length ?? "",
           lyingSurface,
           p.materials ?? "",
-          p.static_files?.[0]?.url ?? "",
-          p.static_files?.[1]?.url ?? "",
-          p.static_files?.[2]?.url ?? "",
-          p.static_files?.[3]?.url ?? "",
-          p.static_files?.[4]?.url ?? "",
-          p.static_files?.[5]?.url ?? "",
-          p.static_files?.[6]?.url ?? "",
-          p.static_files?.[7]?.url ?? "",
-          p.static_files?.[8]?.url ?? "",
-          p.static_files?.[9]?.url ?? "",
+          imageUrls[0] ?? "",
+          imageUrls[1] ?? "",
+          imageUrls[2] ?? "",
+          imageUrls[3] ?? "",
+          imageUrls[4] ?? "",
+          imageUrls[5] ?? "",
+          imageUrls[6] ?? "",
+          imageUrls[7] ?? "",
+          imageUrls[8] ?? "",
+          imageUrls[9] ?? "",
           p.component ?? "",
           stockAmount,
           `${formatEuro(p.final_price)} €`,
@@ -173,11 +193,13 @@ export async function GET() {
           p.brand.company_phone ?? "",
         ];
 
-        const hasAllCsvFields =
+        const hasRequiredCsvFields =
           rowValues.length === headers.length &&
-          rowValues.every((value) => hasCsvFieldValue(value));
+          REQUIRED_CSV_FIELD_INDEXES.every((index) =>
+            hasCsvFieldValue(rowValues[index]),
+          );
 
-        if (!hasAllCsvFields) {
+        if (!hasRequiredCsvFields) {
           skippedProducts += 1;
           return [];
         }

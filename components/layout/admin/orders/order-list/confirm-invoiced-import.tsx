@@ -8,6 +8,8 @@ import { saveAs } from "file-saver";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +38,13 @@ import {
   UpdateBulkExtInvoiceIdPayloadItem,
 } from "@/features/checkout/api";
 import { useUpdateBulkExtInvoiceId } from "@/features/checkout/hook";
+import { CheckOutMain } from "@/types/checkout";
+
+type ConfirmMode = "excel" | "input";
+
+interface ConfirmInvoicedImportProps {
+  selectedOrders?: CheckOutMain[];
+}
 
 const EXCEL_ACCEPT = {
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
@@ -175,14 +184,18 @@ const readInvoicePayloadFromFile = (
     reader.readAsBinaryString(file);
   });
 
-const ConfirmInvoicedImport = () => {
+const ConfirmInvoicedImport = ({
+  selectedOrders = [],
+}: ConfirmInvoicedImportProps) => {
   const updateBulkExtInvoiceIdMutation = useUpdateBulkExtInvoiceId();
 
   const [open, setOpen] = useState(false);
+  const [confirmMode, setConfirmMode] = useState<ConfirmMode>("excel");
   const [openChannel, setOpenChannel] = useState(false);
   const [channel, setChannel] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [payload, setPayload] = useState<UpdateBulkExtInvoiceIdPayload>([]);
+  const [invoiceId, setInvoiceId] = useState("");
   const [isPreparingSubmit, setIsPreparingSubmit] = useState(false);
 
   const extractInvalidExtIds = (
@@ -228,8 +241,10 @@ const ConfirmInvoicedImport = () => {
   };
 
   const resetState = () => {
+    setConfirmMode("excel");
     setFile(null);
     setPayload([]);
+    setInvoiceId("");
     setChannel(null);
     setOpenChannel(false);
   };
@@ -384,6 +399,89 @@ const ConfirmInvoicedImport = () => {
     }
   };
 
+  const handleSubmitInput = async () => {
+    const normalizedInvoiceId = invoiceId.trim();
+
+    if (selectedOrders.length === 0) {
+      toast.error("Please select at least one order first");
+      return;
+    }
+
+    if (!normalizedInvoiceId) {
+      toast.error("Please input invoice ID");
+      return;
+    }
+
+    const missingExternalId = selectedOrders.filter(
+      (order) => !normalizeOrderId(order.marketplace_order_id),
+    );
+
+    if (missingExternalId.length > 0) {
+      toast.error("Some selected orders are missing marketplace order ID.", {
+        description: missingExternalId
+          .map((order) => order.checkout_code || order.id)
+          .join(", "),
+      });
+      return;
+    }
+
+    const alreadyInvoicedOrders = selectedOrders.filter((order) =>
+      Boolean(normalizeOrderId(order.ext_invoice_id)),
+    );
+
+    if (alreadyInvoicedOrders.length > 0) {
+      toast.error("These selected orders are already invoiced.", {
+        description: alreadyInvoicedOrders
+          .map((order) => order.marketplace_order_id || order.checkout_code)
+          .join(", "),
+      });
+    }
+
+    const inputPayload = selectedOrders
+      .filter((order) => !normalizeOrderId(order.ext_invoice_id))
+      .map((order) => ({
+        ext_id: normalizeOrderId(order.marketplace_order_id),
+        ext_invoice_id: normalizedInvoiceId,
+      }));
+
+    if (inputPayload.length === 0) {
+      toast.error("No selected orders to confirm after filtering invoiced orders.");
+      return;
+    }
+
+    const toastId = toast.loading(
+      `Confirming ${inputPayload.length} invoices...`,
+    );
+
+    try {
+      const response =
+        await updateBulkExtInvoiceIdMutation.mutateAsync(inputPayload);
+      const invalidExtIds = extractInvalidExtIds(response);
+
+      if (invalidExtIds.length > 0) {
+        toast.error("These marketplace order IDs do not exist in the system.", {
+          id: toastId,
+          description: invalidExtIds.join(", "),
+        });
+        return;
+      }
+
+      toast.success("Invoices confirmed successfully", { id: toastId });
+      setOpen(false);
+      resetState();
+    } catch (error) {
+      toast.error("Failed to confirm invoices", {
+        id: toastId,
+        description: getErrorMessage(error),
+      });
+    }
+  };
+
+  const isSubmitting =
+    updateBulkExtInvoiceIdMutation.isPending || isPreparingSubmit;
+  const isExcelMode = confirmMode === "excel";
+  const isInputMode = confirmMode === "input";
+
   return (
     <Dialog
       open={open}
@@ -401,120 +499,175 @@ const ConfirmInvoicedImport = () => {
           <DialogTitle>Confirm Invoiced</DialogTitle>
         </DialogHeader>
 
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={handleDownloadExample}
-          className="w-fit"
-        >
-          Download sample file
-        </Button>
-
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">
-            Required file format: 2 columns (`ext_id`, `ext_invoice_id`).
-          </p>
+          <div className="text-sm font-medium text-slate-900">
+            Confirmation method
+          </div>
+          <RadioGroup
+            value={confirmMode}
+            onValueChange={(value) => setConfirmMode(value as ConfirmMode)}
+            className="grid gap-2 sm:grid-cols-2"
+          >
+            <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 p-3 text-sm hover:bg-slate-50">
+              <RadioGroupItem value="excel" />
+              Confirm via Excel file
+            </label>
+            <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 p-3 text-sm hover:bg-slate-50">
+              <RadioGroupItem value="input" />
+              Confirm selected orders
+            </label>
+          </RadioGroup>
+        </div>
 
-          <Popover open={openChannel} onOpenChange={setOpenChannel}>
-            <PopoverTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                role="combobox"
-                className="w-full justify-between font-normal"
-              >
-                {channel
-                  ? CHANEL_OPTIONS.find((item) => item.key === channel)?.label
-                  : "Select channel"}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              usePortal={false}
-              className="z-[120] w-[var(--radix-popover-trigger-width)] p-0 pointer-events-auto"
+        {isExcelMode ? (
+          <>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleDownloadExample}
+              className="w-fit"
             >
-              <Command>
-                <CommandInput placeholder="Search channel..." />
-                <CommandEmpty>No channel found.</CommandEmpty>
-                <CommandGroup className="max-h-56 overflow-y-auto">
-                  {sortedChannelOptions.map((item) => (
-                    <CommandItem
-                      key={item.key}
-                      value={`${item.label} ${item.key}`}
-                      onSelect={() => {
-                        setChannel(item.key);
-                        setFile(null);
-                        setPayload([]);
-                        setOpenChannel(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          channel === item.key ? "opacity-100" : "opacity-0",
-                        )}
-                      />
-                      {item.label}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </div>
+              Download sample file
+            </Button>
 
-        <div
-          {...getRootProps()}
-          className={`mt-2 flex h-40 items-center justify-center rounded-lg border-2 border-dashed ${
-            !channel || updateBulkExtInvoiceIdMutation.isPending
-              ? "cursor-not-allowed opacity-50"
-              : "cursor-pointer"
-          } ${
-            isDragActive ? "border-primary bg-primary/10" : "border-gray-300"
-          }`}
-        >
-          <input {...getInputProps()} />
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Required file format: 2 columns (`ext_id`, `ext_invoice_id`).
+              </p>
 
-          {!file ? (
-            <p className="text-sm text-gray-500">
-              {channel
-                ? "Drop or click to upload (.xls/.xlsx)"
-                : "Select channel first"}
-            </p>
-          ) : (
-            <div className="flex items-center gap-2">
-              <FileSpreadsheet className="h-4 w-4" />
-              <p className="text-sm text-gray-600">{file.name}</p>
+              <Popover open={openChannel} onOpenChange={setOpenChannel}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between font-normal"
+                  >
+                    {channel
+                      ? CHANEL_OPTIONS.find((item) => item.key === channel)
+                          ?.label
+                      : "Select channel"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  usePortal={false}
+                  className="z-[120] w-[var(--radix-popover-trigger-width)] p-0 pointer-events-auto"
+                >
+                  <Command>
+                    <CommandInput placeholder="Search channel..." />
+                    <CommandEmpty>No channel found.</CommandEmpty>
+                    <CommandGroup className="max-h-56 overflow-y-auto">
+                      {sortedChannelOptions.map((item) => (
+                        <CommandItem
+                          key={item.key}
+                          value={`${item.label} ${item.key}`}
+                          onSelect={() => {
+                            setChannel(item.key);
+                            setFile(null);
+                            setPayload([]);
+                            setOpenChannel(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              channel === item.key
+                                ? "opacity-100"
+                                : "opacity-0",
+                            )}
+                          />
+                          {item.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
-          )}
-        </div>
 
-        <div className="text-sm text-muted-foreground">
-          {payload.length > 0
-            ? `${payload.length} rows ready`
-            : "No rows parsed yet"}
-        </div>
+            <div
+              {...getRootProps()}
+              className={`mt-2 flex h-40 items-center justify-center rounded-lg border-2 border-dashed ${
+                !channel || updateBulkExtInvoiceIdMutation.isPending
+                  ? "cursor-not-allowed opacity-50"
+                  : "cursor-pointer"
+              } ${
+                isDragActive
+                  ? "border-primary bg-primary/10"
+                  : "border-gray-300"
+              }`}
+            >
+              <input {...getInputProps()} />
+
+              {!file ? (
+                <p className="text-sm text-gray-500">
+                  {channel
+                    ? "Drop or click to upload (.xls/.xlsx)"
+                    : "Select channel first"}
+                </p>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FileSpreadsheet className="h-4 w-4" />
+                  <p className="text-sm text-gray-600">{file.name}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="text-sm text-muted-foreground">
+              {payload.length > 0
+                ? `${payload.length} rows ready`
+                : "No rows parsed yet"}
+            </div>
+          </>
+        ) : null}
+
+        {isInputMode ? (
+          <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+            <div className="text-sm text-muted-foreground">
+              Selected orders:{" "}
+              <span className="font-medium text-slate-900">
+                {selectedOrders.length}
+              </span>
+            </div>
+            <Input
+              value={invoiceId}
+              onChange={(event) => setInvoiceId(event.target.value)}
+              placeholder="Input invoice ID"
+              disabled={isSubmitting}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter") return;
+                event.preventDefault();
+                void handleSubmitInput();
+              }}
+            />
+            <p className="text-xs text-muted-foreground">
+              This invoice ID will be applied to all selected orders.
+            </p>
+          </div>
+        ) : null}
 
         <div className="mt-2 flex justify-end gap-2">
           <Button
             variant="outline"
             onClick={() => setOpen(false)}
-            disabled={updateBulkExtInvoiceIdMutation.isPending || isPreparingSubmit}
+            disabled={isSubmitting}
           >
             Cancel
           </Button>
           <Button
-            onClick={handleSubmit}
+            onClick={isExcelMode ? handleSubmit : handleSubmitInput}
             disabled={
-              payload.length === 0 ||
-              updateBulkExtInvoiceIdMutation.isPending ||
-              isPreparingSubmit
+              isSubmitting ||
+              (isExcelMode && payload.length === 0) ||
+              (isInputMode &&
+                (!invoiceId.trim() || selectedOrders.length === 0))
             }
           >
-            {updateBulkExtInvoiceIdMutation.isPending || isPreparingSubmit ? (
+            {isSubmitting ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              "Submit"
+              "Confirm"
             )}
           </Button>
         </div>
