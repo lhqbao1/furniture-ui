@@ -594,7 +594,7 @@ export default function OrderToolbar({
 
           <div className="flex flex-wrap items-center gap-2 text-sm font-medium">
             <OrderImport />
-            <ConfirmInvoicedImport />
+            <ConfirmInvoicedImport selectedOrders={selectedOrders} />
           </div>
         </div>
       </div>
