@@ -102,6 +102,32 @@ export type UpdateBulkExtInvoiceIdResponse =
   | null
   | UpdateBulkExtInvoiceIdErrorItem[];
 
+export interface UpdateMainCheckoutInvoiceAddressPayload {
+  address_line: string;
+  city: string;
+  country: string;
+  postal_code: string;
+  phone_number: string;
+  recipient_name: string;
+  email: string;
+  company_name: string;
+  tax_id: string;
+}
+
+export interface UpdateMainCheckoutItemPricePayload {
+  id_provider: string;
+  price: number;
+}
+
+export interface UpdateMainCheckoutPayload {
+  channel?: string;
+  ext_id?: string;
+  ext_reference?: string;
+  invoice_address?: Partial<UpdateMainCheckoutInvoiceAddressPayload>;
+  shipping_amount?: number;
+  item_prices?: UpdateMainCheckoutItemPricePayload[];
+}
+
 export interface ProductRefundFile {
   url: string;
   id?: string;
@@ -452,6 +478,23 @@ export async function updateBulkExtInvoiceId(
   );
 
   return data as UpdateBulkExtInvoiceIdResponse;
+}
+
+export async function updateMainCheckout(
+  main_checkout_id: string,
+  payload: UpdateMainCheckoutPayload,
+) {
+  const { data } = await apiAdmin.put(
+    `/checkout/update-main-checkout/${main_checkout_id}`,
+    payload,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  return data as CheckOutMain;
 }
 
 export async function uploadCheckoutFiles(

@@ -35,6 +35,32 @@ const REQUIRED_CSV_FIELD_INDEXES = [
   28, // shipping_cost
 ];
 
+const getOneMonthFromNow = () => {
+  const date = new Date();
+  date.setMonth(date.getMonth() + 1);
+  return date;
+};
+
+const hasIncomingStockWithinOneMonth = (product: ProductItem) => {
+  const now = new Date();
+  const oneMonthFromNow = getOneMonthFromNow();
+
+  return (product.inventory_pos ?? []).some((item) => {
+    const quantity = Number(item?.quantity) || 0;
+    if (quantity <= 0 || !item?.list_delivery_date) return false;
+
+    const deliveryDate = new Date(item.list_delivery_date);
+    if (Number.isNaN(deliveryDate.getTime())) return false;
+
+    return deliveryDate > now && deliveryDate <= oneMonthFromNow;
+  });
+};
+
+const getDiscountedFinalPrice = (finalPrice: unknown) => {
+  const price = Number(finalPrice) || 0;
+  return Math.max(0, +(price * 0.9).toFixed(2));
+};
+
 export async function GET() {
   try {
     const products = await getAllProductsSelect({
@@ -116,7 +142,7 @@ export async function GET() {
     const rows = products.flatMap((p) => {
       if (
         !hasRequiredFields(p) ||
-        p.final_price <= 0 ||
+        getDiscountedFinalPrice(p.final_price) <= 0 ||
         p.brand.name.toLowerCase() === "prestige works"
       ) {
         skippedProducts += 1;
@@ -130,12 +156,12 @@ export async function GET() {
             ? Math.floor(availableStock)
             : 0;
 
-        // Keep old behavior, but enforce explicit stock > 0 gate.
-        if (stockAmount <= 0) {
+        if (stockAmount <= 0 && !hasIncomingStockWithinOneMonth(p)) {
           skippedProducts += 1;
           return [];
         }
 
+        const discountedFinalPrice = getDiscountedFinalPrice(p.final_price);
         const size = `${p.height} x ${p.width} x ${p.length} cm`;
         const lyingSurface = `${p.width} x ${p.length} cm`;
         const color = p.color.replace(/\s+(and|und)\s+/gi, "/");
@@ -176,7 +202,7 @@ export async function GET() {
           imageUrls[9] ?? "",
           p.component ?? "",
           stockAmount,
-          `${formatEuro(p.final_price)} €`,
+          `${formatEuro(discountedFinalPrice)} €`,
           `${p.delivery_time} Werktage`,
           p.carrier === "amm" || p.carrier === "spedition"
             ? "Spedition"
