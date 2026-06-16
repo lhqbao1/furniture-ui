@@ -20,22 +20,26 @@ import {
   CornerDownLeft,
   Trash2,
   Eraser,
+  ImageIcon,
+  Loader2,
 } from "lucide-react";
 import { TextStyleKit } from "@tiptap/extension-text-style";
 import type { Editor } from "@tiptap/react";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "@tiptap/extension-link";
 import LinkControls from "./link-button";
-import { FixedFont } from "./fixed-font";
 import { KeepHtmlPaste } from "./keep-html-style";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { Table } from "@tiptap/extension-table";
 import { html as beautifyHtml } from "js-beautify";
+import TipTapImage from "@tiptap/extension-image";
+import { useUploadStaticFile } from "@/features/file/hook";
+import { toast } from "sonner";
 
 export function MenuBar({
   editor,
@@ -46,6 +50,8 @@ export function MenuBar({
   showHtml: boolean;
   setShowHtml: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const uploadImageMutation = useUploadStaticFile();
   const editorState = useEditorState({
     editor,
     selector: (ctx) => ({
@@ -92,6 +98,45 @@ export function MenuBar({
       <Icon className="w-4 h-4" />
     </Button>
   );
+
+  const handleUploadImage = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file.");
+      return;
+    }
+
+    const formData = new FormData();
+    const sanitizedFile = new File([file], file.name.replace(/\s+/g, "-"), {
+      type: file.type,
+    });
+    formData.append("files", sanitizedFile);
+
+    try {
+      const response = await uploadImageMutation.mutateAsync(formData);
+      const imageUrl = response.results?.[0]?.url;
+
+      if (!imageUrl) {
+        toast.error("Upload succeeded but no image URL was returned.");
+        return;
+      }
+
+      editor
+        .chain()
+        .focus()
+        .setImage({ src: imageUrl, alt: sanitizedFile.name })
+        .run();
+      toast.success("Image inserted");
+    } catch {
+      toast.error("Failed to upload image");
+    }
+  };
 
   return (
     <div className="flex flex-wrap gap-2 pb-3">
@@ -241,6 +286,27 @@ export function MenuBar({
         "Redo",
       )}
       <LinkControls editor={editor} />
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleUploadImage}
+      />
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        onClick={() => imageInputRef.current?.click()}
+        disabled={uploadImageMutation.isPending}
+        title="Upload Image"
+      >
+        {uploadImageMutation.isPending ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <ImageIcon className="w-4 h-4" />
+        )}
+      </Button>
       <Button
         type="button"
         variant="outline"
@@ -270,6 +336,13 @@ export default function RichEditor({
     StarterKit,
     // FixedFont,
     KeepHtmlPaste,
+    TipTapImage.configure({
+      allowBase64: false,
+      inline: false,
+      HTMLAttributes: {
+        class: "rounded-lg border border-slate-200",
+      },
+    }),
     Link.configure({
       openOnClick: false,
       autolink: false,
