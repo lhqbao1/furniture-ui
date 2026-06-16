@@ -336,6 +336,13 @@ input[type="number"] {
   margin-left: 48px;
 }
 
+.ProseMirror img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 16px 0;
+}
+
 .product-descriptions li {
   list-style-type: disc;
   padding-left: 16px;
