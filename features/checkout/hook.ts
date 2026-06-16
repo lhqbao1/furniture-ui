@@ -46,9 +46,11 @@ import {
   uploadCheckoutFiles,
   UploadCheckoutFilesPayload,
   UpdateBulkExtInvoiceIdPayload,
+  UpdateMainCheckoutPayload,
   updateIsClaimedFactoryMainCheckout,
   updateBulkExtInvoiceId,
   updateIsClaimedMarketplaceMainCheckout,
+  updateMainCheckout,
   updateReasonForMainCheckout,
   updateTagForMainCheckout,
   updateNoteForMainCheckout,
@@ -526,6 +528,26 @@ export function useUpdateBulkExtInvoiceId() {
     mutationFn: (payload: UpdateBulkExtInvoiceIdPayload) =>
       updateBulkExtInvoiceId(payload),
     onSuccess: () => {
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
+    },
+  });
+}
+
+export function useUpdateMainCheckout() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      payload,
+    }: {
+      main_checkout_id: string;
+      payload: UpdateMainCheckoutPayload;
+    }) => updateMainCheckout(main_checkout_id, payload),
+    onSuccess: (_data, variables) => {
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
+      });
       qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });
     },

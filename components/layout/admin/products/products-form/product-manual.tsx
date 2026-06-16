@@ -16,6 +16,7 @@ const MANUAL_SECTIONS = [
   { key: "Benutzerhandbuch", label: "User Manual" },
   { key: "Sicherheit_information", label: "Safety Information" },
   { key: "Aufbauanleitung", label: "Assembly Instructions" },
+  { key: "Datenblatt", label: "Data Sheet", multiple: true },
 ];
 
 const ProductManual = () => {
@@ -23,30 +24,37 @@ const ProductManual = () => {
   const uploadFileMutation = useUploadStaticFile();
 
   const pdfFiles = (form.watch("pdf_files") || []) as ProductManualFile[];
-  // ============================
-  // UPLOAD NEW FILE (Replace old one)
-  // ============================
-  const handleUpload = async (files: File[], title: string) => {
-    const prevFiles = [...pdfFiles];
-
-    const file = files[0];
+  const sanitizePdfFile = (file: File) => {
     const sanitizedName = file.name.replace(/\s+/g, "-");
-    const sanitizedFile = new File([file], sanitizedName, {
+    return new File([file], sanitizedName, {
       type: file.type,
     });
+  };
+
+  const handleUpload = async (
+    files: File[],
+    title: string,
+    shouldAppend = false,
+  ) => {
+    const prevFiles = [...pdfFiles];
+
+    const sanitizedFiles = files.map((file) => sanitizePdfFile(file));
 
     const formData = new FormData();
-    formData.append("files", sanitizedFile);
+    sanitizedFiles.forEach((file) => {
+      formData.append("files", file);
+    });
 
     const res = await uploadFileMutation.mutateAsync(formData);
 
-    const newItem = {
+    const newItems = res.results.map((item) => ({
       title,
-      url: res.results[0].url,
-    };
+      url: item.url,
+    }));
 
-    // Replace file for this section
-    const updated = [...prevFiles.filter((f) => f.title !== title), newItem];
+    const updated = shouldAppend
+      ? [...prevFiles, ...newItems]
+      : [...prevFiles.filter((f) => f.title !== title), ...newItems];
 
     form.setValue("pdf_files", updated, {
       shouldDirty: true,
@@ -57,10 +65,13 @@ const ProductManual = () => {
   // ============================
   // REMOVE FILE
   // ============================
-  const removeFile = (title: string) => {
+  const removeFile = (title: string, url?: string) => {
     const prevFiles = [...pdfFiles];
 
-    const updated = prevFiles.filter((f) => f.title !== title);
+    const updated = url
+      ? prevFiles.filter((f) => !(f.title === title && f.url === url))
+      : prevFiles.filter((f) => f.title !== title);
+
     form.setValue("pdf_files", updated, {
       shouldDirty: true,
       shouldValidate: true,
@@ -74,7 +85,7 @@ const ProductManual = () => {
           Product Manuals (PDF)
         </FormLabel>
 
-        <div className="grid lg:grid-cols-3 grid-cols-1 gap-6">
+        <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-6">
           {MANUAL_SECTIONS.map((section) => {
             const filesOfSection = pdfFiles.filter(
               (item) => item.title === section.key,
@@ -92,41 +103,52 @@ const ProductManual = () => {
                   accept="application/pdf"
                   className="hidden"
                   id={`pdf-upload-${section.key}`}
+                  multiple={section.multiple}
                   onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      await handleUpload([file], section.key);
+                    const files = Array.from(e.target.files ?? []);
+                    if (files.length > 0) {
+                      await handleUpload(
+                        files,
+                        section.key,
+                        Boolean(section.multiple),
+                      );
+                      e.currentTarget.value = "";
                     }
                   }}
                 />
 
-                {/* If file exists → show label with delete button */}
-                {currentFile ? (
-                  <div className="flex items-center justify-between px-4 py-2 border rounded-md bg-secondary/10 text-sm">
-                    <a
-                      href={currentFile.url}
-                      download={
-                        currentFile.url.split("/").pop() || "manual.pdf"
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="truncate text-secondary hover:underline"
-                      title="Download file"
-                    >
-                      {currentFile.url.split("/").pop()}
-                    </a>
+                {filesOfSection.length > 0 && (
+                  <div className="space-y-2">
+                    {filesOfSection.map((file) => (
+                      <div
+                        key={`${section.key}-${file.url}`}
+                        className="flex items-center justify-between gap-2 px-4 py-2 border rounded-md bg-secondary/10 text-sm"
+                      >
+                        <a
+                          href={file.url}
+                          download={file.url.split("/").pop() || "manual.pdf"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="truncate text-secondary hover:underline"
+                          title="Download file"
+                        >
+                          {file.url.split("/").pop()}
+                        </a>
 
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="text-red-600 hover:text-red-700 hover:bg-transparent p-0"
-                      onClick={() => removeFile(section.key)}
-                    >
-                      ✕
-                    </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="text-red-600 hover:text-red-700 hover:bg-transparent p-0"
+                          onClick={() => removeFile(section.key, file.url)}
+                        >
+                          ✕
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                ) : (
-                  /* Upload button */
+                )}
+
+                {section.multiple || !currentFile ? (
                   <label
                     htmlFor={`pdf-upload-${section.key}`}
                     className="cursor-pointer flex items-center gap-2 text-sm w-full px-4 py-2 border rounded-md bg-white hover:bg-secondary/10 transition truncate"
@@ -136,11 +158,15 @@ const ProductManual = () => {
                     ) : (
                       <>
                         <Upload className="w-5 h-5 shrink-0" />
-                        <span className="truncate">Upload file</span>
+                        <span className="truncate">
+                          {filesOfSection.length > 0
+                            ? "Add more files"
+                            : "Upload file"}
+                        </span>
                       </>
                     )}
                   </label>
-                )}
+                ) : null}
               </div>
             );
           })}

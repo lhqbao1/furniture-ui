@@ -170,6 +170,7 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
 
     return [
       {
+        id: clean(order.id ?? ""),
         code: clean(order.checkout_code),
         marketplace: clean(order.from_marketplace ?? "Prestige Home"),
         marketplace_order_id: clean(order.marketplace_order_id),

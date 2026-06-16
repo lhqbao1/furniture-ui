@@ -10,6 +10,26 @@ interface UserManualTabProps {
 
 const UserManualTab = ({ files }: UserManualTabProps) => {
   const t = useTranslations();
+
+  const groupedFiles = React.useMemo(() => {
+    const groups = new Map<string, ProductPdfFiles[]>();
+
+    (files ?? []).forEach((file) => {
+      const title = file?.title?.trim();
+      const url = file?.url?.trim();
+      if (!title || !url) return;
+
+      const currentFiles = groups.get(title) ?? [];
+      currentFiles.push(file);
+      groups.set(title, currentFiles);
+    });
+
+    return Array.from(groups.entries()).map(([title, groupFiles]) => ({
+      title,
+      files: groupFiles,
+    }));
+  }, [files]);
+
   const downloadFile = async (url: string) => {
     try {
       const response = await fetch(url, { mode: "cors" });
@@ -41,22 +61,29 @@ const UserManualTab = ({ files }: UserManualTabProps) => {
 
   return (
     <div className="flex flex-col gap-4">
-      {files?.map((item, index) => (
+      {groupedFiles.map((group) => (
         <div
-          key={index}
+          key={group.title}
           className="flex flex-col gap-3 p-3"
         >
-          <div className="font-bold">{item.title}</div>
+          <div className="font-bold">{group.title}</div>
 
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 w-fit"
-            type="button"
-            onClick={() => downloadFile(item.url)}
-          >
-            <FileText className="w-4 h-4 text-red-500" />
-            {t("download")}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            {group.files.map((item, index) => (
+              <Button
+                key={`${group.title}-${item.url}`}
+                variant="outline"
+                className="flex items-center gap-2 w-fit"
+                type="button"
+                onClick={() => downloadFile(item.url)}
+              >
+                <FileText className="w-4 h-4 text-red-500" />
+                {group.files.length > 1
+                  ? `${t("download")} ${index + 1}`
+                  : t("download")}
+              </Button>
+            ))}
+          </div>
         </div>
       ))}
     </div>

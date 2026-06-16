@@ -241,8 +241,7 @@ export const InvoicePDF = ({
     Number.isFinite(paymentTermDays) && paymentTermDays > 0
       ? String(paymentTermDays)
       : "XX";
-  const shipperDateRaw =
-    primaryCheckout?.shipment?.shipper_date?.trim();
+  const shipperDateRaw = primaryCheckout?.shipment?.shipper_date?.trim();
   const hasServicePeriod = Boolean(shipperDateRaw);
   const servicePeriodValue = hasServicePeriod
     ? formatDateToNum(shipperDateRaw ?? "") || shipperDateRaw || ""
@@ -1064,9 +1063,7 @@ export const InvoicePDF = ({
         <View style={styles.flexColBlockWithTop}>
           <Text style={{ marginBottom: 2, fontSize: 9 }}>Lieferadresse:</Text>
           <Text style={{ fontSize: 9 }}>
-            {normalizeRecipientName(
-              primaryShippingAddress?.recipient_name,
-            )}
+            {normalizeRecipientName(primaryShippingAddress?.recipient_name)}
           </Text>
 
           <Text style={{ fontSize: 9 }}>
@@ -1083,7 +1080,9 @@ export const InvoicePDF = ({
             {primaryShippingAddress?.postal_code?.trim()
               ? primaryShippingAddress.postal_code
               : ""}{" "}
-            {primaryShippingAddress?.city?.trim() ? primaryShippingAddress.city : ""}
+            {primaryShippingAddress?.city?.trim()
+              ? primaryShippingAddress.city
+              : ""}
           </Text>
           <Text style={{ fontSize: 9 }}>
             {getCountryName(

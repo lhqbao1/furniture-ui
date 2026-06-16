@@ -20,7 +20,11 @@ import { X } from "lucide-react";
 import { ProductItem } from "@/types/products";
 import { useGetAllProducts } from "@/features/products/hook";
 import { toast } from "sonner";
-import { calculateProductVATFromNet } from "@/lib/caculate-vat";
+import {
+  calculateProductVAT,
+  calculateProductVATFromNet,
+  calculateShippingGrossFromNet,
+} from "@/lib/caculate-vat";
 import { getCountryCode } from "@/components/shared/getCountryNameDe";
 
 interface SelectedProduct {
@@ -43,6 +47,7 @@ const SelectOrderItems = ({
   const form = useFormContext();
   const { setValue } = form;
   const priceMode = form.watch("price_mode") ?? "gross";
+  const totalShippingInput = Number(form.watch("total_shipping") ?? 0) || 0;
   const fromMarketplace = String(form.watch("from_marketplace") ?? "").toLowerCase();
   const countryCode = getCountryCode(form.watch("invoice_country"));
   const taxId = form.watch("tax_id") ?? null;
@@ -140,6 +145,91 @@ const SelectOrderItems = ({
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+
+  const productTotals = useMemo(() => {
+    const totals = listProducts.reduce(
+      (totals, item) => {
+        const quantity = Math.max(0, Math.floor(Number(item.quantity) || 0));
+        const unitPrice = Number(item.final_price) || 0;
+
+        if (quantity <= 0 || unitPrice <= 0) return totals;
+
+        if (priceMode === "net") {
+          const vatInfo = calculateProductVATFromNet(
+            unitPrice,
+            item.product?.tax ?? null,
+            countryCode,
+            effectiveTaxIdForVat,
+          );
+
+          return {
+            gross: totals.gross + (Number(vatInfo.gross) || 0) * quantity,
+            net: totals.net + unitPrice * quantity,
+            validItems: totals.validItems + 1,
+          };
+        }
+
+        const vatInfo = calculateProductVAT(
+          unitPrice,
+          item.product?.tax ?? null,
+          countryCode,
+          effectiveTaxIdForVat,
+        );
+
+        return {
+          gross: totals.gross + unitPrice * quantity,
+          net: totals.net + (Number(vatInfo.net) || 0) * quantity,
+          validItems: totals.validItems + 1,
+        };
+      },
+      {
+        gross: 0,
+        net: 0,
+        validItems: 0,
+      },
+    );
+
+    const shippingInput = Math.max(0, Number(totalShippingInput) || 0);
+    if (shippingInput <= 0) return totals;
+
+    if (priceMode === "net") {
+      const convertedShipping = calculateShippingGrossFromNet(
+        listProducts.map((item) => ({
+          unitNet: Number(item.final_price) || 0,
+          quantity: Number(item.quantity) || 0,
+          tax: item.product?.tax ?? null,
+        })),
+        shippingInput,
+        countryCode,
+        effectiveTaxIdForVat,
+      );
+
+      return {
+        ...totals,
+        gross: totals.gross + (Number(convertedShipping.gross) || 0),
+        net: totals.net + shippingInput,
+      };
+    }
+
+    const shippingVatInfo = calculateProductVAT(
+      shippingInput,
+      "19%",
+      countryCode,
+      effectiveTaxIdForVat,
+    );
+
+    return {
+      ...totals,
+      gross: totals.gross + shippingInput,
+      net: totals.net + (Number(shippingVatInfo.net) || 0),
+    };
+  }, [
+    countryCode,
+    effectiveTaxIdForVat,
+    listProducts,
+    priceMode,
+    totalShippingInput,
+  ]);
 
   // 🔹 Auto update form.items khi listProducts thay đổi
   useEffect(() => {
@@ -330,6 +420,45 @@ const SelectOrderItems = ({
               </div>
             );
           })}
+
+          {productTotals.validItems > 0 && (
+            <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <div className="text-sm font-semibold text-slate-900">
+                    Order totals
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Includes products and shipping, calculated from{" "}
+                    {priceMode === "net" ? "net" : "gross"} prices.
+                  </div>
+                </div>
+                <div className="rounded-full border border-secondary/20 bg-white px-3 py-1 text-xs font-medium text-secondary">
+                  {productTotals.validItems} item
+                  {productTotals.validItems > 1 ? "s" : ""}
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-lg border border-slate-200 bg-white p-3">
+                  <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Gross total
+                  </div>
+                  <div className="mt-1 text-lg font-semibold text-slate-900">
+                    € {formatCurrency(productTotals.gross)}
+                  </div>
+                </div>
+                <div className="rounded-lg border border-slate-200 bg-white p-3">
+                  <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Net total
+                  </div>
+                  <div className="mt-1 text-lg font-semibold text-slate-900">
+                    € {formatCurrency(productTotals.net)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
