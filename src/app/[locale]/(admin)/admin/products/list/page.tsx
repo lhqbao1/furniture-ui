@@ -167,6 +167,7 @@ const ProductList = () => {
     sort_by_stock: effectiveSortByStock,
     supplier_id: filters.supplier_id,
     brand_id: filters.brand,
+    category_id: filters.category_id,
     sort_by_incoming_stock: filters.sort_by_incoming_stock,
   });
 

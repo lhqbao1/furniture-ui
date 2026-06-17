@@ -24,6 +24,7 @@ export interface GetAllProductsParams {
   sort_by_marketplace?: string;
   supplier_id?: string;
   brand_id?: string;
+  category_id?: string;
   sort_by_incoming_stock?: string;
 }
 
@@ -158,11 +159,14 @@ export async function getAllProducts(params?: GetAllProductsParams) {
     params: {
       ...(params?.page !== undefined && { page: params.page }),
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
-      ...(params?.supplier_id !== undefined && {
+      ...(params?.supplier_id && {
         supplier_id: params.supplier_id,
       }),
-      ...(params?.brand_id !== undefined && {
+      ...(params?.brand_id && {
         brand_id: params.brand_id,
+      }),
+      ...(params?.category_id && {
+        category_id: params.category_id,
       }),
       ...(params?.all_products !== undefined && {
         all_products: params.all_products,

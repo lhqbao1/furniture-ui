@@ -42,6 +42,8 @@ import EANDrawer from "./toolbar/bulk-update/ean-drawer";
 import MultiSearch from "./toolbar/multi-search";
 import { useGetSuppliers } from "@/features/supplier/hook";
 import { useGetBrands } from "@/features/brand/hook";
+import { useGetCategories } from "@/features/category/hook";
+import { flattenCategoryOptions } from "./toolbar/filter/category/category-options";
 
 export enum ToolbarType {
   product = "product",
@@ -78,6 +80,7 @@ const FILTER_KEYS = [
   "all_products",
   "supplier_id",
   "brand_id",
+  "category_id",
   "sort_by_stock",
   "sort_by_incoming_stock",
   "sort_by_marketplace",
@@ -118,6 +121,7 @@ export default function TableToolbar({
   const defaultSearch = searchParams.get("search") ?? "";
   const { data: suppliers } = useGetSuppliers(type === ToolbarType.product);
   const { data: brands } = useGetBrands();
+  const { data: categories } = useGetCategories();
 
   const [searchValue, setSearchValue] = useState(defaultSearch);
   const [prevParams, setPrevParams] = useState(
@@ -214,6 +218,14 @@ export default function TableToolbar({
     return map;
   }, [brands]);
 
+  const categoryLabelMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+    flattenCategoryOptions(categories ?? []).forEach((category) => {
+      map.set(category.id, category.name);
+    });
+    return map;
+  }, [categories]);
+
   const activeFilterChips = React.useMemo(() => {
     type FilterChip = {
       id: string;
@@ -271,6 +283,15 @@ export default function TableToolbar({
       });
     }
 
+    const categoryId = searchParams.get("category_id");
+    if (categoryId) {
+      chips.push({
+        id: "category",
+        label: `Category: ${categoryLabelMap.get(categoryId) ?? categoryId}`,
+        onRemove: () => removeFilterParam("category_id"),
+      });
+    }
+
     const stockSort = searchParams.get("sort_by_stock");
     if (stockSort === "asc" || stockSort === "desc") {
       chips.push({
@@ -310,6 +331,7 @@ export default function TableToolbar({
     return chips;
   }, [
     brandLabelMap,
+    categoryLabelMap,
     parseCsvParam,
     removeFilterParam,
     removeFilterValue,

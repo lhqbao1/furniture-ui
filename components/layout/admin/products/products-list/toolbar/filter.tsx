@@ -6,6 +6,7 @@ import ProductStatusFilter from "./filter/status";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import SupplierFilter from "./filter/supplier-filter";
 import BrandFilter from "./filter/brand/brand-filter";
+import CategoryFilter from "./filter/category/category-filter";
 import FilterExportForm from "./filter-export-dialog";
 
 interface FilterFormProps {
@@ -29,6 +30,8 @@ export default function FilterForm({ isDSP = false }: FilterFormProps) {
       {!isDSP && <SupplierFilter />}
 
       <BrandFilter />
+
+      <CategoryFilter />
 
       {/* Reset */}
       <div className="flex justify-end gap-2">

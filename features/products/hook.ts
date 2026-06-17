@@ -61,6 +61,7 @@ export function useGetAllProducts({
   sort_by_marketplace,
   supplier_id,
   brand_id,
+  category_id,
   sort_by_incoming_stock,
 }: GetAllProductsParams = {}) {
   return useQuery({
@@ -77,6 +78,7 @@ export function useGetAllProducts({
       sort_by_marketplace,
       supplier_id,
       brand_id,
+      category_id,
       sort_by_incoming_stock,
     ],
     queryFn: () =>
@@ -92,6 +94,7 @@ export function useGetAllProducts({
         sort_by_marketplace,
         supplier_id,
         brand_id,
+        category_id,
         sort_by_incoming_stock,
       }),
     placeholderData: keepPreviousData,
