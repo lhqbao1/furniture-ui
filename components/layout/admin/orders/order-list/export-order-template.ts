@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { getStatusStyle } from "./status-styles";
 import { CheckOutMain } from "@/types/checkout";
+import { CartItem } from "@/types/cart";
 import { formatDateDDMMYYYY } from "@/lib/date-formated";
 import { calculateProductVAT } from "@/lib/caculate-vat";
 
@@ -38,6 +39,19 @@ function getPrimaryCheckout(order: CheckOutMain) {
 
 function clean(val: unknown) {
   return val === null || val === undefined || val === "None" ? "" : val;
+}
+
+function calculateOrderProductCosts(items: CartItem[]) {
+  return items.reduce(
+    (totals, item) => {
+      const quantity = Number(item.quantity) || 0;
+      totals.productsCost += (Number(item.products?.cost) || 0) * quantity;
+      totals.freightCost +=
+        (Number(item.products?.delivery_cost) || 0) * quantity;
+      return totals;
+    },
+    { productsCost: 0, freightCost: 0 },
+  );
 }
 
 function calculateOrderNetValues(order: CheckOutMain) {
@@ -147,6 +161,7 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
     const user = checkout?.user;
     const allItems = exportableCheckouts.flatMap((c) => c.cart?.items ?? []);
     const { netAmount, shippingNet } = calculateOrderNetValues(order);
+    const { productsCost, freightCost } = calculateOrderProductCosts(allItems);
 
     const buyerAddressRow = {
       invoice_name: clean(invoice?.recipient_name ?? ""),
@@ -195,7 +210,9 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
         discount_amout: clean(order.voucher_amount),
         total_amount: clean(order.total_amount),
         net_amount: clean(netAmount),
-        shipping_cost: clean(shippingNet),
+        shipping_amount: clean(shippingNet),
+        products_cost: clean(+productsCost.toFixed(2)),
+        freight_cost: clean(+freightCost.toFixed(2)),
         ...buyerAddressRow,
         carrier: clean(checkout?.shipment?.shipping_carrier ?? ""),
         suppliers: clean(
