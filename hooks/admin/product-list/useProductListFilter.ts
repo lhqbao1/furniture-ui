@@ -11,6 +11,7 @@ export function useProductListFilters() {
     sort_by_stock: searchParams.get("sort_by_stock") || undefined,
     supplier_id: searchParams.get("supplier_id") || "",
     brand: searchParams.get("brand_id") || "",
+    category_id: searchParams.get("category_id") || "",
     sort_by_incoming_stock: searchParams.get("sort_by_incoming_stock") || "",
   };
 }

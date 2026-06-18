@@ -164,7 +164,7 @@ const ProductDescription = ({
         }}
       >
         <DialogContent
-          className="max-w-[min(1100px,calc(100vw-2rem))] overflow-hidden border-slate-200 bg-white p-0 shadow-2xl sm:rounded-3xl"
+          className="w-[90vw] max-w-[90vw] overflow-hidden border-slate-200 bg-white p-0 shadow-2xl sm:rounded-3xl"
           overlayClassName="bg-black/50"
           showCloseButton={false}
           onKeyDown={(event) => {
@@ -177,7 +177,7 @@ const ProductDescription = ({
           </DialogTitle>
 
           {activeImage ? (
-            <div className="flex max-h-[88vh] flex-col overflow-hidden rounded-3xl bg-white">
+            <div className="flex h-[94vh] max-h-[94vh] flex-col overflow-hidden rounded-3xl bg-white">
               <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 text-slate-950 sm:px-5">
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium">
@@ -202,7 +202,7 @@ const ProductDescription = ({
                 </DialogClose>
               </div>
 
-              <div className="relative flex min-h-[320px] items-center justify-center bg-white p-3 sm:p-5">
+              <div className="relative flex min-h-0 flex-1 items-center justify-center bg-white p-1 sm:p-2">
                 {hasMultipleImages ? (
                   <Button
                     type="button"
@@ -225,7 +225,7 @@ const ProductDescription = ({
                   width={1200}
                   height={900}
                   unoptimized
-                  className="max-h-[74vh] max-w-full rounded-2xl object-contain shadow-2xl"
+                  className="h-full max-h-full w-full max-w-full rounded-2xl object-contain shadow-2xl"
                   loading="lazy"
                 />
 
