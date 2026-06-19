@@ -61,6 +61,7 @@ import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import EditProductDrawer from "../marketplace/edit-product-drawer";
 import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 import { getIncomingDisplayItems } from "@/lib/product-incoming-stock";
+import ProductStockDialog from "./product-stock-dialog";
 
 const PRESTIGE_OWNER_VALUE = "__PRESTIGE__";
 
@@ -2027,20 +2028,24 @@ export const getProductColumns = (
       const computedStock = calculateAvailableStock(row.original);
 
       return (
-        <div
-          className={cn(
-            "text-center text-white rounded-xl px-2 py-1",
-            computedStock === 0
-              ? "bg-red-500 text-white"
-              : computedStock < 10
-                ? "bg-gray-400"
-                : computedStock <= 20
-                  ? "bg-primary"
-                  : "bg-secondary",
-          )}
-        >
-          {computedStock} pcs.
-        </div>
+        <ProductStockDialog product={row.original}>
+          <button
+            type="button"
+            className={cn(
+              "rounded-xl px-2 py-1 text-center text-white transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+              computedStock === 0
+                ? "bg-red-500 text-white"
+                : computedStock < 10
+                  ? "bg-gray-400"
+                  : computedStock <= 20
+                    ? "bg-primary"
+                    : "bg-secondary",
+            )}
+            aria-label={`View and edit stock for ${row.original.name}`}
+          >
+            {computedStock} pcs.
+          </button>
+        </ProductStockDialog>
       );
     },
     enableSorting: true,

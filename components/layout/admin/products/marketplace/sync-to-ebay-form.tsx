@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Pencil, Plus, RefreshCw } from "lucide-react";
+import { Copy, Loader2, Pencil, Plus, RefreshCw } from "lucide-react";
 import { useSyncToEbay } from "@/features/ebay/hook";
 import { syncToEbayInput } from "@/features/ebay/api";
 import { stripHtmlRegex } from "@/hooks/simplifyHtml";
@@ -52,6 +52,54 @@ interface SyncToEbayFormProps {
 }
 
 type MarketPlaceFormValues = z.infer<typeof marketPlaceSchema>;
+
+const CopyableProductIdentifier = ({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | null;
+}) => {
+  const normalizedValue = value?.trim() ?? "";
+
+  const handleCopy = async () => {
+    if (!normalizedValue) return;
+
+    try {
+      await navigator.clipboard.writeText(normalizedValue);
+      toast.success(`${label} copied`);
+    } catch {
+      toast.error(`Failed to copy ${label}`);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="text-sm font-medium text-slate-900">{label}</div>
+      <div className="flex items-center gap-2">
+        <Input
+          readOnly
+          value={normalizedValue || "—"}
+          className="font-mono text-sm"
+          onFocus={(event) => event.currentTarget.select()}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          aria-label={`Copy ${label}`}
+          title={`Copy ${label}`}
+          className="shrink-0"
+          disabled={!normalizedValue}
+          onClick={handleCopy}
+        >
+          <Copy className="size-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 export function parseError(error: unknown): string {
   if (!error) return "Unknown error";
 
@@ -617,6 +665,11 @@ const SyncToEbayForm = ({
                     </FormItem>
                   )}
                 />
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <CopyableProductIdentifier label="SKU" value={product.sku} />
+                  <CopyableProductIdentifier label="EAN" value={product.ean} />
+                </div>
 
                 {currentMarketplace !== "ebay" && (
                   <FormField

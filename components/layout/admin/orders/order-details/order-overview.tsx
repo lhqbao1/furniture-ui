@@ -29,9 +29,12 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -55,6 +58,22 @@ type MarketplaceInvoicePreset = {
   invoice_city: string;
   invoice_postal_code: string;
   invoice_country: string;
+};
+
+type EditableOrderField = "ext_id" | "ext_reference";
+
+const EDITABLE_ORDER_FIELD_CONFIG: Record<
+  EditableOrderField,
+  { label: string; description: string }
+> = {
+  ext_id: {
+    label: "Ext order",
+    description: "Update the external order ID for this order.",
+  },
+  ext_reference: {
+    label: "External Reference",
+    description: "Update the external reference for this order.",
+  },
 };
 
 const PRESET_BY_MARKETPLACE: Record<string, MarketplaceInvoicePreset> = {
@@ -201,6 +220,9 @@ const OrderDetailOverView = ({
   const [channelDialogOpen, setChannelDialogOpen] = useState(false);
   const [channelPopoverOpen, setChannelPopoverOpen] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState(currentChannelKey);
+  const [editableOrderField, setEditableOrderField] =
+    useState<EditableOrderField | null>(null);
+  const [editableOrderFieldValue, setEditableOrderFieldValue] = useState("");
 
   const selectedChannelOption = useMemo(
     () => getChannelOption(selectedChannel),
@@ -249,6 +271,52 @@ const OrderDetailOverView = ({
     }
   };
 
+  const openOrderFieldDialog = (
+    field: EditableOrderField,
+    currentValue?: string | null,
+  ) => {
+    setEditableOrderFieldValue(currentValue ?? "");
+    setEditableOrderField(field);
+  };
+
+  const handleOrderFieldDialogOpenChange = (open: boolean) => {
+    if (open) return;
+    setEditableOrderField(null);
+    setEditableOrderFieldValue("");
+  };
+
+  const handleUpdateOrderField = async () => {
+    if (!editableOrderField) return;
+
+    const nextValue = editableOrderFieldValue.trim();
+    const payload =
+      editableOrderField === "ext_id"
+        ? { ext_id: nextValue }
+        : { ext_reference: nextValue };
+
+    try {
+      await updateMainCheckoutMutation.mutateAsync({
+        main_checkout_id: order.id,
+        payload,
+      });
+      toast.success(
+        `${EDITABLE_ORDER_FIELD_CONFIG[editableOrderField].label} updated successfully`,
+      );
+      handleOrderFieldDialogOpenChange(false);
+    } catch {
+      toast.error(
+        `Failed to update ${EDITABLE_ORDER_FIELD_CONFIG[editableOrderField].label.toLowerCase()}`,
+      );
+    }
+  };
+
+  const currentEditableOrderFieldValue =
+    editableOrderField === "ext_id"
+      ? (order.marketplace_order_id ?? "")
+      : (order.netto_buyer_id ?? "");
+  const isOrderFieldValueUnchanged =
+    editableOrderFieldValue.trim() === currentEditableOrderFieldValue.trim();
+
   return (
     <div className="col-span-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-4">
       <div className="flex items-center justify-between">
@@ -289,8 +357,22 @@ const OrderDetailOverView = ({
             <ReceiptText className="size-3.5" />
             <span>Ext order</span>
           </div>
-          <div className="font-medium text-slate-700">
-            {order.marketplace_order_id ? order.marketplace_order_id : "-"}
+          <div className="flex items-center gap-1.5">
+            <div className="font-medium text-slate-700">
+              {order.marketplace_order_id ? order.marketplace_order_id : "-"}
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label="Edit ext order"
+              className="size-7 text-primary hover:bg-primary/10 hover:text-primary"
+              onClick={() =>
+                openOrderFieldDialog("ext_id", order.marketplace_order_id)
+              }
+            >
+              <Pencil className="size-3.5" />
+            </Button>
           </div>
         </div>
         <div className="flex items-center justify-between gap-3">
@@ -298,8 +380,25 @@ const OrderDetailOverView = ({
             <ReceiptText className="size-3.5" />
             <span>External Reference</span>
           </div>
-          <div className="font-medium text-slate-700">
-            {order.netto_buyer_id ? order.netto_buyer_id : "-"}
+          <div className="flex items-center gap-1.5">
+            <div className="font-medium text-slate-700">
+              {order.netto_buyer_id ? order.netto_buyer_id : "-"}
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label="Edit external reference"
+              className="size-7 text-primary hover:bg-primary/10 hover:text-primary"
+              onClick={() =>
+                openOrderFieldDialog(
+                  "ext_reference",
+                  order.netto_buyer_id,
+                )
+              }
+            >
+              <Pencil className="size-3.5" />
+            </Button>
           </div>
         </div>
         <div className="flex items-center justify-between gap-3">
@@ -478,6 +577,75 @@ const OrderDetailOverView = ({
               )}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={editableOrderField !== null}
+        onOpenChange={handleOrderFieldDialogOpenChange}
+      >
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              Edit{" "}
+              {editableOrderField
+                ? EDITABLE_ORDER_FIELD_CONFIG[editableOrderField].label
+                : "order field"}
+            </DialogTitle>
+            <DialogDescription>
+              {editableOrderField
+                ? EDITABLE_ORDER_FIELD_CONFIG[editableOrderField].description
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+
+          <Input
+            value={editableOrderFieldValue}
+            onChange={(event) =>
+              setEditableOrderFieldValue(event.target.value)
+            }
+            placeholder={
+              editableOrderField
+                ? EDITABLE_ORDER_FIELD_CONFIG[editableOrderField].label
+                : ""
+            }
+            autoFocus
+            onKeyDown={(event) => {
+              if (
+                event.key === "Enter" &&
+                !isOrderFieldValueUnchanged &&
+                !updateMainCheckoutMutation.isPending
+              ) {
+                event.preventDefault();
+                void handleUpdateOrderField();
+              }
+            }}
+          />
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleOrderFieldDialogOpenChange(false)}
+              disabled={updateMainCheckoutMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleUpdateOrderField}
+              disabled={
+                updateMainCheckoutMutation.isPending ||
+                isOrderFieldValueUnchanged
+              }
+            >
+              {updateMainCheckoutMutation.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                "Save"
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
