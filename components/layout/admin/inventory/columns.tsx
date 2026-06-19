@@ -184,7 +184,7 @@ function EditableEANCell({ product }: { product: ProductItem }) {
   };
 
   return (
-    <div className="text-center">
+    <div className="text-left">
       {editing ? (
         <Input
           value={value}
@@ -682,15 +682,6 @@ export const getInventoryColumns = (
     },
 
     {
-    accessorKey: "ean",
-    meta: { width: 150 },
-    header: ({}) => <div className="text-center uppercase">EAN</div>,
-    cell: ({ row }) => {
-      return <EditableEANCell product={row.original} />;
-    },
-    },
-
-    {
     accessorKey: "name",
     meta: { width: 250 },
     header: ({ column }) => (
@@ -716,12 +707,10 @@ export const getInventoryColumns = (
             <span className="font-semibold text-secondary">SKU:</span>{" "}
             <span>{row.original.sku || "—"}</span>
           </div>
-          {isPhVariant ? (
-            <div>
-              <span className="font-semibold text-sky-700">EAN:</span>{" "}
-              <span>{row.original.ean || "—"}</span>
-            </div>
-          ) : null}
+          <div className="flex items-start gap-1">
+            <span className="font-semibold text-sky-700">EAN:</span>
+            <EditableEANCell product={row.original} />
+          </div>
         </div>
       </div>
     ),
@@ -1296,7 +1285,6 @@ export const getInventoryColumns = (
   }
 
   const hiddenColumnKeys = new Set([
-    "ean",
     "supplier",
     "purchase_cost",
     "price",

@@ -1,5 +1,20 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useUpdateMainCheckout } from "@/features/checkout/hook";
 import { User } from "@/types/user";
-import React from "react";
+import { Loader2, Pencil } from "lucide-react";
+import React, { useState } from "react";
+import { toast } from "sonner";
 
 type VatSummaryRow = {
   percent: number;
@@ -7,6 +22,7 @@ type VatSummaryRow = {
 };
 
 interface OrderInformationProps {
+  main_checkout_id: string;
   payment_method?: string;
   language: string;
   external_id?: string;
@@ -29,6 +45,7 @@ interface OrderInformationProps {
 }
 
 const OrderSummary = ({
+  main_checkout_id,
   payment_method,
   language,
   external_id,
@@ -49,6 +66,10 @@ const OrderSummary = ({
   refund_amount,
   is_Ebay = false,
 }: OrderInformationProps) => {
+  const updateMainCheckoutMutation = useUpdateMainCheckout();
+  const [shippingDialogOpen, setShippingDialogOpen] = useState(false);
+  const [shippingAmountInput, setShippingAmountInput] = useState("");
+
   const formatEuro = (value: number | undefined) =>
     `€${(value ?? 0).toLocaleString("de-DE", {
       minimumFractionDigits: 2,
@@ -70,6 +91,49 @@ const OrderSummary = ({
     })}%)`;
   };
 
+  const currentShippingAmount = Number(shipping_amount) || 0;
+  const parseShippingAmount = (value: string) => {
+    const normalized = value.trim().replace(/\s/g, "");
+    if (!normalized) return Number.NaN;
+
+    return Number(
+      normalized.includes(",")
+        ? normalized.replaceAll(".", "").replace(",", ".")
+        : normalized,
+    );
+  };
+  const nextShippingAmount = parseShippingAmount(shippingAmountInput);
+  const isShippingAmountValid =
+    Number.isFinite(nextShippingAmount) && nextShippingAmount >= 0;
+  const isShippingAmountUnchanged =
+    isShippingAmountValid &&
+    Number(nextShippingAmount.toFixed(2)) ===
+      Number(currentShippingAmount.toFixed(2));
+
+  const handleShippingDialogOpenChange = (open: boolean) => {
+    setShippingDialogOpen(open);
+    if (open) {
+      setShippingAmountInput(currentShippingAmount.toFixed(2));
+    }
+  };
+
+  const handleUpdateShippingAmount = async () => {
+    if (!isShippingAmountValid || isShippingAmountUnchanged) return;
+
+    try {
+      await updateMainCheckoutMutation.mutateAsync({
+        main_checkout_id,
+        payload: {
+          shipping_amount: Number(nextShippingAmount.toFixed(2)),
+        },
+      });
+      toast.success("Shipping amount updated successfully");
+      setShippingDialogOpen(false);
+    } catch {
+      toast.error("Failed to update shipping amount");
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-6">
       <div className="mb-4">
@@ -85,8 +149,20 @@ const OrderSummary = ({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="text-slate-600">Shipping</div>
-          <div className="text-right font-medium text-slate-900">
-            {formatEuro(shipping_amount)}
+          <div className="flex items-center justify-end gap-1.5">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label="Edit shipping amount"
+              className="size-7 text-primary hover:bg-primary/10 hover:text-primary"
+              onClick={() => handleShippingDialogOpenChange(true)}
+            >
+              <Pencil className="size-3.5" />
+            </Button>
+            <div className="text-right font-medium text-slate-900">
+              {formatEuro(shipping_amount)}
+            </div>
           </div>
         </div>
         {discount_amount && discount_amount > 0 ? (
@@ -137,6 +213,83 @@ const OrderSummary = ({
           </div>
         </div>
       </div>
+
+      <Dialog
+        open={shippingDialogOpen}
+        onOpenChange={handleShippingDialogOpenChange}
+      >
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Shipping</DialogTitle>
+            <DialogDescription>
+              Only the shipping amount will be updated for this order.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="shipping-amount"
+              className="text-sm font-medium text-slate-900"
+            >
+              Shipping amount (€)
+            </label>
+            <Input
+              id="shipping-amount"
+              type="text"
+              inputMode="decimal"
+              autoFocus
+              value={shippingAmountInput}
+              disabled={updateMainCheckoutMutation.isPending}
+              onChange={(event) => setShippingAmountInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (
+                  event.key === "Enter" &&
+                  isShippingAmountValid &&
+                  !isShippingAmountUnchanged &&
+                  !updateMainCheckoutMutation.isPending
+                ) {
+                  event.preventDefault();
+                  void handleUpdateShippingAmount();
+                }
+              }}
+            />
+            {shippingAmountInput.trim() && !isShippingAmountValid ? (
+              <p className="text-sm text-destructive">
+                Shipping amount must be zero or greater.
+              </p>
+            ) : null}
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShippingDialogOpen(false)}
+              disabled={updateMainCheckoutMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleUpdateShippingAmount}
+              disabled={
+                !isShippingAmountValid ||
+                isShippingAmountUnchanged ||
+                updateMainCheckoutMutation.isPending
+              }
+            >
+              {updateMainCheckoutMutation.isPending ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                "Save"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

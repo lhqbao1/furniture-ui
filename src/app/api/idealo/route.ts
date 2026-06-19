@@ -4,6 +4,7 @@ import { cleanImageLink } from "@/hooks/simplify-desciprtion";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { ProductItem, StaticFile } from "@/types/products";
 import { CategoryResponse } from "@/types/categories";
+import { getAllProductsSelect } from "@/features/product-group/api";
 
 // Escape CSV value
 const escapeCsv = (value?: string | number) => {
@@ -14,7 +15,10 @@ const escapeCsv = (value?: string | number) => {
 
 export async function GET() {
   try {
-    const products = (await getProductsFeed()) ?? [];
+    const products = await getAllProductsSelect({
+      all_products: true,
+      supplier_id: "prestige_home",
+    });
 
     if (!Array.isArray(products)) {
       throw new Error("Products is not array");

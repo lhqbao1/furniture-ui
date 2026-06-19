@@ -20,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import InventoryFilterForm from "./filter-form";
-import ImportInventoryDialog from "./dialog/import-dialog";
 import ImportStockSupplierDialog from "./import-stock-supplier";
 
 export enum ToolbarType {
@@ -125,24 +124,9 @@ export default function InventoryTableToolbar({
   ]);
 
   return (
-    <div className="w-full p-2">
-      <div className="flex items-start justify-center gap-3">
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <div className="flex text-sm font-medium">
-            <ImportStockSupplierDialog
-              setIsImporting={setIsImporting}
-              isSupplier
-            />
-          </div>
-
-          {!isInventory && (
-            <div className="flex text-sm font-medium">
-              <ImportInventoryDialog setIsImporting={setIsImporting} />
-            </div>
-          )}
-        </div>
-
-        <div className="w-full min-w-0 max-w-2xl">
+    <div className="w-full rounded-2xl border border-secondary/15 bg-white p-3 shadow-sm md:p-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start">
+        <div className="w-full min-w-0 md:flex-1">
           {searchContent ?? (
             <Input
               placeholder={searchByEnter ? "Search (press Enter)" : "Search"}
@@ -159,45 +143,55 @@ export default function InventoryTableToolbar({
           )}
         </div>
 
-        <div className="w-full sm:w-[140px]">
-          <Select
-            value={String(pageSize)}
-            onValueChange={(value) => setPageSize(Number(value))}
-          >
-            <SelectTrigger className="border text-black cursor-pointer">
-              <SelectValue placeholder="Select size" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">1 rows</SelectItem>
-              <SelectItem value="5">5 rows</SelectItem>
-              <SelectItem value="10">10 rows</SelectItem>
-              <SelectItem value="20">20 rows</SelectItem>
-              <SelectItem value="50">50 rows</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <div className="grid w-full grid-cols-3 gap-2 md:w-fit md:grid-cols-[140px_110px_110px]">
+          <div className="min-w-0">
+            <Select
+              value={String(pageSize)}
+              onValueChange={(value) => setPageSize(Number(value))}
+            >
+              <SelectTrigger className="w-full cursor-pointer border bg-white text-black">
+                <SelectValue placeholder="Select size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1 rows</SelectItem>
+                <SelectItem value="5">5 rows</SelectItem>
+                <SelectItem value="10">10 rows</SelectItem>
+                <SelectItem value="20">20 rows</SelectItem>
+                <SelectItem value="50">50 rows</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-1">
-              Filter <ChevronDown className="h-4 w-4" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex w-full items-center gap-1">
+                Filter <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-h-[80vh] w-[calc(100vw-1rem)] overflow-y-auto p-4 sm:w-[800px] sm:px-8">
+              {resolvedFilterContent}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {isInventory ? (
+            <div className="flex min-w-0 [&_button]:w-full">
+              <ImportStockSupplierDialog
+                setIsImporting={setIsImporting}
+                isSupplier
+              />
+            </div>
+          ) : (
+            <Button
+              variant={"secondary"}
+              className="w-full"
+              onClick={() =>
+                router.push("/admin/logistic/inventory/incoming/add")
+              }
+            >
+              Add PO
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[800px] px-8 py-4">
-            {resolvedFilterContent}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {!isInventory && (
-          <Button
-            variant={"secondary"}
-            onClick={() =>
-              router.push("/admin/logistic/inventory/incoming/add")
-            }
-          >
-            Add PO
-          </Button>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

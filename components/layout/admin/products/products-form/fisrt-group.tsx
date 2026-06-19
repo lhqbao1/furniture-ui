@@ -210,7 +210,7 @@ const ProductDetailInputs = ({
       />
 
       {/*Product ID & status */}
-      <div className="flex gap-6">
+      <div className="flex flex-wrap gap-4 sm:gap-6">
         {productId ? <div>ID: {productId}</div> : ""}
 
         {/*Product Active */}
@@ -345,7 +345,7 @@ const ProductDetailInputs = ({
         ) : (
           <FormItem className="flex flex-col w-full">
             <FormLabel className="text-black font-semibold text-sm">
-              Computed stock
+              Available stock
             </FormLabel>
             <FormControl>
               <Input

@@ -362,7 +362,7 @@ export default function TableToolbar({
   return (
     <div className="w-full rounded-2xl border border-secondary/15 bg-white p-3 shadow-sm md:p-4">
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex flex-col gap-3">
           <div className="flex w-full flex-1 items-center gap-2 rounded-xl border border-secondary/10 bg-muted/20 p-1.5">
             <MultiSearch />
             <Input
@@ -398,12 +398,19 @@ export default function TableToolbar({
             />
           </div>
 
-          <div className="flex w-full flex-wrap items-center gap-2 rounded-xl border border-secondary/10 bg-muted/20 p-1.5 xl:w-auto xl:justify-end">
+          <div
+            className={cn(
+              "grid w-full gap-2 rounded-xl border border-secondary/10 bg-muted/20 p-1.5 md:ml-auto md:w-fit",
+              columnOptions?.length
+                ? "grid-cols-3 md:grid-cols-[120px_120px_120px]"
+                : "grid-cols-2 sm:grid-cols-4 md:grid-cols-[120px_120px_120px_120px]",
+            )}
+          >
             <Select
               value={String(pageSize)}
               onValueChange={(value) => setPageSize(Number(value))}
             >
-              <SelectTrigger className="h-10 w-[120px] cursor-pointer border bg-white text-black">
+              <SelectTrigger className="h-10 w-full cursor-pointer border bg-white text-black">
                 <SelectValue placeholder="Select size" />
               </SelectTrigger>
               <SelectContent>
@@ -423,7 +430,7 @@ export default function TableToolbar({
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="secondary"
-                  className="h-10 bg-secondary text-white hover:bg-secondary/90 flex items-center gap-1"
+                  className="flex h-10 w-full items-center gap-1 bg-secondary px-2 text-white hover:bg-secondary/90"
                 >
                   Filter <ChevronDown className="h-4 w-4" />
                 </Button>
@@ -438,7 +445,7 @@ export default function TableToolbar({
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="h-10 bg-white hover:bg-white/90 flex items-center gap-1"
+                  className="flex h-10 w-full items-center gap-1 bg-white px-2 hover:bg-white/90"
                 >
                   View <ChevronDown className="h-4 w-4" />
                 </Button>
@@ -481,7 +488,7 @@ export default function TableToolbar({
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="h-10 bg-white hover:bg-white/90 flex items-center gap-1"
+                    className="flex h-10 w-full items-center gap-1 bg-white px-2 hover:bg-white/90"
                   >
                     Columns <ChevronDown className="h-4 w-4" />
                   </Button>
@@ -513,7 +520,7 @@ export default function TableToolbar({
 
         {type === ToolbarType.product && activeFilterChips.length > 0 ? (
           <div className="rounded-xl border border-secondary/15 bg-secondary/5 p-3">
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
               <div className="mr-1 inline-flex items-center gap-1.5 rounded-md bg-secondary/10 px-2 py-1 text-xs font-semibold text-secondary">
                 <SlidersHorizontal className="h-3.5 w-3.5" />
                 Active filters
@@ -560,7 +567,7 @@ export default function TableToolbar({
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="h-9 bg-white hover:bg-white/90 flex items-center gap-1"
+                    className="flex h-9 flex-1 items-center gap-1 bg-white hover:bg-white/90 sm:flex-none"
                   >
                     Group action <ChevronDown className="h-4 w-4" />
                   </Button>
@@ -591,7 +598,7 @@ export default function TableToolbar({
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <div className="flex items-center gap-2 text-sm font-medium">
+              <div className="flex flex-1 items-center justify-end gap-2 text-sm font-medium sm:flex-none">
                 <DropdownMenu>
                   <DropdownMenuContent className="w-150 p-4 space-y-4">
                     <FilterExportForm />

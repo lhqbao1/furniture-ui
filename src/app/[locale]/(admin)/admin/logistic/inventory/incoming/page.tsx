@@ -20,12 +20,14 @@ import {
 } from "@/components/ui/hover-card";
 import Image from "next/image";
 import { formatIncomingStockDate } from "@/lib/format-incoming-stock";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const formatISOWeek = (value?: string | null) => {
   return formatIncomingStockDate(value);
 };
 
 const IncomingInventoryList = () => {
+  const isMobile = useIsMobile();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [inventoryPoPage, setInventoryPoPage] = useState(1);
@@ -241,8 +243,8 @@ const IncomingInventoryList = () => {
   if (isError) return <div>No data</div>;
 
   return (
-    <div className="h-screen flex flex-col gap-6 pb-6 overflow-hidden">
-      <div className="text-3xl text-secondary font-bold text-center">
+    <div className="flex min-h-screen flex-col gap-4 overflow-visible pb-6 sm:gap-6 md:h-screen md:overflow-hidden">
+      <div className="text-center text-2xl font-bold text-secondary sm:text-3xl">
         Purchase Orders
       </div>
 
@@ -261,8 +263,8 @@ const IncomingInventoryList = () => {
         }
       />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="min-h-0">
+        <TabsList className="grid w-full grid-cols-2 sm:w-fit">
           <TabsTrigger value="purchase-orders">Purchase Orders</TabsTrigger>
           <TabsTrigger value="inventory-po">Incoming Items</TabsTrigger>
         </TabsList>
@@ -274,7 +276,11 @@ const IncomingInventoryList = () => {
             <div
               ref={tableWrapRef}
               className="min-h-0"
-              style={tableHeight ? { height: `${tableHeight}px` } : undefined}
+              style={
+                !isMobile && tableHeight
+                  ? { height: `${tableHeight}px` }
+                  : undefined
+              }
             >
               <ProductTable
                 data={purchaseOrderPageItems}
@@ -286,7 +292,7 @@ const IncomingInventoryList = () => {
                 totalItems={purchaseOrderItems.length}
                 totalPages={purchaseOrderTotalPages}
                 hasHeaderBackGround
-                isSticky
+                isSticky={!isMobile}
                 stickyContainerClassName="h-full"
               />
             </div>
@@ -302,7 +308,11 @@ const IncomingInventoryList = () => {
             <div
               ref={tableWrapRef}
               className="min-h-0"
-              style={tableHeight ? { height: `${tableHeight}px` } : undefined}
+              style={
+                !isMobile && tableHeight
+                  ? { height: `${tableHeight}px` }
+                  : undefined
+              }
             >
               <ProductTable
                 data={inventoryPoPageItems}
@@ -314,7 +324,7 @@ const IncomingInventoryList = () => {
                 totalItems={inventoryPoTotal}
                 totalPages={inventoryPoTotalPages}
                 hasHeaderBackGround
-                isSticky
+                isSticky={!isMobile}
                 stickyContainerClassName="h-full"
               />
             </div>

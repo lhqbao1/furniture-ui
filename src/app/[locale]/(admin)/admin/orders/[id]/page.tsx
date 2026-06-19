@@ -57,6 +57,7 @@ import {
 } from "lucide-react";
 import { StaticFile } from "@/types/products";
 import { extractInvoiceCartItemsFromMain } from "@/lib/checkout-filter";
+import EditOrderItemPricesDrawer from "@/components/layout/admin/orders/order-details/edit-order-item-prices-drawer";
 
 function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
   return extractInvoiceCartItemsFromMain(checkOutMain);
@@ -553,10 +554,14 @@ const OrderDetails = () => {
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-3 md:p-4 shadow-sm">
-        <div className="mb-3 px-1">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3 px-1">
           <h3 className="text-base font-semibold text-slate-900">
             Order items
           </h3>
+          <EditOrderItemPricesDrawer
+            mainCheckoutId={order.id}
+            items={cartItems}
+          />
         </div>
         <ProductTable
           data={cartItems}
@@ -971,6 +976,7 @@ const OrderDetails = () => {
         </div>
         <div className="lg:col-span-4">
           <OrderSummary
+            main_checkout_id={order.id}
             language={order.checkouts[0].user.language ?? ""}
             sub_total={orderTaxSummary.totalNetWithoutShipping}
             shipping_amount={orderTaxSummary.shipping.net}
