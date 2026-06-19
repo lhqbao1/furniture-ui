@@ -256,7 +256,7 @@ export function ProductTable<TData, TValue>({
                           ...(isSticky
                             ? { top: `${headerGroupIndex * 40}px` }
                             : {}),
-                          ...(stickyLeft !== undefined
+                          ...(isSticky && stickyLeft !== undefined
                             ? { left: `${stickyLeft}px` }
                             : {}),
                         }}
@@ -265,8 +265,8 @@ export function ProductTable<TData, TValue>({
                           meta?.headerClassName ?? "",
                           headerClassName ?? "",
                           isSticky && "sticky z-30 shadow-sm",
-                          stickyLeft !== undefined && "sticky z-40",
-                          meta?.stickyClassName ?? "",
+                          isSticky && stickyLeft !== undefined && "sticky z-40",
+                          isSticky ? (meta?.stickyClassName ?? "") : "",
                         )}
                       >
                         {header.isPlaceholder
@@ -307,20 +307,22 @@ export function ProductTable<TData, TValue>({
                               width: meta?.width,
                               minWidth: meta?.width,
                               maxWidth: meta?.width,
-                              ...(stickyLeft !== undefined
+                              ...(isSticky && stickyLeft !== undefined
                                 ? { left: `${stickyLeft}px` }
                                 : {}),
                             }}
                             className={cn(
-                              stickyLeft !== undefined && "sticky z-20",
-                              stickyLeft !== undefined &&
+                              isSticky && stickyLeft !== undefined && "sticky z-20",
+                              isSticky &&
+                                stickyLeft !== undefined &&
                                 hasBackground &&
                                 index % 2 === 1 &&
                                 stripedRowBackgroundClass,
-                              stickyLeft !== undefined &&
+                              isSticky &&
+                                stickyLeft !== undefined &&
                                 (!hasBackground || index % 2 !== 1) &&
                                 "bg-white",
-                              meta?.stickyClassName ?? "",
+                              isSticky ? (meta?.stickyClassName ?? "") : "",
                             )}
                           >
                             {flexRender(cell.column.columnDef.cell, {

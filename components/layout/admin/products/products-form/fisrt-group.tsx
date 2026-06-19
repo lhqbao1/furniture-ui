@@ -210,7 +210,7 @@ const ProductDetailInputs = ({
       />
 
       {/*Product ID & status */}
-      <div className="flex gap-6">
+      <div className="flex flex-wrap gap-4 sm:gap-6">
         {productId ? <div>ID: {productId}</div> : ""}
 
         {/*Product Active */}

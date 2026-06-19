@@ -241,7 +241,12 @@ const ProductForm = ({
   ]);
 
   return (
-    <div className={cn("lg:pb-20 lg:px-30 pb-12", isDrawer && "!px-4")}>
+    <div
+      className={cn(
+        "px-2 pb-12 sm:px-4 lg:px-30 lg:pb-20",
+        isDrawer && "lg:!px-4",
+      )}
+    >
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit, (errors) => {
@@ -254,13 +259,13 @@ const ProductForm = ({
           })}
         >
           {" "}
-          <div className="lg:grid-cols-12 lg:grid flex flex-col-reverse lg:gap-24 w-full">
+          <div className="flex w-full flex-col-reverse gap-5 lg:grid lg:grid-cols-12 lg:gap-12 xl:gap-24">
             <div className="lg:col-span-9 flex flex-col gap-4">
               <Accordion
                 type="multiple"
                 value={openAccordion}
                 onValueChange={setOpenAccordion}
-                className="w-full space-y-8"
+                className="w-full space-y-4 sm:space-y-8"
               >
                 {/* DETAILS */}
                 <AccordionItem value="details" className="border-none">
@@ -277,7 +282,7 @@ const ProductForm = ({
                     }
                   >
                     <Card>
-                      <CardContent>
+                      <CardContent className="p-4 sm:p-6">
                         <ProductDetailInputs
                           isEdit={!!productValues}
                           productId={productValues?.id_provider ?? null}
@@ -304,7 +309,7 @@ const ProductForm = ({
                     }
                   >
                     <Card>
-                      <CardContent>
+                      <CardContent className="p-4 sm:p-6">
                         <ProductAdditionalInputs />
                       </CardContent>
                     </Card>
@@ -325,7 +330,7 @@ const ProductForm = ({
                     }
                   >
                     <Card>
-                      <CardContent>
+                      <CardContent className="p-4 sm:p-6">
                         <SelectBundleComponent
                           currentProduct={productValues}
                           isInDrawer={Boolean(isDrawer)}
@@ -349,7 +354,7 @@ const ProductForm = ({
                     }
                   >
                     <Card>
-                      <CardContent>
+                      <CardContent className="p-4 sm:p-6">
                         <ProductLogisticsGroup />
                       </CardContent>
                     </Card>
@@ -368,7 +373,7 @@ const ProductForm = ({
                     }
                   >
                     <Card>
-                      <CardContent>
+                      <CardContent className="p-4 sm:p-6">
                         <ProductManual />
                       </CardContent>
                     </Card>
@@ -387,7 +392,7 @@ const ProductForm = ({
                     }
                   >
                     <Card>
-                      <CardContent>
+                      <CardContent className="p-4 sm:p-6">
                         <ProductSEOGroup setIsLoadingSEO={setIsLoadingSEO} />
                       </CardContent>
                     </Card>
@@ -407,7 +412,7 @@ const ProductForm = ({
                       }
                     >
                       <Card>
-                        <CardContent className="">
+                        <CardContent className="overflow-x-auto p-4 sm:p-6">
                           <LogStockTab productDetail={productValues} />
                         </CardContent>
                       </Card>
@@ -430,7 +435,7 @@ const ProductForm = ({
                       }
                     >
                       <Card>
-                        <CardContent className="">
+                        <CardContent className="overflow-x-auto p-4 sm:p-6">
                           <DetailsLogTab productId={productValues.id} />
                         </CardContent>
                       </Card>
@@ -443,10 +448,10 @@ const ProductForm = ({
             <div className="lg:col-span-3 flex min-w-0 flex-col items-end gap-4">
               <div
                 className={cn(
-                  "grid min-w-0 grid-cols-2 gap-2 justify-end z-20",
+                  "z-20 grid min-w-0 grid-cols-2 justify-end gap-2",
                   isDrawer
-                    ? "sticky top-4 self-end w-full"
-                    : "fixed right-4 top-24 w-[23rem] max-w-[calc(100vw-2rem)] xl:right-[7.5rem]",
+                    ? "w-full self-end lg:sticky lg:top-4"
+                    : "w-full lg:fixed lg:right-4 lg:top-24 lg:w-[23rem] lg:max-w-[calc(100vw-2rem)] xl:right-[7.5rem]",
                 )}
               >
                 <Button

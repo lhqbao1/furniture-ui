@@ -25,6 +25,7 @@ import { ProductItem } from "@/types/products";
 import { Loader2 } from "lucide-react";
 import { AlertTriangle, PackageSearch, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const PRODUCT_COLUMN_OPTIONS: {
   id: string;
@@ -59,6 +60,7 @@ const DEFAULT_VISIBLE_PRODUCT_COLUMNS = new Set(
 );
 
 const ProductList = () => {
+  const isMobile = useIsMobile();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [sortByStock, setSortByStock] = useState<"asc" | "desc" | undefined>();
@@ -225,8 +227,8 @@ const ProductList = () => {
     !isLoading && !isFetching && !isError && filteredItems.length === 0;
 
   return (
-    <div className="relative h-screen flex flex-col gap-6 pb-6 overflow-hidden">
-      <div className="text-3xl text-secondary font-bold text-center">
+    <div className="relative flex min-h-screen flex-col gap-4 overflow-visible px-1 pb-6 sm:gap-6 sm:px-0 md:h-screen md:overflow-hidden">
+      <div className="text-center text-2xl font-bold text-secondary sm:text-3xl">
         Product List
       </div>
       <TableToolbar
@@ -247,7 +249,9 @@ const ProductList = () => {
       <div
         ref={tableWrapRef}
         className="min-h-0"
-        style={tableHeight ? { height: `${tableHeight}px` } : undefined}
+        style={
+          !isMobile && tableHeight ? { height: `${tableHeight}px` } : undefined
+        }
       >
         {isError ? (
           <div className="flex h-full items-center justify-center rounded-2xl border border-destructive/30 bg-destructive/5 p-6">
@@ -342,7 +346,7 @@ const ProductList = () => {
                 : (data?.pagination.total_pages ?? 0)
             }
             hasHeaderBackGround
-            isSticky
+            isSticky={!isMobile}
             stickyContainerClassName="h-full"
             onSelectionChange={setSelectedProductIds} // 👈 đây
             onSelectedRowsChange={setSelectedProducts}

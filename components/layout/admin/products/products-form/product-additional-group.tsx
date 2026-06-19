@@ -182,7 +182,7 @@ const ProductAdditionalInputs = ({
         )}
       />
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         {/* Product unit */}
         <FormField
           control={form.control}
@@ -244,7 +244,7 @@ const ProductAdditionalInputs = ({
         />
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
         {/* WEEE Nr */}
         <FormField
           control={form.control}
@@ -303,7 +303,7 @@ const ProductAdditionalInputs = ({
         />
       </div>
 
-      <div className="grid lg:grid-cols-4 grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
         {/* Product length */}
         <FormField
           control={form.control}
