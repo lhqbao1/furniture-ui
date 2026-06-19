@@ -87,7 +87,7 @@ const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
     product.final_price <= minMarketplacePrice;
 
   return (
-    <section className="mt-12 rounded-2xl border border-[#e7eaef] bg-gradient-to-b from-white to-[#f9fbfa] p-4 shadow-[0_8px_24px_rgba(0,0,0,0.04)] md:p-6">
+    <section className="mt-4 rounded-2xl border border-[#e7eaef] bg-gradient-to-b from-white to-[#f9fbfa] p-4 shadow-[0_8px_24px_rgba(0,0,0,0.04)] sm:mt-6 md:p-6 lg:mt-12">
       <Accordion
         type="single"
         collapsible

@@ -362,7 +362,7 @@ export default function TableToolbar({
   return (
     <div className="w-full rounded-2xl border border-secondary/15 bg-white p-3 shadow-sm md:p-4">
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex flex-col gap-3">
           <div className="flex w-full flex-1 items-center gap-2 rounded-xl border border-secondary/10 bg-muted/20 p-1.5">
             <MultiSearch />
             <Input
@@ -398,12 +398,19 @@ export default function TableToolbar({
             />
           </div>
 
-          <div className="grid w-full grid-cols-3 gap-2 rounded-xl border border-secondary/10 bg-muted/20 p-1.5 xl:flex xl:w-auto xl:flex-wrap xl:items-center xl:justify-end">
+          <div
+            className={cn(
+              "grid w-full gap-2 rounded-xl border border-secondary/10 bg-muted/20 p-1.5 md:ml-auto md:w-fit",
+              columnOptions?.length
+                ? "grid-cols-3 md:grid-cols-[120px_120px_120px]"
+                : "grid-cols-2 sm:grid-cols-4 md:grid-cols-[120px_120px_120px_120px]",
+            )}
+          >
             <Select
               value={String(pageSize)}
               onValueChange={(value) => setPageSize(Number(value))}
             >
-              <SelectTrigger className="h-10 w-full cursor-pointer border bg-white text-black xl:w-[120px]">
+              <SelectTrigger className="h-10 w-full cursor-pointer border bg-white text-black">
                 <SelectValue placeholder="Select size" />
               </SelectTrigger>
               <SelectContent>
@@ -481,7 +488,7 @@ export default function TableToolbar({
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="h-10 bg-white hover:bg-white/90 flex items-center gap-1"
+                    className="flex h-10 w-full items-center gap-1 bg-white px-2 hover:bg-white/90"
                   >
                     Columns <ChevronDown className="h-4 w-4" />
                   </Button>
