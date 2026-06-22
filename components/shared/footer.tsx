@@ -99,11 +99,11 @@ const Footer = () => {
           <li className="hover:pl-2 transition-all duration-500">
             <Link href={`/widerrufsbelehrung`}>Widerrufsbelehrung</Link>
           </li>
-          <li className="hover:pl-2 transition-all duration-500">
+          {/* <li className="hover:pl-2 transition-all duration-500">
             <Link href={`/rueckgabe-und-erstattung`}>
               Rückgabe- & Erstattungsrichtlinie
             </Link>
-          </li>
+          </li> */}
 
           <li className="hover:pl-2 transition-all duration-500">
             <Link
