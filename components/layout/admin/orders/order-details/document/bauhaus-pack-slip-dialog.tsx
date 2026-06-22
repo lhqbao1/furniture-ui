@@ -1,10 +1,11 @@
 "use client";
 
 import React from "react";
-import { BlobProvider } from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer";
 import { DownloadCloud, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { BauhausReturnSlipPdf } from "@/components/layout/pdf/bauhaus-return-slip";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +17,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { filterInvoiceCheckouts } from "@/lib/checkout-filter";
-import { cn } from "@/lib/utils";
 import { CheckOutMain } from "@/types/checkout";
 import { InvoiceResponse } from "@/types/invoice";
 
@@ -51,6 +51,7 @@ export default function BauhausPackSlipDialog({
   const [productNumbers, setProductNumbers] = React.useState<
     Record<string, string>
   >({});
+  const [isGenerating, setIsGenerating] = React.useState(false);
 
   React.useEffect(() => {
     if (!open) return;
@@ -73,6 +74,36 @@ export default function BauhausPackSlipDialog({
   const canDownload =
     items.length > 0 &&
     items.every((item) => Boolean(normalizedProductNumbers[item.id]));
+
+  const handleDownload = async () => {
+    if (!canDownload || isGenerating) return;
+
+    setIsGenerating(true);
+
+    try {
+      const blob = await pdf(
+        <BauhausReturnSlipPdf
+          checkout={checkout}
+          invoice={invoice}
+          productNumbers={normalizedProductNumbers}
+        />,
+      ).toBlob();
+      const blobUrl = URL.createObjectURL(blob);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = blobUrl;
+      downloadLink.download = fileName;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1_000);
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Failed to generate Bauhaus pack slip", error);
+      toast.error("Failed to download Bauhaus pack slip.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -132,53 +163,19 @@ export default function BauhausPackSlipDialog({
           >
             Cancel
           </Button>
-          {canDownload ? (
-            <BlobProvider
-              document={
-                <BauhausReturnSlipPdf
-                  checkout={checkout}
-                  invoice={invoice}
-                  productNumbers={normalizedProductNumbers}
-                />
-              }
-            >
-              {({ url, loading }) => {
-                const isDisabled = loading || !url;
-
-                return (
-                  <a
-                    href={isDisabled ? undefined : url}
-                    download={fileName}
-                    aria-disabled={isDisabled}
-                    className={cn(
-                      buttonVariants(),
-                      "gap-2",
-                      isDisabled && "pointer-events-none opacity-50",
-                    )}
-                    onClick={(event) => {
-                      if (isDisabled) {
-                        event.preventDefault();
-                        return;
-                      }
-                      onOpenChange(false);
-                    }}
-                  >
-                    {loading ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      <DownloadCloud className="size-4" />
-                    )}
-                    {loading ? "Generating..." : "Download Pack Slip"}
-                  </a>
-                );
-              }}
-            </BlobProvider>
-          ) : (
-            <Button type="button" disabled className="gap-2">
+          <Button
+            type="button"
+            className="gap-2"
+            disabled={!canDownload || isGenerating}
+            onClick={() => void handleDownload()}
+          >
+            {isGenerating ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
               <DownloadCloud className="size-4" />
-              Download Pack Slip
-            </Button>
-          )}
+            )}
+            {isGenerating ? "Generating..." : "Download Pack Slip"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
