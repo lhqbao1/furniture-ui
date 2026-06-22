@@ -247,11 +247,13 @@ const styles = StyleSheet.create({
 interface BauhausReturnSlipProps {
   checkout: CheckOutMain;
   invoice: InvoiceResponse;
+  productNumbers?: Record<string, string>;
 }
 
 export const BauhausReturnSlipPdf = ({
   checkout,
   invoice,
+  productNumbers = {},
 }: BauhausReturnSlipProps) => {
   const flattenedCartItems = useMemo(() => {
     const checkouts = filterInvoiceCheckouts(
@@ -447,7 +449,7 @@ export const BauhausReturnSlipPdf = ({
                   </View>
                   <View style={[styles.cell, styles.colNumber]}>
                     <Text style={styles.cellContent}>
-                      {idx === 0 ? "32879443" : ""}
+                      {item ? (productNumbers[item.id] ?? "") : ""}
                     </Text>
                   </View>
                   <View style={[styles.cell, styles.colName]}>
