@@ -32,7 +32,7 @@ export function ProductImageCarousel({
   };
 
   return (
-    <div className="flex flex-row px-12 w-full">
+    <div className="flex w-full flex-row px-4 sm:px-8 lg:px-12">
       <Carousel
         opts={{ loop: true, align: "start" }}
         setApi={setApi} // 👈 lấy api khi mount

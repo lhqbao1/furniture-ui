@@ -7,6 +7,24 @@ import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 const clean = (val: unknown) =>
   val === null || val === undefined ? "" : val;
 
+const getProductMargin = (product: ProductItem) => {
+  const salePrice = Number(product.final_price);
+  const purchaseCost = Number(product.cost);
+  const vatRate = Number.parseFloat(String(product.tax ?? "")) / 100;
+
+  if (
+    !Number.isFinite(salePrice) ||
+    !Number.isFinite(purchaseCost) ||
+    !Number.isFinite(vatRate) ||
+    salePrice <= 0
+  ) {
+    return "";
+  }
+
+  const margin = (1 - (purchaseCost * (1 + vatRate)) / salePrice) * 100;
+  return Number.isFinite(margin) ? Number(margin.toFixed(1)) : "";
+};
+
 export const getIncomingStockExportLabel = (product: ProductItem): string => {
   const fallbackInventoriesPo = (product as ProductItem & {
     inventories_po?: ProductItem["inventory_pos"] | null;
@@ -125,6 +143,7 @@ export const buildProductExportData = (
       return_cost: clean(product.return_cost),
       original_price: clean(product.price),
       sale_price: clean(product.final_price),
+      margin: getProductMargin(product),
       shipping_revenue: clean(
         product.carrier === "amm" || product.carrier === "spedition"
           ? 35.95

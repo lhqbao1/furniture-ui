@@ -559,7 +559,7 @@ export default async function Page({
         {JSON.stringify([productSchema, breadcrumbSchema])}
       </Script>
       <div className="flex justify-center items-center">
-        <div className="lg:w-10/12 w-full">
+        <div className="w-full pb-28 md:pb-0 lg:w-10/12">
           {/* ️🔥 CRITICAL FIRST PAINT → PPR ưu tiên render */}
           <ProductDetails
             productDetails={plainProduct}

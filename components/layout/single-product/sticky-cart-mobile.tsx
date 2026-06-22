@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
@@ -10,7 +9,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { FormQuantityInputMobile } from "./details/quantity-input-mobile";
@@ -25,7 +23,6 @@ interface MobileStickyCartProps {
 
 export default function MobileStickyCart({
   price,
-  oldPrice,
   onAddToCart,
   maxStock,
   isActive,
@@ -44,11 +41,11 @@ export default function MobileStickyCart({
   return (
     <div
       className={cn(
-        "fixed bottom-0 left-0 z-50 w-full bg-white border-t shadow-lg",
+        "fixed bottom-0 left-0 z-50 w-full border-t bg-white shadow-[0_-8px_24px_rgba(15,23,42,0.10)]",
         "md:hidden",
       )}
     >
-      <div className="px-4 py-3">
+      <div className="px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3">
         {/* Price */}
         <div className="flex gap-2 items-center justify-end">
        {/*
@@ -70,7 +67,7 @@ export default function MobileStickyCart({
             })}
           </div>
         </div>
-        <div className="flex gap-3 justify-end">
+        <div className="flex items-start gap-3">
           <FormField
             control={form.control}
             name="quantity"
