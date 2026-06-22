@@ -180,11 +180,13 @@ export const submitProduct = async ({
   const isAmmOrSpeditionCarrier =
     normalizedCarrier.includes("amm") ||
     normalizedCarrier.includes("spedition");
+  const isGlsCarrier = normalizedCarrier === "gls";
 
   if (
     Number.isFinite(mergedWeight) &&
     mergedWeight > 31 &&
-    !isAmmOrSpeditionCarrier
+    !isAmmOrSpeditionCarrier &&
+    !isGlsCarrier
   ) {
     toast.info(
       `This product is over 31kg and carrier "${latestValues.carrier || "unknown"}" is selected. Please make sure this is the intended carrier.`,

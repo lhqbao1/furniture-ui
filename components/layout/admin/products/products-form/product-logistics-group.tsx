@@ -171,6 +171,7 @@ const ProductLogisticsGroup = ({
     const isAmmOrSpeditionCarrier =
       normalizedCarrier.includes("amm") ||
       normalizedCarrier.includes("spedition");
+    const isGlsCarrier = normalizedCarrier === "gls";
 
     const { error } = calcDeliveryCost(
       mergedPackage ? [mergedPackage] : [],
@@ -183,7 +184,8 @@ const ProductLogisticsGroup = ({
     if (
       Number.isFinite(mergedWeight) &&
       mergedWeight > 31 &&
-      !isAmmOrSpeditionCarrier
+      !isAmmOrSpeditionCarrier &&
+      !isGlsCarrier
     ) {
       warningKey = `over-31-${normalizedCarrier}`;
       warningMessage = `This product is over 31kg and carrier "${watchedCarrier || "unknown"}" is selected. Please make sure this is the intended carrier.`;
