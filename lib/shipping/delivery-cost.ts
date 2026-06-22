@@ -30,6 +30,38 @@ const DPD_RATES: Array<{ maxKg: number; price: number }> = [
   { maxKg: 31.5, price: 5.1 },
 ];
 
+const GLS_LIMITS = {
+  maxWeightKg: 40,
+  maxLengthCm: 200,
+  maxWidthCm: 80,
+  maxHeightCm: 60,
+  maxGirthCm: 300,
+  nonSortableLengthCm: 120,
+  overlengthCm: 150,
+  largeParcelLiters: 150,
+};
+
+const GLS_RATES: Array<{ maxKg: number; price: number }> = [
+  { maxKg: 1, price: 3.08 },
+  { maxKg: 2, price: 3.08 },
+  { maxKg: 3, price: 3.08 },
+  { maxKg: 5, price: 3.08 },
+  { maxKg: 8, price: 4.49 },
+  { maxKg: 10, price: 4.49 },
+  { maxKg: 15, price: 4.99 },
+  { maxKg: 20, price: 4.99 },
+  { maxKg: 25, price: 4.99 },
+  { maxKg: 31.5, price: 5.27 },
+  { maxKg: 40, price: 15.4 },
+];
+
+const GLS_SURCHARGES = {
+  nationalRoadToll: 0.35,
+  nonSortable: 3.35,
+  overlength: 3.7,
+  largeParcel: 3.85,
+};
+
 const SPEDITION_RATES: Array<{ maxKg: number; price: number }> = [
   { maxKg: 75, price: 31.5 },
   { maxKg: 100, price: 34.16 },
@@ -87,7 +119,7 @@ function getDpdGirthCm(length: number, width: number, height: number) {
 }
 
 function calcPackageCost(pkg: PackageInput) {
-  const { weight, length, width, height } = pkg;
+  const { weight } = pkg;
 
   if (weight == null) {
     return { cost: null };
@@ -138,6 +170,66 @@ function calcPackageCostDpd(pkg: PackageInput) {
   return { cost: rate.price };
 }
 
+function calcPackageCostGls(pkg: PackageInput) {
+  const { weight, length, width, height } = pkg;
+
+  if (
+    weight == null ||
+    length == null ||
+    width == null ||
+    height == null
+  ) {
+    return { cost: null };
+  }
+
+  if (weight <= 0 || length <= 0 || width <= 0 || height <= 0) {
+    return { cost: null };
+  }
+
+  const girth = length + 2 * width + 2 * height;
+  if (
+    weight > GLS_LIMITS.maxWeightKg ||
+    length > GLS_LIMITS.maxLengthCm ||
+    width > GLS_LIMITS.maxWidthCm ||
+    height > GLS_LIMITS.maxHeightCm ||
+    girth > GLS_LIMITS.maxGirthCm
+  ) {
+    return {
+      cost: null,
+      error:
+        "GLS BusinessParcel limits exceeded (40 kg / 200 × 80 × 60 cm / 300 cm girth).",
+    };
+  }
+
+  const volumeCm3 = length * width * height;
+  const volumetricWeight = volumeCm3 / 6000;
+  const billableWeight =
+    weight <= 30 && volumetricWeight > weight
+      ? Math.min(volumetricWeight, 30)
+      : weight;
+  const rate = pickRate(GLS_RATES, billableWeight);
+
+  if (!rate) {
+    return { cost: null, error: "No GLS rate found for this package." };
+  }
+
+  const isOverlength = length > GLS_LIMITS.overlengthCm;
+  const isNonSortable =
+    !isOverlength &&
+    (length > GLS_LIMITS.nonSortableLengthCm || height < 3);
+  const isLargeParcel = volumeCm3 / 1000 > GLS_LIMITS.largeParcelLiters;
+
+  const dimensionSurcharges =
+    (isOverlength ? GLS_SURCHARGES.overlength : 0) +
+    (isNonSortable ? GLS_SURCHARGES.nonSortable : 0) +
+    (isLargeParcel ? GLS_SURCHARGES.largeParcel : 0);
+
+  return {
+    cost:
+      rate.price + GLS_SURCHARGES.nationalRoadToll + dimensionSurcharges,
+  };
+}
+
 export function calcDeliveryCost(
   packages: PackageInput[],
   carrier: CarrierType,
@@ -149,13 +241,19 @@ export function calcDeliveryCost(
     };
   }
 
-  const normalizedCarrier = carrier === "spedition" ? "amm" : carrier;
+  const rawCarrier = String(carrier ?? "").toLowerCase().trim();
+  const normalizedCarrier = rawCarrier === "spedition" ? "amm" : rawCarrier;
   const isDpd = normalizedCarrier === "dpd";
+  const isGls = normalizedCarrier === "gls";
 
   let total = 0;
 
   for (const pkg of packages) {
-    const result = isDpd ? calcPackageCostDpd(pkg) : calcPackageCost(pkg);
+    const result = isDpd
+      ? calcPackageCostDpd(pkg)
+      : isGls
+        ? calcPackageCostGls(pkg)
+        : calcPackageCost(pkg);
     if (result.error)
       return { cost: null as number | null, error: result.error };
     if (result.cost == null) {
