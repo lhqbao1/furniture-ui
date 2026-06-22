@@ -96,18 +96,16 @@ const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
         onValueChange={(value) => setOpenPriceComparsion(value === "compare")}
       >
         <AccordionItem value="compare" className="border-b-0">
-          <div className="flex justify-end">
-            <AccordionTrigger
-              className="!flex-none w-fit rounded-xl border border-secondary bg-secondary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-secondary/90 data-[state=open]:border-secondary data-[state=open]:bg-secondary md:px-5 md:text-base"
-              hasIcon
-              iconClassName="size-4 text-white"
-            >
-              <span className="inline-flex items-center gap-2">
-                <Scale className="size-4 text-white" />
-                {t("priceComparison")}
-              </span>
-            </AccordionTrigger>
-          </div>
+          <AccordionTrigger
+            className="w-full rounded-xl border border-secondary bg-secondary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-secondary/90 data-[state=open]:border-secondary data-[state=open]:bg-secondary sm:ml-auto sm:w-fit sm:py-2 md:px-5 md:text-base"
+            hasIcon
+            iconClassName="size-4 text-white"
+          >
+            <span className="inline-flex items-center gap-2">
+              <Scale className="size-4 text-white" />
+              {t("priceComparison")}
+            </span>
+          </AccordionTrigger>
           <AccordionContent className="mt-4 md:mt-5">
             {openPriceComparision &&
               (!showContent ? <ComparePriceCardsSkeleton length={4} /> : (

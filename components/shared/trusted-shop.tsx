@@ -32,7 +32,7 @@ export function TrustedShops() {
       data-mobile-custom-width="156"
       data-mobile-disable-reviews="false"
       data-mobile-enable-fadeout="true"
-      data-disable-mobile="false"
+      data-disable-mobile="true"
       data-disable-trustbadge="false"
       data-color-scheme="light"
       charSet="UTF-8"

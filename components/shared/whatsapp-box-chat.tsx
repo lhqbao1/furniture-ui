@@ -74,10 +74,11 @@ export default function WhatsAppChatBox() {
             setBubbleVisible(false); // mở chat → ẩn bubble luôn
           }}
           className="
-      fixed md:bottom-6 bottom-30 md:right-6 right-2 z-[1000]
+      fixed bottom-[calc(7rem+env(safe-area-inset-bottom))] right-3 z-[60]
+      md:bottom-6 md:right-6 md:z-[1000]
       w-14 h-14 rounded-full
       flex items-center justify-center
-      hover:scale-105 transition-all duration-300 cursor-pointer
+      hover:scale-105 transition-transform duration-300 cursor-pointer
     "
           aria-label="Open WhatsApp chat"
         >
@@ -93,7 +94,7 @@ export default function WhatsAppChatBox() {
 
       {/* BUBBLE – CÓ THỂ TẮT */}
       {!open && bubbleVisible && (
-        <div className="fixed bottom-6 right-[88px] z-[1000]">
+        <div className="fixed bottom-6 right-[88px] z-[1000] hidden md:block">
           <div className="relative bg-white text-sm px-4 py-2 rounded-md shadow-lg border whatsapp-bubble">
             {t("whatsapp_greeting")}
 
@@ -118,10 +119,11 @@ export default function WhatsAppChatBox() {
       {/* CHAT BOX */}
       <div
         className={`
-          fixed bottom-6 right-6 z-[1000]
-          w-[340px] rounded-xl shadow-2xl overflow-hidden
+          fixed bottom-[calc(7rem+env(safe-area-inset-bottom))] right-3 z-[70]
+          w-[calc(100vw-1.5rem)] max-w-[340px] rounded-xl shadow-2xl overflow-hidden
+          md:bottom-6 md:right-6 md:z-[1000]
           bg-[#ECE5DD]
-          transform transition-all duration-300 ease-out
+          transform transition-[opacity,transform] duration-300 ease-out
           ${
             open
               ? "opacity-100 translate-y-0 scale-100"

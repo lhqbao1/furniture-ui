@@ -597,3 +597,10 @@ input[type="number"] {
     transform: none;
   }
 }
+@media (max-width: 767px) {
+  body > div[class^="_1nbip"],
+  body > div:has(iframe[src*="trustedshops"]),
+  iframe[src*="trustedshops"] {
+    display: none !important;
+  }
+}
