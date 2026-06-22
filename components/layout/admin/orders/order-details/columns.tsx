@@ -33,6 +33,17 @@ export function getOrderDetailColumns({
       ),
     },
     {
+      id: "sku",
+      header: () => <div className="text-center w-full">SKU</div>,
+      cell: ({ row }) => (
+        <div className="text-center">
+          {row.original.products?.sku ||
+            row.original.purchased_products?.sku ||
+            "—"}
+        </div>
+      ),
+    },
+    {
       id: "product_name",
       header: "NAME",
       cell: ({ row }) => (
