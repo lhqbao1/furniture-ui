@@ -18,7 +18,7 @@ import DeleteDialogConfirm from "../dialog/delete-dialog-confirm";
 import InventorySelect from "./inventory-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { FolderUp } from "lucide-react";
+import { FileSpreadsheet, FolderUp, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -171,9 +171,76 @@ function ContainerCard({
       ),
     };
   }, [containerInventory]);
-  const canSendAmm =
-    item.is_sended_avis === false || item.is_sended_avis === null;
   const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [isExporting, setIsExporting] = React.useState(false);
+
+  const handleExportProducts = React.useCallback(async () => {
+    if (!containerInventory?.length || isExporting) return;
+
+    setIsExporting(true);
+
+    try {
+      const [fileSaver, XLSX] = await Promise.all([
+        import("file-saver"),
+        import("xlsx"),
+      ]);
+      const exportRows = containerInventory.map((inventoryItem) => ({
+        image: inventoryItem.product.image?.replaceAll(" ", "%20") ?? "",
+        name: inventoryItem.product.name ?? "",
+        sku: inventoryItem.product.sku ?? "",
+        ean: inventoryItem.product.ean ?? "",
+      }));
+      const worksheet = XLSX.utils.json_to_sheet(exportRows);
+      for (let rowIndex = 0; rowIndex < exportRows.length; rowIndex += 1) {
+        const excelRow = rowIndex + 2;
+        const imageCell = worksheet[`A${excelRow}`];
+        const skuCell = worksheet[`C${excelRow}`];
+        const eanCell = worksheet[`D${excelRow}`];
+
+        if (imageCell?.v) {
+          imageCell.l = { Target: String(imageCell.v) };
+        }
+        if (skuCell) {
+          skuCell.t = "s";
+          skuCell.z = "@";
+        }
+        if (eanCell) {
+          eanCell.t = "s";
+          eanCell.z = "@";
+        }
+      }
+      worksheet["!cols"] = [
+        { wch: 55 },
+        { wch: 55 },
+        { wch: 28 },
+        { wch: 22 },
+      ];
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const safeContainerNumber = (item.container_number || item.id).replace(
+        /[^a-zA-Z0-9-_]/g,
+        "-",
+      );
+
+      fileSaver.saveAs(
+        blob,
+        `container-products-${safeContainerNumber}.xlsx`,
+      );
+      toast.success("Container products exported.");
+    } catch {
+      toast.error("Failed to export container products.");
+    } finally {
+      setIsExporting(false);
+    }
+  }, [containerInventory, isExporting, item.container_number, item.id]);
 
   return (
     <Card>
@@ -201,7 +268,6 @@ function ContainerCard({
         )}
         <CardAction className="space-x-2">
           <AddContainerDialog purchaseOrderId={po_id} container={item} />
-          {/* {hasInventory && canSendAmm && ( */}
           {hasInventory && (
             <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
               <DialogTrigger asChild>
@@ -246,6 +312,21 @@ function ContainerCard({
               </DialogContent>
             </Dialog>
           )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            aria-label="Export container products"
+            title="Export container products"
+            disabled={!hasInventory || isExporting}
+            onClick={() => void handleExportProducts()}
+          >
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FileSpreadsheet className="h-4 w-4 text-secondary" />
+            )}
+          </Button>
           <DeleteDialogConfirm containerId={item.id} />
         </CardAction>
       </CardHeader>
