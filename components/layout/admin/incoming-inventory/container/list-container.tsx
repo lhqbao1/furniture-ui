@@ -180,12 +180,11 @@ function ContainerCard({
     setIsExporting(true);
 
     try {
-      const [fileSaver, XLSX] = await Promise.all([
-        import("file-saver"),
-        import("xlsx"),
-      ]);
+      const XLSX = await import("xlsx");
       const exportRows = containerInventory.map((inventoryItem) => ({
-        image: inventoryItem.product.image?.replaceAll(" ", "%20") ?? "",
+        image: inventoryItem.product.image
+          ? new URL(inventoryItem.product.image, window.location.origin).toString()
+          : "",
         name: inventoryItem.product.name ?? "",
         sku: inventoryItem.product.sku ?? "",
         ean: inventoryItem.product.ean ?? "",
@@ -198,7 +197,10 @@ function ContainerCard({
         const eanCell = worksheet[`D${excelRow}`];
 
         if (imageCell?.v) {
-          imageCell.l = { Target: String(imageCell.v) };
+          const imageUrl = String(imageCell.v).replaceAll('"', '""');
+          worksheet[`A${excelRow}`] = {
+            f: `_xlfn.IMAGE("${imageUrl}","Product image",0)`,
+          };
         }
         if (skuCell) {
           skuCell.t = "s";
@@ -210,10 +212,14 @@ function ContainerCard({
         }
       }
       worksheet["!cols"] = [
-        { wch: 55 },
+        { wch: 18 },
         { wch: 55 },
         { wch: 28 },
         { wch: 22 },
+      ];
+      worksheet["!rows"] = [
+        { hpx: 28 },
+        ...exportRows.map(() => ({ hpx: 84 })),
       ];
 
       const workbook = XLSX.utils.book_new();
@@ -229,13 +235,17 @@ function ContainerCard({
         /[^a-zA-Z0-9-_]/g,
         "-",
       );
-
-      fileSaver.saveAs(
-        blob,
-        `container-products-${safeContainerNumber}.xlsx`,
-      );
+      const fileUrl = URL.createObjectURL(blob);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = fileUrl;
+      downloadLink.download = `container-products-${safeContainerNumber}.xlsx`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+      URL.revokeObjectURL(fileUrl);
       toast.success("Container products exported.");
-    } catch {
+    } catch (error) {
+      console.error("Failed to export container products", error);
       toast.error("Failed to export container products.");
     } finally {
       setIsExporting(false);

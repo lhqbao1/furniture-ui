@@ -10,13 +10,13 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { DownloadCloud, Loader2, Trash2 } from "lucide-react";
 import { PackageSlipPdf } from "@/components/layout/pdf/package-slip-pdf";
-import { BauhausReturnSlipPdf } from "@/components/layout/pdf/bauhaus-return-slip";
 import UploadInvoicePdfDialog from "./upload-invoice-pdf-dialog";
 import { toast } from "sonner";
 import { useDeleteCheckoutPdfFile } from "@/features/checkout/hook";
 import { CheckOutMain } from "@/types/checkout";
 import B2BInvoiceDrawer from "../../order-list/b2b-invoice-drawer";
 import { filterMainCheckoutForInvoice } from "@/lib/checkout-filter";
+import BauhausPackSlipDialog from "./bauhaus-pack-slip-dialog";
 
 interface DownloadInvoiceProps {
   checkoutId: string;
@@ -66,6 +66,8 @@ const DownloadInvoice = ({
 }: DownloadInvoiceProps) => {
   const deleteCheckoutPdfFileMutation = useDeleteCheckoutPdfFile();
   const [openB2BDrawer, setOpenB2BDrawer] = React.useState(false);
+  const [openBauhausPackSlipDialog, setOpenBauhausPackSlipDialog] =
+    React.useState(false);
   const [b2bMarketplace, setB2BMarketplace] = React.useState("");
   const normalizedType = String(type ?? "").toLowerCase();
   const isInvoiceType = normalizedType === "invoice";
@@ -124,6 +126,9 @@ const DownloadInvoice = ({
         invoice.main_checkout,
     };
   }, [invoice]);
+  const isBauhausPackageSlip =
+    isPackageType &&
+    filteredCheckout?.from_marketplace?.toLowerCase() === "bauhaus";
 
   const { data: productRefundData, isLoading: isProductRefundLoading } =
     useQuery({
@@ -273,21 +278,29 @@ const DownloadInvoice = ({
       );
     }
 
+    if (isBauhausPackageSlip) {
+      return (
+        <Button
+          variant="outline"
+          size="sm"
+          type="button"
+          className="gap-1.5"
+          onClick={() => setOpenBauhausPackSlipDialog(true)}
+        >
+          <DownloadCloud className="size-4" />
+          Sample
+        </Button>
+      );
+    }
+
     return (
       <Button variant="outline" size="sm" type="button" className="gap-1.5">
         <PDFDownloadLink
           document={
-            filteredCheckout.from_marketplace?.toLowerCase() === "bauhaus" ? (
-              <BauhausReturnSlipPdf
-                checkout={filteredCheckout}
-                invoice={filteredInvoice}
-              />
-            ) : (
-              <PackageSlipPdf
-                checkout={filteredCheckout}
-                invoice={filteredInvoice}
-              />
-            )
+            <PackageSlipPdf
+              checkout={filteredCheckout}
+              invoice={filteredInvoice}
+            />
           }
           fileName={defaultGeneratedFileName}
         >
@@ -427,6 +440,15 @@ const DownloadInvoice = ({
         marketplace={b2bMarketplace}
         selectedOrders={selectedB2BOrders}
       />
+      {isBauhausPackageSlip && filteredCheckout && filteredInvoice ? (
+        <BauhausPackSlipDialog
+          open={openBauhausPackSlipDialog}
+          onOpenChange={setOpenBauhausPackSlipDialog}
+          checkout={filteredCheckout}
+          invoice={filteredInvoice}
+          fileName={defaultGeneratedFileName}
+        />
+      ) : null}
     </div>
   );
 };
