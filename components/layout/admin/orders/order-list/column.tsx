@@ -623,6 +623,26 @@ const ActionCellChild = ({
     ? (isRowExpanded?.(currentRowId) ?? expandedRowId === currentRowId)
     : false;
 
+  const formatFileTimestamp = (date: Date) => {
+    const pad = (value: number) => String(value).padStart(2, "0");
+
+    return [
+      date.getFullYear(),
+      pad(date.getMonth() + 1),
+      pad(date.getDate()),
+      pad(date.getHours()),
+      pad(date.getMinutes()),
+      pad(date.getSeconds()),
+    ].join("");
+  };
+
+  const buildDeliveryOrderFileName = () => {
+    const shippingCode = checkout?.shipment?.ship_code || checkoutId;
+    const timestamp = formatFileTimestamp(new Date());
+
+    return `AMM_LIEFERAUFTRAG_${shippingCode}_${timestamp}.xml`;
+  };
+
   const normalizeDeliveryItems = (cartItems: CartItem[]): CartItem[] => {
     return cartItems.flatMap((item) => {
       const bundles = item?.products?.bundles;
@@ -742,7 +762,7 @@ const ActionCellChild = ({
     const blob = new Blob([xml], { type: "application/xml;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    const fileName = `delivery-order-${checkout?.shipment?.ship_code || checkoutId}.xml`;
+    const fileName = buildDeliveryOrderFileName();
 
     link.href = url;
     link.download = fileName;
