@@ -60,6 +60,16 @@ const normalizePackage = (value: unknown): PackageValue => {
   };
 };
 
+const DEFAULT_DELIVERY_TIME_BY_CARRIER: Record<string, string> = {
+  amm: "5-8",
+  spedition: "5-8",
+  dpd: "3-5",
+  gls: "3-5",
+};
+
+const getDefaultDeliveryTimeByCarrier = (carrier: string) =>
+  DEFAULT_DELIVERY_TIME_BY_CARRIER[carrier.toLowerCase().trim()];
+
 const pickFirstPackageDimension = (packages: unknown): PackageValue | null => {
   if (!Array.isArray(packages) || packages.length === 0) return null;
 
@@ -128,7 +138,7 @@ const ProductLogisticsGroup = ({
     if (!bundleItems || bundleItems.length === 0) return;
 
     // ✅ Fill từng gói từ bundle_items (ưu tiên bundle_item.packages)
-    const filledPackages = bundleItems.map((bundle) =>
+    const filledPackages = bundleItems.map((bundle: unknown) =>
       getBundleMappedPackage(bundle),
     );
 
@@ -238,6 +248,16 @@ const ProductLogisticsGroup = ({
                       // normalize output canonical
                       if (val === "spedition") val = "amm";
                       field.onChange(val);
+
+                      const defaultDeliveryTime =
+                        getDefaultDeliveryTimeByCarrier(val);
+
+                      if (defaultDeliveryTime) {
+                        form.setValue("delivery_time", defaultDeliveryTime, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                      }
                     }}
                   >
                     <SelectTrigger
