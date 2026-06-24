@@ -52,6 +52,7 @@ export async function GET() {
         }
 
         try {
+          const carrier = p.carrier?.trim().toLowerCase();
           const stock = calculateAvailableStock(p);
           const imageUrl = Array.isArray(p.static_files)
             ? cleanImageLink(p.static_files[0]?.url)
@@ -83,9 +84,9 @@ export async function GET() {
   <g:shipping>
     <g:country>DE</g:country>
     <g:service>Standard</g:service>
-    <g:price>${p.carrier === "dpd" ? "5.95 EUR" : "35.95 EUR"}</g:price>
+    <g:price>${carrier === "dpd" ? "5.95 EUR" : "35.95 EUR"}</g:price>
   </g:shipping>
-  <g:shipping_label>${p.carrier === "dpd" ? "DPD" : "AMM"}</g:shipping_label>
+  <g:shipping_label>${carrier === "dpd" ? "DPD" : "AMM"}</g:shipping_label>
 </item>`];
         } catch (error) {
           skippedProducts += 1;

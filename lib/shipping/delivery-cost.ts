@@ -112,7 +112,7 @@ function pickRate(
   return rates.find((rate) => weightKg <= rate.maxKg) ?? null;
 }
 
-function getDpdGirthCm(length: number, width: number, height: number) {
+function getPackageGirthCm(length: number, width: number, height: number) {
   const longest = Math.max(length, width, height);
   const sum = length + width + height;
   return longest + 2 * (sum - longest);
@@ -153,7 +153,7 @@ function calcPackageCostDpd(pkg: PackageInput) {
   }
 
   const longest = Math.max(length, width, height);
-  const girth = getDpdGirthCm(length, width, height);
+  const girth = getPackageGirthCm(length, width, height);
 
   if (longest > DPD_LIMITS.maxLengthCm || girth > DPD_LIMITS.maxGirthCm) {
     return {
@@ -186,7 +186,7 @@ function calcPackageCostGls(pkg: PackageInput) {
     return { cost: null };
   }
 
-  const girth = length + 2 * width + 2 * height;
+  const girth = getPackageGirthCm(length, width, height);
   if (
     weight > GLS_LIMITS.maxWeightKg ||
     length > GLS_LIMITS.maxLengthCm ||
