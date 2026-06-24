@@ -134,11 +134,20 @@ export function getStatusStyle(raw: string) {
 
 export function getStatusStyleDe(raw: string) {
   const key = raw.toLowerCase();
+  const pendingStatus = {
+    text: "Warten auf Zahlung",
+    bg: "bg-[#f3e8ff]",
+    color: "text-[#9b59ff]",
+  };
   const cancelStatus = {
     text: "Storniert",
     bg: "bg-[#FFD2D3]",
     color: "text-[#FF0000]",
   };
+
+  if (key === "canceled_no_stock") {
+    return pendingStatus;
+  }
 
   if (key.includes("cancel")) {
     return cancelStatus;
@@ -146,11 +155,7 @@ export function getStatusStyleDe(raw: string) {
 
   switch (key) {
     case "pending":
-      return {
-        text: "Warten auf Zahlung",
-        bg: "bg-[#f3e8ff]",
-        color: "text-[#9b59ff]",
-      };
+      return pendingStatus;
 
     case "tock_reserved":
       return {
@@ -247,13 +252,6 @@ export function getStatusStyleDe(raw: string) {
         bg: "bg-[#FDE9D2]",
         color: "text-[#F7931E]",
       };
-    case "canceled_no_stock":
-      return {
-        text: "Storniert",
-        bg: "bg-[#FFD2D3]",
-        color: "text-[#FF0000]",
-      };
-
     case "canceled_wrong_price":
       return {
         text: "Storniert",
