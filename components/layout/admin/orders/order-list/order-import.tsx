@@ -29,7 +29,11 @@ import {
 import { createManualCheckOut } from "@/features/checkout/api";
 import { getProductByIdProvider } from "@/features/products/api";
 import { calculateProductDeliveryRange } from "@/hooks/get-estimated-shipping";
-import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
+import {
+  DEFAULT_MANUAL_CHECKOUT_WAREHOUSE,
+  MANUAL_CHECKOUT_WAREHOUSES,
+  ManualCreateOrderFormValues,
+} from "@/lib/schema/manual-checkout";
 import { ProductItem } from "@/types/products";
 import ExportExampleOrderExcelButton from "./export-example-button";
 import { cn } from "@/lib/utils";
@@ -80,6 +84,7 @@ type NormalizedOrder = {
   total_shipping: number;
   vat: number;
   carrier: string | null;
+  ware_house: (typeof MANUAL_CHECKOUT_WAREHOUSES)[number];
 };
 
 type GroupedOrder = ManualCreateOrderFormValues;
@@ -423,6 +428,10 @@ const normalize = (
     total_shipping: toNumberOrDefault(row["total_shipping"], 35.95),
     vat: toVatMultiplier(row["vat"]),
     carrier: toStringOrNull(row["carrier"]),
+    ware_house:
+      MANUAL_CHECKOUT_WAREHOUSES.find(
+        (warehouse) => warehouse === toTrimmedStringOrNull(row["ware_house"]),
+      ) ?? DEFAULT_MANUAL_CHECKOUT_WAREHOUSE,
   };
 };
 
