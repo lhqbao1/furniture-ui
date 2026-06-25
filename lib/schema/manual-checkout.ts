@@ -14,6 +14,14 @@ const BooleanLikeSchema = z.preprocess((value) => {
   return value;
 }, z.boolean());
 
+export const MANUAL_CHECKOUT_WAREHOUSES = [
+  "9_1 Amm GmbH",
+  "9_3 Amm GmbH C-Waren",
+] as const;
+
+export const DEFAULT_MANUAL_CHECKOUT_WAREHOUSE =
+  MANUAL_CHECKOUT_WAREHOUSES[0];
+
 export const ManualOrderItemSchema = z.object({
   id_provider: z.string().min(1, { message: "Product ID is required" }),
   quantity: z
@@ -69,6 +77,7 @@ export const ManualCreateOrderSchema = z
     total_discount: z.number().optional(),
     price_mode: z.enum(["gross", "net"]).optional(),
     carrier: z.string().optional().nullable(),
+    ware_house: z.enum(MANUAL_CHECKOUT_WAREHOUSES),
     tax: z.number().min(0, "Tax is required"),
     payment_term: z.number().optional().nullable(),
     delivery_from: z.string().optional().nullable(),
@@ -135,6 +144,7 @@ export const manualCheckoutDefaultValues: ManualCreateOrderFormValues = {
   total_shipping: 0,
   price_mode: "gross",
   carrier: "",
+  ware_house: DEFAULT_MANUAL_CHECKOUT_WAREHOUSE,
   items: [],
   recipient_name: "",
   invoice_recipient_name: "",

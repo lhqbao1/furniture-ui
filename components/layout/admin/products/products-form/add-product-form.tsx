@@ -209,7 +209,11 @@ const ProductForm = ({
     setIsLoadingSEO,
     addProductMutation,
     editProductMutation,
-  } = useProductForm({ productValues, productValuesClone });
+  } = useProductForm({
+    productValues,
+    productValuesClone,
+    persistDraft: !isDrawer,
+  });
 
   const [isMarketplaceSyncing, setIsMarketplaceSyncing] = useState(false);
 

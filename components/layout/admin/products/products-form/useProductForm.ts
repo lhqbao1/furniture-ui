@@ -74,9 +74,11 @@ const removeProductDraft = (draftKey: string | null) => {
 export const useProductForm = ({
   productValues,
   productValuesClone,
+  persistDraft = true,
 }: {
   productValues?: Partial<ProductItem>;
   productValuesClone?: Partial<ProductItem>;
+  persistDraft?: boolean;
 }) => {
   const router = useRouter();
   const locale = useLocale();
@@ -128,20 +130,22 @@ export const useProductForm = ({
 
     const sourceMode = productValuesClone ? "clone" : "edit";
     const sourceKey = `${sourceMode}:${sourceValues.id ?? "new"}`;
-    const nextDraftKey = `${PRODUCT_FORM_DRAFT_PREFIX}:${sourceKey}`;
+    const nextDraftKey = persistDraft
+      ? `${PRODUCT_FORM_DRAFT_PREFIX}:${sourceKey}`
+      : null;
     const isDifferentProduct = lastResetSourceKeyRef.current !== sourceKey;
 
     setDraftKey(nextDraftKey);
     if (!isDifferentProduct) return;
 
     const normalizedValues = normalizeProductValues(sourceValues);
-    const draftValues = readProductDraft(nextDraftKey);
+    const draftValues = nextDraftKey ? readProductDraft(nextDraftKey) : null;
 
     form.reset(draftValues ?? normalizedValues, {
       keepDefaultValues: Boolean(draftValues),
     });
     lastResetSourceKeyRef.current = sourceKey;
-  }, [productValuesClone, productValues, form]);
+  }, [persistDraft, productValuesClone, productValues, form]);
 
   useEffect(() => {
     if (!draftKey) return;

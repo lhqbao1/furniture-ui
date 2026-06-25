@@ -75,7 +75,13 @@ const EditProductDrawer = ({ product }: EditProductDrawerProps) => {
           </DrawerClose>
         </DrawerHeader>
         <div className="relative px-2 pb-6 sm:px-0 sm:pb-0">
-          <ProductForm productValues={product} onSubmit={handleEdit} isDrawer />
+          {open ? (
+            <ProductForm
+              productValues={product}
+              onSubmit={handleEdit}
+              isDrawer
+            />
+          ) : null}
         </div>
       </DrawerContent>
     </Drawer>

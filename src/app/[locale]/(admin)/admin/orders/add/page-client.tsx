@@ -11,6 +11,7 @@ import { useCreateInformationManualOrder } from "@/features/user-order/hook";
 import { useTranslations } from "next-intl";
 import z from "zod";
 import {
+  MANUAL_CHECKOUT_WAREHOUSES,
   manualCheckoutDefaultValues,
   ManualCreateOrderFormValues,
   ManualCreateOrderSchema,
@@ -38,6 +39,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 export interface CartItem {
   id: number;
@@ -373,6 +376,40 @@ export default function CreateOrderPageClient() {
           {/* Table cart and total */}
           <div className="col-span-1 space-y-4 rounded-2xl border border-secondary/15 bg-white p-4 shadow-sm">
             <ManualAdditionalInformation listProducts={listProducts} />
+            <FormField
+              control={form.control}
+              name="ware_house"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-black font-semibold text-sm">
+                    Warehouse
+                  </FormLabel>
+                  <RadioGroup
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    className="grid gap-3 sm:grid-cols-2"
+                  >
+                    {MANUAL_CHECKOUT_WAREHOUSES.map((warehouse) => {
+                      const optionId = `manual-checkout-warehouse-${warehouse.replace(/\W+/g, "-")}`;
+
+                      return (
+                        <Label
+                          key={warehouse}
+                          htmlFor={optionId}
+                          className="flex cursor-pointer items-center gap-3 rounded-md border border-input bg-white px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-50"
+                        >
+                          <FormControl>
+                            <RadioGroupItem id={optionId} value={warehouse} />
+                          </FormControl>
+                          <span>{warehouse}</span>
+                        </Label>
+                      );
+                    })}
+                  </RadioGroup>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <SelectOrderItems
               listProducts={listProducts}
               setListProducts={setListProducts}
