@@ -11,7 +11,7 @@ import {
   useAddProductGroup,
   useUpdateProductGroup,
 } from "@/features/product-group/hook";
-import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { Loader2, Pencil } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 
@@ -21,22 +21,18 @@ interface AddOrEditParentDialogDefaultValues {
 }
 
 interface AddOrEditParentDialogProps {
-  dialogOpen: boolean;
-  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  groupName: string;
-  setGroupName: React.Dispatch<React.SetStateAction<string>>;
   defaultValues?: AddOrEditParentDialogDefaultValues;
 }
 
 const AddOrEditParentDialog = ({
-  dialogOpen,
-  setDialogOpen,
-  groupName,
-  setGroupName,
   defaultValues,
 }: AddOrEditParentDialogProps) => {
   const addProductGroupMutation = useAddProductGroup();
   const editProductGroupMutation = useUpdateProductGroup();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [groupName, setGroupName] = React.useState("");
+  const isPending =
+    addProductGroupMutation.isPending || editProductGroupMutation.isPending;
 
   const handleAddOrEditProductGroup = (name: string) => {
     if (defaultValues) {
@@ -44,12 +40,12 @@ const AddOrEditParentDialog = ({
         { name: name, id: defaultValues.id },
         {
           onSuccess: () => {
-            toast.success("Product group created");
+            toast.success("Product group updated");
             setDialogOpen(false);
             setGroupName("");
           },
           onError: () => {
-            toast.error("Create product group failed");
+            toast.error("Update product group failed");
           },
         },
       );
@@ -70,18 +66,27 @@ const AddOrEditParentDialog = ({
   return (
     <Dialog
       open={dialogOpen}
-      onOpenChange={() => setDialogOpen(!dialogOpen)}
+      onOpenChange={(nextOpen) => {
+        setDialogOpen(nextOpen);
+        setGroupName(nextOpen ? (defaultValues?.name ?? "") : "");
+      }}
     >
       <DialogTrigger asChild>
         {defaultValues ? (
-          <div
-            className="cursor-pointer"
+          <button
+            type="button"
+            className="inline-flex size-8 items-center justify-center rounded-md text-amber-500 transition-colors hover:bg-amber-50 hover:text-amber-600"
+            aria-label={`Edit ${defaultValues.name}`}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
             onClick={(e) => {
               e.stopPropagation();
             }}
           >
-            <Pencil className="size-4 text-gray-600" />
-          </div>
+            <Pencil className="size-4" />
+          </button>
         ) : (
           <Button
             type="button"
@@ -91,7 +96,7 @@ const AddOrEditParentDialog = ({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="w-1/3">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {defaultValues ? "Edit Group Name" : "Add Product Group"}
@@ -110,12 +115,13 @@ const AddOrEditParentDialog = ({
               type="button"
               variant="outline"
               onClick={() => setDialogOpen(false)}
+              disabled={isPending}
             >
               Cancel
             </Button>
             <Button
               type="button"
-              disabled={addProductGroupMutation.isPending}
+              disabled={isPending}
               onClick={() => {
                 if (groupName.trim()) {
                   handleAddOrEditProductGroup(groupName.trim());
@@ -124,7 +130,7 @@ const AddOrEditParentDialog = ({
                 }
               }}
             >
-              {addProductGroupMutation.isPending ? (
+              {isPending ? (
                 <Loader2 className="animate-spin" />
               ) : (
                 "Save"
