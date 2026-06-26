@@ -94,7 +94,7 @@ export default function CreateOrderPageClient() {
   const [disabledFields, setDisabledFields] = useState<string[]>([]);
   const [saveUserInformation, setSaveUserInformation] = useState(false);
   const [hasSelectedSavedUser, setHasSelectedSavedUser] = useState(false);
-  const prevProductIdsRef = React.useRef<string[]>([]);
+  const shippingManuallyEditedRef = React.useRef(false);
 
   const form = useForm<ManualCreateOrderFormValues>({
     resolver: zodResolver(ManualCreateOrderSchema),
@@ -115,25 +115,28 @@ export default function CreateOrderPageClient() {
   );
   const shipping = priceMode === "net" ? shippingResult.net : shippingResult.gross;
 
+  const handleShippingManualChange = React.useCallback(() => {
+    shippingManuallyEditedRef.current = true;
+  }, []);
+
   useEffect(() => {
-    const productIds = listProducts.map((item) => item.product.id);
-    const prevIds = prevProductIdsRef.current;
-    const idsChanged =
-      productIds.length !== prevIds.length ||
-      productIds.some((id, index) => id !== prevIds[index]);
-
-    if (!idsChanged) return;
-
-    prevProductIdsRef.current = productIds;
-
     // guard item empty
     if (!listProducts || listProducts.length === 0) {
+      shippingManuallyEditedRef.current = false;
       form.setValue("total_shipping", 0);
       form.setValue("carrier", undefined); // hoặc "" tùy schema
       return;
     }
 
-    const currentItems = form.getValues("items") ?? [];
+    const currentItems = listProducts.map((item) => ({
+      id_provider: String(item.product.id_provider ?? ""),
+      quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)),
+      title: item.product.name ?? "",
+      sku: item.product.sku ?? "",
+      final_price: Number(item.final_price) || 0,
+      bader_id: item.bader_id ?? null,
+      carrier: item.carrier ?? "",
+    }));
     const result = calculateShippingCostManual(
       currentItems,
       countryCode,
@@ -152,12 +155,14 @@ export default function CreateOrderPageClient() {
       })),
     );
 
-    const currentShipping = form.getValues("total_shipping");
     const currentCarrier = form.getValues("carrier");
 
-    // chỉ override nếu user chưa nhập
-    if (currentShipping == null || currentShipping === 0) {
-      form.setValue("total_shipping", autoShipping, { shouldDirty: true });
+    // chỉ override nếu user chưa tự chỉnh shipping
+    if (!shippingManuallyEditedRef.current) {
+      form.setValue("total_shipping", autoShipping, {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
     }
 
     if (autoCarrier && autoCarrier !== currentCarrier) {
@@ -255,7 +260,11 @@ export default function CreateOrderPageClient() {
     });
 
     const shippingInputValue =
-      Number(values.total_shipping ?? shipping ?? 0) || 0;
+      values.total_shipping == null
+        ? shippingManuallyEditedRef.current
+          ? 0
+          : Number(shipping ?? 0) || 0
+        : Number(values.total_shipping) || 0;
     const normalizedShipping =
       priceMode === "net"
         ? calculateShippingGrossFromNet(
@@ -312,6 +321,7 @@ export default function CreateOrderPageClient() {
           toast.success("Create order successfully");
           form.reset();
           setListProducts([]);
+          shippingManuallyEditedRef.current = false;
           setHasSelectedSavedUser(false);
           setSaveUserInformation(false);
         },
@@ -375,7 +385,10 @@ export default function CreateOrderPageClient() {
 
           {/* Table cart and total */}
           <div className="col-span-1 space-y-4 rounded-2xl border border-secondary/15 bg-white p-4 shadow-sm">
-            <ManualAdditionalInformation listProducts={listProducts} />
+            <ManualAdditionalInformation
+              listProducts={listProducts}
+              onShippingManualChange={handleShippingManualChange}
+            />
             <FormField
               control={form.control}
               name="ware_house"

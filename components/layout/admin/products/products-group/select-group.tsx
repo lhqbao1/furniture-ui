@@ -24,9 +24,6 @@ import DeleteGroupDialog from "./delete-group-dialog";
 import AddOrEditParentDialog from "./add-or-edit-parent-dialog";
 
 const SelectProductGroup = () => {
-  const [groupName, setGroupName] = React.useState("");
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [dialogAddOpen, setDialogAddOpen] = React.useState(false);
   const [, setCurrentGroup] = useAtom(currentProductGroup);
 
   const { data: groups, isLoading, isError } = useGetProductGroup();
@@ -40,12 +37,7 @@ const SelectProductGroup = () => {
         <FormItem className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <FormLabel className="text-sm font-semibold">Groups</FormLabel>
-            <AddOrEditParentDialog
-              dialogOpen={dialogAddOpen}
-              setDialogOpen={setDialogAddOpen}
-              groupName={groupName}
-              setGroupName={setGroupName}
-            />
+            <AddOrEditParentDialog />
           </div>
 
           <FormControl>
@@ -91,10 +83,6 @@ const SelectProductGroup = () => {
                           <div className="ml-2 hidden items-center gap-2 group-hover:flex">
                             <DeleteGroupDialog parentId={g.id} />
                             <AddOrEditParentDialog
-                              dialogOpen={dialogOpen}
-                              setDialogOpen={setDialogOpen}
-                              groupName={groupName}
-                              setGroupName={setGroupName}
                               defaultValues={{ id: g.id, name: g.name }}
                             />
                           </div>

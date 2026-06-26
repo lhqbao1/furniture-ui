@@ -165,17 +165,6 @@ const Footer = () => {
                 className="h-10 w-auto object-contain"
               />
             </a>
-            <a href="https://www.billiger.de" target="_blank" rel="noopener">
-              {" "}
-              <img
-                src="https://cdn.billiger.com/partnerbutton/light/30588"
-                alt="billiger.de - The price-comparison"
-                title="billiger.de - The price-comparison"
-                width="120"
-                height="40"
-                className="h-10 w-auto object-contain"
-              />{" "}
-            </a>
           </div>
           {/* <a
             href="https://www.praktiker.de/marktplatz/prestige-home-5786"

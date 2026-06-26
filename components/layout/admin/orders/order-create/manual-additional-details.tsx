@@ -48,10 +48,12 @@ type ManualSelectedProduct = {
 
 interface ManualAdditionalInformationProps {
   listProducts?: ManualSelectedProduct[];
+  onShippingManualChange?: () => void;
 }
 
 export default function ManualAdditionalInformation({
   listProducts = [],
+  onShippingManualChange,
 }: ManualAdditionalInformationProps) {
   const form = useFormContext();
   const [marketplaceDisplay, setMarketplaceDisplay] = useState("");
@@ -386,13 +388,13 @@ export default function ManualAdditionalInformation({
                     className="pl-7"
                     step="0.01"
                     value={field.value ?? ""}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       field.onChange(
                         e.target.value === ""
                           ? undefined
                           : e.target.valueAsNumber,
-                      )
-                    }
+                      );
+                    }}
                   />
                   <span className="absolute left-3 text-gray-500">€</span>
                 </div>
@@ -457,13 +459,14 @@ export default function ManualAdditionalInformation({
                     className="pl-7"
                     step="0.01"
                     value={field.value ?? ""}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      onShippingManualChange?.();
                       field.onChange(
                         e.target.value === ""
                           ? undefined
                           : e.target.valueAsNumber,
-                      )
-                    }
+                      );
+                    }}
                   />
                   <span className="absolute left-3 text-gray-500">€</span>
                 </div>

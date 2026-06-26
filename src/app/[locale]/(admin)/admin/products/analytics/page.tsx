@@ -549,6 +549,7 @@ export default function ProductAnalyticsPage() {
 
       const exportRows = exportItems.map((product) => ({
         "Product ID": String(product.id_provider ?? "-"),
+        SKU: product.sku?.trim() || "-",
         Name: product.name?.trim() || "-",
         "Physical stock": toNumber(product.stock),
         "Reserved stock": toNumber(product.result_stock),
