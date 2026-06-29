@@ -9,6 +9,7 @@ import {
 import { Link } from "@/src/i18n/navigation";
 import { calculateProductVAT } from "@/lib/caculate-vat";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import OrderProductEditDrawer from "./order-product-edit-drawer";
 
 export const orderListExpandColumns = (
   supplier_name: string | null,
@@ -27,8 +28,17 @@ export const orderListExpandColumns = (
     accessorKey: "id",
     header: () => <div className="text-center w-full">ID</div>,
     cell: ({ row }) => {
+      const productId =
+        row.original.products?.id ?? row.original.purchased_products?.product_id;
+      const label =
+        row.original.purchased_products?.id_provider ??
+        row.original.products?.id_provider ??
+        "-";
+
       return (
-        <div className="text-center">#{row.original.products.id_provider}</div>
+        <div className="text-center">
+          <OrderProductEditDrawer productId={productId} label={`#${label}`} />
+        </div>
       );
     },
   },
