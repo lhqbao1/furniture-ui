@@ -266,6 +266,7 @@ const RESERVED_ORDER_STATUS_FILTER = [
   "tock_reserved", // Stock reserved
   "paid", // Payment received
   "preparation_shipping", // Preparing
+  "canceled_no_stock",
 ].join(",");
 
 const PH_MARKETPLACE_GROUPS = [
@@ -319,11 +320,7 @@ const PH_MARKETPLACE_FIELDS = [
   {
     id: "text_information_correct",
     labelSuffix: "Text Information Correct",
-    keys: [
-      "text_information_correct",
-      "text_info_correct",
-      "text_information",
-    ],
+    keys: ["text_information_correct", "text_info_correct", "text_information"],
     format: "boolean",
   },
   {
@@ -381,7 +378,9 @@ const formatMarketplaceFieldValue = (
 
   if (format === "currency") {
     const numericValue =
-      typeof value === "number" ? value : Number(String(value).replace(",", "."));
+      typeof value === "number"
+        ? value
+        : Number(String(value).replace(",", "."));
 
     if (!Number.isNaN(numericValue)) {
       return `€${numericValue.toLocaleString("de-DE", {
@@ -411,9 +410,7 @@ const renderBooleanIndicator = (
   trueClassName = "text-primary",
 ) => {
   return value ? (
-    <Check
-      className={cn("mx-auto h-6 w-6 stroke-[3]", trueClassName)}
-    />
+    <Check className={cn("mx-auto h-6 w-6 stroke-[3]", trueClassName)} />
   ) : (
     <X className="mx-auto h-6 w-6 text-red-600 stroke-[3]" />
   );
@@ -432,7 +429,8 @@ const resolveSupportedMarketplace = (
 ): SupportedMarketplace | null => {
   if (aliases.includes("ebay")) return "ebay";
   if (aliases.includes("amazon") || aliases.includes("amz")) return "amazon";
-  if (aliases.includes("kaufland") || aliases.includes("kaufaldn")) return "kaufland";
+  if (aliases.includes("kaufland") || aliases.includes("kaufaldn"))
+    return "kaufland";
   return null;
 };
 
@@ -632,455 +630,464 @@ export const getInventoryColumns = (
   const isPhVariant = options.variant === "ph";
   const columns: ColumnDef<ProductItem>[] = [
     {
-    accessorKey: "static_files",
-    header: "IMAGE",
-    cell: ({ row }) => {
-      const image = row.original.static_files?.[0]?.url;
+      accessorKey: "static_files",
+      header: "IMAGE",
+      cell: ({ row }) => {
+        const image = row.original.static_files?.[0]?.url;
 
-      return (
-        <HoverCard openDelay={100} closeDelay={100}>
-          <HoverCardTrigger asChild>
-            <div className="w-12 h-12 relative cursor-pointer">
-              {image ? (
+        return (
+          <HoverCard openDelay={100} closeDelay={100}>
+            <HoverCardTrigger asChild>
+              <div className="w-12 h-12 relative cursor-pointer">
+                {image ? (
+                  <Image
+                    src={image}
+                    fill
+                    alt="icon"
+                    className="object-contain rounded-md"
+                    sizes="60px"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-12 h-12 bg-gray-200 rounded-md" />
+                )}
+              </div>
+            </HoverCardTrigger>
+
+            {image && (
+              <HoverCardContent className="p-2 w-[220px] h-[220px] flex items-center justify-center">
                 <Image
                   src={image}
-                  fill
-                  alt="icon"
+                  alt="preview"
+                  width={200}
+                  height={200}
                   className="object-contain rounded-md"
-                  sizes="60px"
                   unoptimized
                 />
-              ) : (
-                <div className="w-12 h-12 bg-gray-200 rounded-md" />
-              )}
-            </div>
-          </HoverCardTrigger>
-
-          {image && (
-            <HoverCardContent className="p-2 w-[220px] h-[220px] flex items-center justify-center">
-              <Image
-                src={image}
-                alt="preview"
-                width={200}
-                height={200}
-                className="object-contain rounded-md"
-                unoptimized
-              />
-            </HoverCardContent>
-          )}
-        </HoverCard>
-      );
-    },
-  },
-
-    {
-    accessorKey: "id",
-    header: ({}) => <div className="text-center uppercase">ID</div>,
-    cell: ({ row }) => {
-      return <div className="text-center">{row.original.id_provider}</div>;
-    },
+              </HoverCardContent>
+            )}
+          </HoverCard>
+        );
+      },
     },
 
     {
-    accessorKey: "name",
-    meta: { width: 250 },
-    header: ({ column }) => (
-      <Button
-        variant={"ghost"}
-        className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        <div>NAME</div>
-        <div className="mb-0.5">
-          {{
-            asc: "↑",
-            desc: "↓",
-          }[column.getIsSorted() as string] ?? "↕"}
-        </div>
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <div className="text-wrap">
-        <div>{row.original.name}</div>
-        <div className="mt-2 flex flex-col gap-1.5 items-start text-sm">
-          <div>
-            <span className="font-semibold text-secondary">SKU:</span>{" "}
-            <span>{row.original.sku || "—"}</span>
+      accessorKey: "id",
+      header: ({}) => <div className="text-center uppercase">ID</div>,
+      cell: ({ row }) => {
+        return <div className="text-center">{row.original.id_provider}</div>;
+      },
+    },
+
+    {
+      accessorKey: "name",
+      meta: { width: 250 },
+      header: ({ column }) => (
+        <Button
+          variant={"ghost"}
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          <div>NAME</div>
+          <div className="mb-0.5">
+            {{
+              asc: "↑",
+              desc: "↓",
+            }[column.getIsSorted() as string] ?? "↕"}
           </div>
-          <div className="flex items-start gap-1">
-            <span className="font-semibold text-sky-700">EAN:</span>
-            <EditableEANCell product={row.original} />
-          </div>
-        </div>
-      </div>
-    ),
-    enableSorting: true,
-    },
-
-    {
-    accessorKey: "supplier",
-    meta: { width: 200 },
-    header: ({}) => <div className="text-center uppercase">SUPPLIER</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center text-wrap">
-          {row.original.owner
-            ? row.original.owner.business_name
-            : "Prestige Home"}
-        </div>
-      );
-    },
-    },
-
-    {
-    accessorKey: "purchase_cost",
-    header: ({}) => <div className="text-center uppercase">Purchase cost</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.cost > 0 ? (
-            <>
-              {" "}
-              €
-              {row.original.cost.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </>
-          ) : (
-            <div className="text-center">—</div>
-          )}
-        </div>
-      );
-    },
-    },
-
-    {
-    accessorKey: "price",
-    header: ({}) => <div className="text-center uppercase">Sale price</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.final_price ? (
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="text-wrap">
+          <div>{row.original.name}</div>
+          <div className="mt-2 flex flex-col gap-1.5 items-start text-sm">
             <div>
-              €
-              {row.original.final_price.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-              /pcs
+              <span className="font-semibold text-secondary">SKU:</span>{" "}
+              <span>{row.original.sku || "—"}</span>
             </div>
-          ) : (
-            <div className="text-center">—</div>
-          )}
+            <div className="flex items-start gap-1">
+              <span className="font-semibold text-sky-700">EAN:</span>
+              <EditableEANCell product={row.original} />
+            </div>
+          </div>
         </div>
-      );
-    },
-    },
-
-    {
-    accessorKey: "available",
-    header: ({}) => <div className="text-center uppercase">Available</div>,
-    cell: ({ row }) => {
-      const isBundle =
-        row.original.is_bundle ||
-        (row.original.bundles && row.original.bundles.length > 0);
-      const reserved = isBundle
-        ? calculateBundleReservedStock(row.original)
-        : toNumber(row.original.result_stock);
-      const physical = isBundle
-        ? calculateBundlePhysicalStock(row.original)
-        : toNumber(row.original.stock);
-
-      const available = physical - Math.abs(reserved);
-      return <div className="text-center">{available}</div>;
-    },
+      ),
+      enableSorting: true,
     },
 
     {
-    accessorKey: "reserved",
-    header: ({}) => <div className="text-center uppercase">Reserved</div>,
-    cell: ({ row }) => {
-      return <ReservedStockCell product={row.original} />;
-    },
+      accessorKey: "supplier",
+      meta: { width: 200 },
+      header: ({}) => <div className="text-center uppercase">SUPPLIER</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="text-center text-wrap">
+            {row.original.owner
+              ? row.original.owner.business_name
+              : "Prestige Home"}
+          </div>
+        );
+      },
     },
 
     {
-    accessorKey: "physical",
-    header: ({}) => <div className="text-center uppercase">Physical</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.is_bundle ||
-          (row.original.bundles && row.original.bundles.length > 0) ? (
-            calculateBundlePhysicalStock(row.original)
-          ) : (
-            <EditableStockCell product={row.original} />
-          )}
-        </div>
-      );
+      accessorKey: "purchase_cost",
+      header: ({}) => (
+        <div className="text-center uppercase">Purchase cost</div>
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-center">
+            {row.original.cost > 0 ? (
+              <>
+                {" "}
+                €
+                {row.original.cost.toLocaleString("de-DE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </>
+            ) : (
+              <div className="text-center">—</div>
+            )}
+          </div>
+        );
+      },
     },
-    },
+
     {
-    id: "incoming_stock",
-    header: () => <div className="text-center uppercase">incoming</div>,
-    cell: ({ row }) => {
-      const inventoryPos = row.original.inventory_pos ?? [];
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const upcoming = inventoryPos.filter((item) => {
-        if (!item.list_delivery_date) return false;
-        const date = new Date(item.list_delivery_date);
-        if (Number.isNaN(date.getTime())) return false;
-        date.setHours(0, 0, 0, 0);
-        return date > today;
-      });
-
-      if (!upcoming.length) {
-        return <div className="text-center">—</div>;
-      }
-
-      return (
-        <div className="space-y-1.5 text-sm text-center">
-          {upcoming.map((item) => {
-            const date = item.list_delivery_date
-              ? new Date(item.list_delivery_date)
-              : null;
-
-            const sixWeeksFromNow = new Date(today);
-            sixWeeksFromNow.setDate(sixWeeksFromNow.getDate() + 42);
-            const isSoon =
-              date &&
-              !Number.isNaN(date.getTime()) &&
-              date > today &&
-              date <= sixWeeksFromNow;
-
-            return (
-              <div
-                key={item.id}
-                className={isSoon ? "text-secondary" : undefined}
-              >
-                {formatIncomingStockEntry(item.quantity, date)}
+      accessorKey: "price",
+      header: ({}) => <div className="text-center uppercase">Sale price</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="text-center">
+            {row.original.final_price ? (
+              <div>
+                €
+                {row.original.final_price.toLocaleString("de-DE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+                /pcs
               </div>
-            );
-          })}
-        </div>
-      );
-    },
-    },
-
-    {
-    accessorKey: "available_purchase_value",
-    header: ({}) => (
-      <div className="text-center uppercase">Available Value</div>
-    ),
-    cell: ({ row }) => {
-      const isBundle =
-        row.original.is_bundle ||
-        (row.original.bundles && row.original.bundles.length > 0);
-      const reserved = isBundle
-        ? calculateBundleReservedStock(row.original)
-        : toNumber(row.original.result_stock);
-      const physical = isBundle
-        ? calculateBundlePhysicalStock(row.original)
-        : toNumber(row.original.stock);
-      const available = Math.max(0, physical - Math.abs(reserved));
-      return (
-        <div className="text-center">
-          {row.original.cost ? (
-            <div>
-              €
-              {(row.original.cost * available).toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </div>
-          ) : (
-            <div className="text-center">—</div>
-          )}
-        </div>
-      );
-    },
+            ) : (
+              <div className="text-center">—</div>
+            )}
+          </div>
+        );
+      },
     },
 
     {
-    accessorKey: "reserved_purchase_value",
-    header: ({}) => <div className="text-center uppercase">Reserved Value</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.result_stock ? (
-            <div>
-              €
-              {(row.original.cost * row.original.result_stock).toLocaleString(
-                "de-DE",
-                {
+      accessorKey: "available",
+      header: ({}) => <div className="text-center uppercase">Available</div>,
+      cell: ({ row }) => {
+        const isBundle =
+          row.original.is_bundle ||
+          (row.original.bundles && row.original.bundles.length > 0);
+        const reserved = isBundle
+          ? calculateBundleReservedStock(row.original)
+          : toNumber(row.original.result_stock);
+        const physical = isBundle
+          ? calculateBundlePhysicalStock(row.original)
+          : toNumber(row.original.stock);
+
+        const available = physical - Math.abs(reserved);
+        return <div className="text-center">{available}</div>;
+      },
+    },
+
+    {
+      accessorKey: "reserved",
+      header: ({}) => <div className="text-center uppercase">Reserved</div>,
+      cell: ({ row }) => {
+        return <ReservedStockCell product={row.original} />;
+      },
+    },
+
+    {
+      accessorKey: "physical",
+      header: ({}) => <div className="text-center uppercase">Physical</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="text-center">
+            {row.original.is_bundle ||
+            (row.original.bundles && row.original.bundles.length > 0) ? (
+              calculateBundlePhysicalStock(row.original)
+            ) : (
+              <EditableStockCell product={row.original} />
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      id: "incoming_stock",
+      header: () => <div className="text-center uppercase">incoming</div>,
+      cell: ({ row }) => {
+        const inventoryPos = row.original.inventory_pos ?? [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const upcoming = inventoryPos.filter((item) => {
+          if (!item.list_delivery_date) return false;
+          const date = new Date(item.list_delivery_date);
+          if (Number.isNaN(date.getTime())) return false;
+          date.setHours(0, 0, 0, 0);
+          return date > today;
+        });
+
+        if (!upcoming.length) {
+          return <div className="text-center">—</div>;
+        }
+
+        return (
+          <div className="space-y-1.5 text-sm text-center">
+            {upcoming.map((item) => {
+              const date = item.list_delivery_date
+                ? new Date(item.list_delivery_date)
+                : null;
+
+              const sixWeeksFromNow = new Date(today);
+              sixWeeksFromNow.setDate(sixWeeksFromNow.getDate() + 42);
+              const isSoon =
+                date &&
+                !Number.isNaN(date.getTime()) &&
+                date > today &&
+                date <= sixWeeksFromNow;
+
+              return (
+                <div
+                  key={item.id}
+                  className={isSoon ? "text-secondary" : undefined}
+                >
+                  {formatIncomingStockEntry(item.quantity, date)}
+                </div>
+              );
+            })}
+          </div>
+        );
+      },
+    },
+
+    {
+      accessorKey: "available_purchase_value",
+      header: ({}) => (
+        <div className="text-center uppercase">Available Value</div>
+      ),
+      cell: ({ row }) => {
+        const isBundle =
+          row.original.is_bundle ||
+          (row.original.bundles && row.original.bundles.length > 0);
+        const reserved = isBundle
+          ? calculateBundleReservedStock(row.original)
+          : toNumber(row.original.result_stock);
+        const physical = isBundle
+          ? calculateBundlePhysicalStock(row.original)
+          : toNumber(row.original.stock);
+        const available = Math.max(0, physical - Math.abs(reserved));
+        return (
+          <div className="text-center">
+            {row.original.cost ? (
+              <div>
+                €
+                {(row.original.cost * available).toLocaleString("de-DE", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                },
-              )}
-            </div>
-          ) : (
-            <div className="text-center">—</div>
-          )}
-        </div>
-      );
-    },
-    },
-
-    {
-    accessorKey: "physical_purchase_value",
-    header: ({}) => <div className="text-center uppercase">Physical Value</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.stock && row.original.cost > 0 ? (
-            <div>
-              €
-              {(row.original.cost * row.original.stock).toLocaleString(
-                "de-DE",
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                },
-              )}
-            </div>
-          ) : (
-            <div className="text-center">—</div>
-          )}
-        </div>
-      );
-    },
+                })}
+              </div>
+            ) : (
+              <div className="text-center">—</div>
+            )}
+          </div>
+        );
+      },
     },
 
     {
-    accessorKey: "available_sale_value",
-    header: ({}) => (
-      <div className="text-center uppercase">Available Sale Value</div>
-    ),
-    cell: ({ row }) => {
-      const isBundle =
-        row.original.is_bundle ||
-        (row.original.bundles && row.original.bundles.length > 0);
-      const reserved = isBundle
-        ? calculateBundleReservedStock(row.original)
-        : toNumber(row.original.result_stock);
-      const physical = isBundle
-        ? calculateBundlePhysicalStock(row.original)
-        : toNumber(row.original.stock);
-      const available = Math.max(0, physical - Math.abs(reserved));
-
-      return (
-        <div className="text-center">
-          {available && row.original.final_price > 0 ? (
-            <div>
-              €
-              {(row.original.final_price * available).toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </div>
-          ) : (
-            <div className="text-center">—</div>
-          )}
-        </div>
-      );
-    },
+      accessorKey: "reserved_purchase_value",
+      header: ({}) => (
+        <div className="text-center uppercase">Reserved Value</div>
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-center">
+            {row.original.result_stock ? (
+              <div>
+                €
+                {(row.original.cost * row.original.result_stock).toLocaleString(
+                  "de-DE",
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  },
+                )}
+              </div>
+            ) : (
+              <div className="text-center">—</div>
+            )}
+          </div>
+        );
+      },
     },
 
-  // {
-  //   accessorKey: "incomming",
-  //   header: () => (
-  //     <div className="text-center uppercase">
-  //       Incoming stock / date /unit landed cost
-  //     </div>
-  //   ),
-  //   cell: ({ row }) => {
-  //     const inventoryData = row.original.inventory;
+    {
+      accessorKey: "physical_purchase_value",
+      header: ({}) => (
+        <div className="text-center uppercase">Physical Value</div>
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-center">
+            {row.original.stock && row.original.cost > 0 ? (
+              <div>
+                €
+                {(row.original.cost * row.original.stock).toLocaleString(
+                  "de-DE",
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  },
+                )}
+              </div>
+            ) : (
+              <div className="text-center">—</div>
+            )}
+          </div>
+        );
+      },
+    },
 
-  //     if (!inventoryData || inventoryData.length === 0) {
-  //       return <div className="text-center">Updating</div>;
-  //     }
+    {
+      accessorKey: "available_sale_value",
+      header: ({}) => (
+        <div className="text-center uppercase">Available Sale Value</div>
+      ),
+      cell: ({ row }) => {
+        const isBundle =
+          row.original.is_bundle ||
+          (row.original.bundles && row.original.bundles.length > 0);
+        const reserved = isBundle
+          ? calculateBundleReservedStock(row.original)
+          : toNumber(row.original.result_stock);
+        const physical = isBundle
+          ? calculateBundlePhysicalStock(row.original)
+          : toNumber(row.original.stock);
+        const available = Math.max(0, physical - Math.abs(reserved));
 
-  //     return (
-  //       <div className="flex flex-col gap-2 items-center">
-  //         {inventoryData.map((item) => (
-  //           <div
-  //             key={item.id}
-  //             className="w-full flex flex-row-reverse items-center justify-end gap-1"
-  //           >
-  //             {/* INFO */}
-  //             <div className="grid grid-cols-3 gap-2 text-sm w-[280px]">
-  //               <div className="">{item.incoming_stock} pcs</div>
-  //               <div className="">{formatIOSDate(item.date_received)}</div>
-  //               <div className="">
-  //                 €
-  //                 {(item.cost_received / item.incoming_stock).toLocaleString(
-  //                   "de-DE",
-  //                   {
-  //                     minimumFractionDigits: 2,
-  //                     maximumFractionDigits: 2,
-  //                   },
-  //                 )}
-  //               </div>
-  //             </div>
+        return (
+          <div className="text-center">
+            {available && row.original.final_price > 0 ? (
+              <div>
+                €
+                {(row.original.final_price * available).toLocaleString(
+                  "de-DE",
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  },
+                )}
+              </div>
+            ) : (
+              <div className="text-center">—</div>
+            )}
+          </div>
+        );
+      },
+    },
 
-  //             {/* ACTIONS */}
-  //             <div className="flex gap-2">
-  //               <EditInventoryDialog
-  //                 cost={row.original.cost}
-  //                 productId={row.original.id}
-  //                 stock={row.original.stock}
-  //                 inventoryData={item}
-  //               />
+    // {
+    //   accessorKey: "incomming",
+    //   header: () => (
+    //     <div className="text-center uppercase">
+    //       Incoming stock / date /unit landed cost
+    //     </div>
+    //   ),
+    //   cell: ({ row }) => {
+    //     const inventoryData = row.original.inventory;
 
-  //               <ProductInventoryDeleteDialog id={item.id} />
-  //             </div>
-  //           </div>
-  //         ))}
-  //       </div>
-  //     );
-  //   },
-  // },
+    //     if (!inventoryData || inventoryData.length === 0) {
+    //       return <div className="text-center">Updating</div>;
+    //     }
 
-  // {
-  //   accessorKey: "cost",
-  //   header: ({}) => <div className="text-center uppercase">Landed cost</div>,
-  //   cell: ({ row }) => {
-  //     const inv = row.original.inventory || [];
+    //     return (
+    //       <div className="flex flex-col gap-2 items-center">
+    //         {inventoryData.map((item) => (
+    //           <div
+    //             key={item.id}
+    //             className="w-full flex flex-row-reverse items-center justify-end gap-1"
+    //           >
+    //             {/* INFO */}
+    //             <div className="grid grid-cols-3 gap-2 text-sm w-[280px]">
+    //               <div className="">{item.incoming_stock} pcs</div>
+    //               <div className="">{formatIOSDate(item.date_received)}</div>
+    //               <div className="">
+    //                 €
+    //                 {(item.cost_received / item.incoming_stock).toLocaleString(
+    //                   "de-DE",
+    //                   {
+    //                     minimumFractionDigits: 2,
+    //                     maximumFractionDigits: 2,
+    //                   },
+    //                 )}
+    //               </div>
+    //             </div>
 
-  //     const total = inv.reduce((sum, item) => {
-  //       const cost = Number(item.cost_received ?? 0);
+    //             {/* ACTIONS */}
+    //             <div className="flex gap-2">
+    //               <EditInventoryDialog
+    //                 cost={row.original.cost}
+    //                 productId={row.original.id}
+    //                 stock={row.original.stock}
+    //                 inventoryData={item}
+    //               />
 
-  //       const value = cost;
-  //       return sum + (isNaN(value) ? 0 : value);
-  //     }, 0);
+    //               <ProductInventoryDeleteDialog id={item.id} />
+    //             </div>
+    //           </div>
+    //         ))}
+    //       </div>
+    //     );
+    //   },
+    // },
 
-  //     return (
-  //       <div className="text-center">
-  //         {total > 0 ? (
-  //           <>
-  //             {" "}
-  //             €
-  //             {total.toLocaleString("de-DE", {
-  //               minimumFractionDigits: 2,
-  //               maximumFractionDigits: 2,
-  //             })}
-  //           </>
-  //         ) : (
-  //           "Updating"
-  //         )}
-  //       </div>
-  //     );
-  //   },
-  // },
+    // {
+    //   accessorKey: "cost",
+    //   header: ({}) => <div className="text-center uppercase">Landed cost</div>,
+    //   cell: ({ row }) => {
+    //     const inv = row.original.inventory || [];
 
-  // {
-  //   id: "actions",
-  //   header: "ACTION",
-  //   cell: ({ row }) => <ActionsCell product={row.original} />,
-  // },
+    //     const total = inv.reduce((sum, item) => {
+    //       const cost = Number(item.cost_received ?? 0);
+
+    //       const value = cost;
+    //       return sum + (isNaN(value) ? 0 : value);
+    //     }, 0);
+
+    //     return (
+    //       <div className="text-center">
+    //         {total > 0 ? (
+    //           <>
+    //             {" "}
+    //             €
+    //             {total.toLocaleString("de-DE", {
+    //               minimumFractionDigits: 2,
+    //               maximumFractionDigits: 2,
+    //             })}
+    //           </>
+    //         ) : (
+    //           "Updating"
+    //         )}
+    //       </div>
+    //     );
+    //   },
+    // },
+
+    // {
+    //   id: "actions",
+    //   header: "ACTION",
+    //   cell: ({ row }) => <ActionsCell product={row.original} />,
+    // },
   ];
 
   if (isPhVariant) {
@@ -1131,7 +1138,8 @@ export const getInventoryColumns = (
                       field.keys,
                     ) ?? false;
                   const hasSizePhotoData =
-                    hasMarketplaceSizePhotoFlag || hasProductStaticFiles(row.original);
+                    hasMarketplaceSizePhotoFlag ||
+                    hasProductStaticFiles(row.original);
 
                   return (
                     <div className="text-center text-sm">
@@ -1185,13 +1193,15 @@ export const getInventoryColumns = (
                 }
 
                 if (field.id === "video_available") {
-                  const hasMarketplaceVideoFlag = getMarketplaceBooleanFieldValue(
-                    row.original,
-                    marketplaceGroup.aliases,
-                    field.keys,
-                  );
+                  const hasMarketplaceVideoFlag =
+                    getMarketplaceBooleanFieldValue(
+                      row.original,
+                      marketplaceGroup.aliases,
+                      field.keys,
+                    );
                   const hasVideoData =
-                    hasMarketplaceVideoFlag === true || hasProductVideos(row.original);
+                    hasMarketplaceVideoFlag === true ||
+                    hasProductVideos(row.original);
 
                   return (
                     <div className="text-center text-sm">
@@ -1296,14 +1306,14 @@ export const getInventoryColumns = (
 
   return columns
     .filter((column) => {
-    const columnKey =
-      "accessorKey" in column
-        ? typeof column.accessorKey === "string"
-          ? column.accessorKey
-          : undefined
-        : column.id;
+      const columnKey =
+        "accessorKey" in column
+          ? typeof column.accessorKey === "string"
+            ? column.accessorKey
+            : undefined
+          : column.id;
 
-    return columnKey ? !hiddenColumnKeys.has(columnKey) : true;
+      return columnKey ? !hiddenColumnKeys.has(columnKey) : true;
     })
     .map((column) => {
       const columnKey =
@@ -1313,7 +1323,8 @@ export const getInventoryColumns = (
             : undefined
           : column.id;
 
-      const currentMeta = (column.meta as Record<string, unknown> | undefined) ?? {};
+      const currentMeta =
+        (column.meta as Record<string, unknown> | undefined) ?? {};
 
       if (columnKey === "static_files") {
         return {
