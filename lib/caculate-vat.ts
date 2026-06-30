@@ -163,8 +163,17 @@ export function calculateShippingCost(
   tax_id?: string | null,
   total_shipping?: number,
 ) {
-  // ❗ Không có carrier -> return 0
-  if (!items || items.every((i) => !i.products?.carrier)) {
+  const explicitShippingGross = Number(total_shipping);
+  const hasExplicitShipping =
+    total_shipping !== null &&
+    total_shipping !== undefined &&
+    Number.isFinite(explicitShippingGross);
+
+  // ❗ Không có carrier -> chỉ return 0 khi order cũng không có shipping amount
+  if (
+    !hasExplicitShipping &&
+    (!items || items.every((i) => !i.products?.carrier))
+  ) {
     return {
       gross: 0,
       net: 0,
@@ -179,7 +188,11 @@ export function calculateShippingCost(
       item.products?.carrier?.toLowerCase() === "spedition",
   );
 
-  const gross = total_shipping ?? (hasAmm ? 35.95 : 5.95);
+  const gross = hasExplicitShipping
+    ? explicitShippingGross
+    : hasAmm
+      ? 35.95
+      : 5.95;
 
   const vatRate = parseTaxRate("19%", country_code, tax_id);
 

@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import {
   aggregatePackages,
   calcDeliveryCost,
+  getSuggestedCarrier,
 } from "@/lib/shipping/delivery-cost";
 
 interface ProductLogisticsGroupProps {
@@ -70,12 +71,6 @@ const DEFAULT_DELIVERY_TIME_BY_CARRIER: Record<string, string> = {
 const getDefaultDeliveryTimeByCarrier = (carrier: string) =>
   DEFAULT_DELIVERY_TIME_BY_CARRIER[carrier.toLowerCase().trim()];
 
-const CARRIER_SUGGESTION_OPTIONS = [
-  { id: "dpd", label: "DPD" },
-  { id: "gls", label: "GLS" },
-  { id: "amm", label: "Spedition" },
-] as const;
-
 const formatCarrierSuggestionPrice = (value: number) =>
   new Intl.NumberFormat("de-DE", {
     style: "currency",
@@ -83,11 +78,6 @@ const formatCarrierSuggestionPrice = (value: number) =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
-
-const normalizeCarrierId = (carrier: unknown) => {
-  const normalized = String(carrier ?? "").toLowerCase().trim();
-  return normalized === "spedition" ? "amm" : normalized;
-};
 
 const pickFirstPackageDimension = (packages: unknown): PackageValue | null => {
   if (!Array.isArray(packages) || packages.length === 0) return null;
@@ -151,38 +141,10 @@ const ProductLogisticsGroup = ({
   const watchedBundles = bundleItems;
   const hasMountedWarningRef = useRef(false);
   const lastWarningKeyRef = useRef("");
-  const carrierSuggestion = useMemo(() => {
-    const mergedPackage = aggregatePackages(
-      watchedPackages ?? [],
-      watchedBundles ?? [],
-    );
-
-    if (!mergedPackage) return null;
-
-    const suggestions = CARRIER_SUGGESTION_OPTIONS.map((carrier) => {
-      const result = calcDeliveryCost([mergedPackage], carrier.id);
-
-      return {
-        ...carrier,
-        cost: result.cost,
-        error: result.error,
-      };
-    });
-
-    const validSuggestions = suggestions
-      .filter(
-        (item): item is (typeof suggestions)[number] & { cost: number } =>
-          item.cost != null,
-      )
-      .sort((a, b) => a.cost - b.cost);
-
-    const recommended = validSuggestions[0] ?? null;
-
-    return {
-      recommended,
-      suggestions,
-    };
-  }, [watchedPackages, watchedBundles]);
+  const carrierSuggestion = useMemo(
+    () => getSuggestedCarrier(watchedPackages ?? [], watchedBundles ?? []),
+    [watchedPackages, watchedBundles],
+  );
 
   // Thêm effect để đồng bộ bundleItems → number_of_packages + packages
   useEffect(() => {
@@ -335,22 +297,13 @@ const ProductLogisticsGroup = ({
                     </SelectContent>
                   </Select>
                 </FormControl>
-                {carrierSuggestion?.recommended ? (
+                {carrierSuggestion ? (
                   <p className="text-xs text-muted-foreground">
                     Recommended:{" "}
                     <span className="font-semibold text-secondary">
-                      {carrierSuggestion.recommended.label}
+                      {carrierSuggestion.label}
                     </span>{" "}
-                    (
-                    {formatCarrierSuggestionPrice(
-                      carrierSuggestion.recommended.cost,
-                    )}
-                    )
-                  </p>
-                ) : carrierSuggestion ? (
-                  <p className="text-xs text-red-600">
-                    No carrier recommendation available for these package
-                    dimensions.
+                    ({formatCarrierSuggestionPrice(carrierSuggestion.cost)})
                   </p>
                 ) : (
                   <p className="text-xs text-muted-foreground">

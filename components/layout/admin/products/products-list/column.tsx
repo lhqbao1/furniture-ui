@@ -3,7 +3,15 @@
 import { ColumnDef, Row } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Check, Eye, Loader2, Pencil, Upload } from "lucide-react";
+import {
+  BookOpen,
+  Check,
+  Copy,
+  Eye,
+  Loader2,
+  Pencil,
+  Upload,
+} from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductItem } from "@/types/products";
 import { useEffect, useMemo, useState } from "react";
@@ -1638,6 +1646,12 @@ function ActionsCell({ product }: { product: ProductItem }) {
         >
           <Pencil className="w-4 h-4 text-primary" />
         </Button>
+
+        <Link href={`/admin/products/${product.id}/clone`}>
+          <Button variant="ghost" size="icon" title="Clone Product">
+            <Copy className="w-4 h-4 text-blue-600" />
+          </Button>
+        </Link>
 
         {/* {product.is_import_to_amm === false && (
           <Button
