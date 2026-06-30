@@ -9,10 +9,23 @@ export type CarrierType =
   | "dpd"
   | "amm"
   | "spedition"
+  | "gls"
   | string
   | null
   | undefined;
 export type BundleInput = { quantity?: number | null } | null | undefined;
+
+export const CARRIER_RECOMMENDATION_OPTIONS = [
+  { id: "dpd", label: "DPD" },
+  { id: "gls", label: "GLS" },
+  { id: "amm", label: "Spedition" },
+] as const;
+
+export type CarrierRecommendation = (typeof CARRIER_RECOMMENDATION_OPTIONS)[
+  number
+] & {
+  cost: number;
+};
 
 const DPD_LIMITS = {
   maxWeightKg: 31,
@@ -269,6 +282,30 @@ export function calcDeliveryCost(
     cost: Number(total.toFixed(2)),
     error: undefined as string | undefined,
   };
+}
+
+export function getSuggestedCarrier(
+  packages: PackageInput[] | null | undefined,
+  bundles?: BundleInput[],
+): CarrierRecommendation | null {
+  const mergedPackage = aggregatePackages(packages, bundles);
+  if (!mergedPackage) return null;
+
+  let recommendation: CarrierRecommendation | null = null;
+
+  for (const carrier of CARRIER_RECOMMENDATION_OPTIONS) {
+    const { cost } = calcDeliveryCost([mergedPackage], carrier.id);
+    if (cost == null) continue;
+
+    if (!recommendation || cost < recommendation.cost) {
+      recommendation = {
+        ...carrier,
+        cost,
+      };
+    }
+  }
+
+  return recommendation;
 }
 
 export function aggregatePackages(

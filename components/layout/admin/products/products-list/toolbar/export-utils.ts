@@ -3,6 +3,7 @@
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { ProductItem } from "@/types/products";
 import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
+import { getSuggestedCarrier } from "@/lib/shipping/delivery-cost";
 
 const clean = (val: unknown) =>
   val === null || val === undefined ? "" : val;
@@ -111,10 +112,15 @@ export const buildProductExportData = (
         : null;
 
     const rawVat = clean(product.tax);
+    const vatText = typeof rawVat === "string" ? rawVat : "";
     const vat =
-      rawVat && rawVat.includes("%")
-        ? Number(rawVat.replace("%", "").trim())
+      vatText && vatText.includes("%")
+        ? Number(vatText.replace("%", "").trim())
         : null;
+    const suggestedCarrier = getSuggestedCarrier(
+      product.packages,
+      product.bundles,
+    );
 
     return {
       id: Number(clean(product.id_provider)),
@@ -138,6 +144,7 @@ export const buildProductExportData = (
       amount_unit: Number(clean(product.amount_unit)),
       delivery_time: clean(product.delivery_time),
       carrier: clean(product.carrier),
+      suggestion_carrier: clean(suggestedCarrier?.id),
       net_purchase_cost: clean(product.cost),
       delivery_cost: clean(product.delivery_cost),
       return_cost: clean(product.return_cost),
