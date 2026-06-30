@@ -159,7 +159,7 @@ const EditOrderItemPricesDrawer = ({
         payload: {
           item_prices: selectedPriceEntries.map((item) => ({
             id_provider: item.id_provider,
-            price: Number(item.price.toFixed(2)),
+            price: item.price,
           })),
         },
       });
