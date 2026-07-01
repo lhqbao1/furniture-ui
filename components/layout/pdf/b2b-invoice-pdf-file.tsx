@@ -138,6 +138,23 @@ const getCheckoutCartItems = (
   return checkout.cart?.items ?? [];
 };
 
+type CheckoutCartItem = ReturnType<typeof getCheckoutCartItems>[number];
+
+const formatProductNameWithIdProvider = (
+  item: CheckoutCartItem | null | undefined,
+) => {
+  const productName = String(
+    item?.purchased_products?.name ?? item?.products?.name ?? "-",
+  ).trim();
+  const idProvider = String(
+    item?.purchased_products?.id_provider ?? item?.products?.id_provider ?? "",
+  ).trim();
+
+  if (!idProvider || productName === "-") return productName || "-";
+
+  return `${productName} - ${idProvider}`;
+};
+
 const resolveRefNumber = ({
   order,
   item,
@@ -305,8 +322,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
           vatRate,
           rowVat,
           tax: formatTaxPercent(taxValue),
-          productName:
-            item?.purchased_products?.name ?? item?.products?.name ?? "-",
+          productName: formatProductNameWithIdProvider(item),
         };
       });
     })
@@ -376,7 +392,6 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
         >
           <Image
             src="https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/681cde2c-27cd-45ea-94c2-7d82a35453bc_invoice-logo.png?"
-            alt="Prestige Home logo"
             style={{ width: 60, height: 50 }}
           />
         </View>

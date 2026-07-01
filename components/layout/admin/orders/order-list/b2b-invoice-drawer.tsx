@@ -122,6 +122,23 @@ const getCheckoutCartItems = (checkout: CheckOutMain["checkouts"][number] | unde
   return checkout.cart?.items ?? [];
 };
 
+type CheckoutCartItem = ReturnType<typeof getCheckoutCartItems>[number];
+
+const formatProductNameWithIdProvider = (
+  item: CheckoutCartItem | null | undefined,
+) => {
+  const productName = String(
+    item?.purchased_products?.name ?? item?.products?.name ?? "-",
+  ).trim();
+  const idProvider = String(
+    item?.purchased_products?.id_provider ?? item?.products?.id_provider ?? "",
+  ).trim();
+
+  if (!idProvider || productName === "-") return productName || "-";
+
+  return `${productName} - ${idProvider}`;
+};
+
 const normalizeInvoiceOrders = (orders: CheckOutMain[]) =>
   orders
     .map((order) => filterMainCheckoutForInvoice(order))
@@ -320,10 +337,7 @@ export default function B2BInvoiceDrawer({
             item: firstItem,
             itemCount: orderItems.length,
           }),
-          Produktname:
-            firstItem?.purchased_products?.name ??
-            firstItem?.products?.name ??
-            "-",
+          Produktname: formatProductNameWithIdProvider(firstItem),
           Menge: quantity,
           Versand: formatEur(shippingNet),
           "E.-Preis": formatEur(unitNet),
