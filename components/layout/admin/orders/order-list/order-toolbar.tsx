@@ -8,7 +8,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
+import {
+  ChevronDown,
+  MapPin,
+  Package,
+  ReceiptText,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -44,6 +51,8 @@ import {
 } from "./filter/order-country-filter-options";
 import { STATUS_OPTIONS } from "@/data/data";
 import { ORDER_LIST_STATUS_FILTER_OPTIONS } from "./filter/order-status-filter-options";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import type { SearchBy } from "@/features/checkout/api";
 
 export enum ToolbarType {
   product = "product",
@@ -72,6 +81,7 @@ interface OrderToolbarProps {
 
 const FILTER_KEYS = [
   "search",
+  "search_by",
   "multi_search",
   "status",
   "channel",
@@ -83,6 +93,37 @@ const FILTER_KEYS = [
   "is_claimed_marketplace",
   "filter_by_shipment",
 ];
+
+const SEARCH_BY_OPTIONS = [
+  {
+    value: "order",
+    label: "Order info",
+    helper: "ID, customer, channel",
+    icon: ReceiptText,
+  },
+  {
+    value: "product",
+    label: "Product",
+    helper: "SKU, name, item data",
+    icon: Package,
+  },
+  {
+    value: "shipping_address",
+    label: "Shipping address",
+    helper: "Name, street, city",
+    icon: MapPin,
+  },
+] satisfies Array<{
+  value: SearchBy;
+  label: string;
+  helper: string;
+  icon: React.ComponentType<{ className?: string }>;
+}>;
+
+function parseSearchByParam(value: string | null): SearchBy {
+  if (value === "product" || value === "shipping_address") return value;
+  return "order";
+}
 
 export default function OrderToolbar({
   pageSize,
@@ -114,6 +155,7 @@ export default function OrderToolbar({
 
   const [searchValue, setSearchValue] = useState(defaultSearch);
   const prevParamsRef = useRef(Object.fromEntries(searchParams.entries()));
+  const selectedSearchBy = parseSearchByParam(searchParams.get("search_by"));
 
   const statusLabelMap = React.useMemo(() => {
     const map = new Map<string, string>();
@@ -183,6 +225,16 @@ export default function OrderToolbar({
     [pathname, router, setPage],
   );
 
+  const handleSearchByChange = React.useCallback(
+    (value: string) => {
+      const nextSearchBy = parseSearchByParam(value);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("search_by", nextSearchBy);
+      pushWithParams(params);
+    },
+    [pushWithParams, searchParams],
+  );
+
   const removeFilterValue = React.useCallback(
     (paramKey: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -219,6 +271,7 @@ export default function OrderToolbar({
   const applySearch = React.useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
     const normalizedSearch = searchValue.trim();
+    params.set("search_by", selectedSearchBy);
 
     if (normalizedSearch) {
       params.set("search", normalizedSearch);
@@ -227,7 +280,7 @@ export default function OrderToolbar({
     }
 
     pushWithParams(params);
-  }, [pushWithParams, searchParams, searchValue]);
+  }, [pushWithParams, searchParams, searchValue, selectedSearchBy]);
 
   const activeFilterChips = React.useMemo(() => {
     type FilterChip = {
@@ -240,9 +293,13 @@ export default function OrderToolbar({
 
     const search = (searchParams.get("search") ?? "").trim();
     if (search) {
+      const searchByLabel =
+        SEARCH_BY_OPTIONS.find((option) => option.value === selectedSearchBy)
+          ?.label ?? "Order info";
+
       chips.push({
         id: "search",
-        label: `Search: ${search}`,
+        label: `Search in ${searchByLabel}: ${search}`,
         onRemove: () => {
           setSearchValue("");
           removeFilterParam("search");
@@ -335,6 +392,7 @@ export default function OrderToolbar({
     return chips;
   }, [
     searchParams,
+    selectedSearchBy,
     statusLabelMap,
     channelLabelMap,
     countryLabelMap,
@@ -368,23 +426,69 @@ export default function OrderToolbar({
   return (
     <div className="w-full rounded-2xl border border-secondary/15 bg-white p-3 shadow-sm md:p-4">
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex w-full flex-1 items-center gap-2">
-            <MultiSearch />
-            <Input
-              placeholder="Search (press Enter)"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  applySearch();
-                }
-              }}
-            />
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+          <div className="flex w-full flex-1 flex-col gap-2">
+            <div className="flex w-full items-center gap-2">
+              <MultiSearch />
+              <Input
+                placeholder="Search (press Enter)"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    applySearch();
+                  }
+                }}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1 rounded-xl border border-secondary/10 bg-slate-50/80 p-1.5 sm:flex-row sm:items-center">
+              <div className="px-2 text-xs font-semibold text-muted-foreground sm:whitespace-nowrap">
+                Search in
+              </div>
+              <RadioGroup
+                value={selectedSearchBy}
+                onValueChange={handleSearchByChange}
+                className="grid flex-1 grid-cols-1 gap-1 sm:grid-cols-3"
+              >
+                {SEARCH_BY_OPTIONS.map((option) => {
+                  const Icon = option.icon;
+                  const checked = selectedSearchBy === option.value;
+                  const optionId = `order-search-by-${option.value}`;
+
+                  return (
+                    <label
+                      key={option.value}
+                      htmlFor={optionId}
+                      className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 transition-colors ${
+                        checked
+                          ? "border-secondary bg-white text-secondary shadow-sm"
+                          : "border-transparent text-slate-600 hover:bg-white/80 hover:text-slate-900"
+                      }`}
+                    >
+                      <RadioGroupItem
+                        id={optionId}
+                        value={option.value}
+                        className="sr-only"
+                      />
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <span className="min-w-0">
+                        <span className="block truncate text-xs font-semibold leading-4">
+                          {option.label}
+                        </span>
+                        <span className="block truncate text-[11px] leading-4 text-muted-foreground">
+                          {option.helper}
+                        </span>
+                      </span>
+                    </label>
+                  );
+                })}
+              </RadioGroup>
+            </div>
           </div>
 
-          <div className="flex w-full flex-wrap items-center gap-2 xl:w-auto xl:justify-end">
+          <div className="flex w-full flex-wrap items-center gap-2 xl:w-auto xl:shrink-0 xl:justify-end">
             <Select
               value={String(pageSize)}
               onValueChange={(value) => setPageSize(Number(value))}

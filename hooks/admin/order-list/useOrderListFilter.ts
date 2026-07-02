@@ -1,4 +1,5 @@
 import { useSearchParams } from "next/navigation";
+import type { SearchBy } from "@/features/checkout/api";
 
 // 🔥 STATUS → UPPERCASE
 function parseStatusParam(param: string | null) {
@@ -47,6 +48,11 @@ function parseShipmentFilterParam(param: string | null): boolean | undefined {
   return param.trim().toLowerCase() === "true" ? true : undefined;
 }
 
+function parseSearchByParam(param: string | null): SearchBy {
+  if (param === "product" || param === "shipping_address") return param;
+  return "order";
+}
+
 export function useOrderListFilters() {
   const searchParams = useSearchParams();
 
@@ -60,6 +66,7 @@ export function useOrderListFilters() {
     fromDate: searchParams.get("from_date") || undefined,
     toDate: searchParams.get("to_date") || undefined,
     search: searchParams.get("search") || "",
+    searchBy: parseSearchByParam(searchParams.get("search_by")),
     country: parseCountryParam(searchParams.get("country")),
     isB2B: parseIsB2BParam(searchParams.get("is_b2b")),
     filterByShipment: parseShipmentFilterParam(
