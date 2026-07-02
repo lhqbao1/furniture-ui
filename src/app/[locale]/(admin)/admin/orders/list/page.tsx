@@ -44,6 +44,7 @@ const OrderList = () => {
     from_date: filters.fromDate,
     to_date: filters.toDate,
     search: filters.search,
+    search_by: filters.searchBy,
     country: filters.country,
     is_b2b: filters.isB2B,
     filter_by_shipment: filters.filterByShipment,

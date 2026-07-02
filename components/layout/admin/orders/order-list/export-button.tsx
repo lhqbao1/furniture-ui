@@ -627,9 +627,9 @@ export default function ExportOrderExcelButton({
               </div>
             </div>
 
-            <div className="max-h-[360px] overflow-y-auto rounded-xl border border-secondary/15 bg-muted/20 p-3">
+            <div className="h-[360px] overflow-y-auto rounded-xl border border-secondary/15 bg-muted/20 p-3">
               {filteredColumns.length > 0 ? (
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {filteredColumns.map((column) => {
                     const checked = selectedSet.has(column.key);
 
