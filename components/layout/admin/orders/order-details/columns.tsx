@@ -1,6 +1,7 @@
 import { calculateCartItemDisplayPricing } from "@/lib/caculate-vat";
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
+import OrderProductEditDrawer from "../order-list/order-product-edit-drawer";
 
 interface OrderDetailColumnsProps {
   country_code?: string | null;
@@ -21,9 +22,25 @@ export function getOrderDetailColumns({
     {
       id: "id",
       header: () => <div className="text-center w-full">ID</div>,
-      cell: ({ row }) => (
-        <div className="text-center">#{row.original.products.id_provider}</div>
-      ),
+      cell: ({ row }) => {
+        const productId =
+          row.original.products?.id ??
+          row.original.purchased_products?.product_id ??
+          null;
+        const idProvider =
+          row.original.products?.id_provider ??
+          row.original.purchased_products?.id_provider ??
+          "-";
+
+        return (
+          <div className="text-center">
+            <OrderProductEditDrawer
+              productId={productId}
+              label={`#${idProvider}`}
+            />
+          </div>
+        );
+      },
     },
     {
       id: "ean",
