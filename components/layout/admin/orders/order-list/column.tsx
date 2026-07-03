@@ -77,9 +77,11 @@ const ORDER_INFO_CARD_MAX_HEIGHT = 560;
 const ORDER_INFO_CARD_MIN_HEIGHT = 260;
 const ORDER_INFO_CARD_MARGIN = 16;
 
-function getOrderInfoFileEntries(order: Pick<CheckOutMain, "files"> & {
-  product_refund?: CheckOutMain["product_refund"];
-}): OrderInfoFileEntry[] {
+function getOrderInfoFileEntries(
+  order: Pick<CheckOutMain, "files"> & {
+    product_refund?: CheckOutMain["product_refund"];
+  },
+): OrderInfoFileEntry[] {
   const entries = new Map<string, OrderInfoFileEntry>();
 
   (order.product_refund ?? []).forEach((refundItem, refundIndex) => {
@@ -130,7 +132,10 @@ function getOrderInfoCardPosition(rect: DOMRect): OrderInfoCardPosition {
       left,
       maxHeight: Math.max(
         ORDER_INFO_CARD_MIN_HEIGHT,
-        Math.min(ORDER_INFO_CARD_MAX_HEIGHT, viewportHeight - top - ORDER_INFO_CARD_MARGIN),
+        Math.min(
+          ORDER_INFO_CARD_MAX_HEIGHT,
+          viewportHeight - top - ORDER_INFO_CARD_MARGIN,
+        ),
       ),
     };
   }
@@ -259,7 +264,9 @@ const formatPostalCityCountry = (
 ) => {
   const postal = String(postalCode ?? "").trim();
   const cityName = String(city ?? "").trim();
-  const countryCode = String(country ?? "").trim().toUpperCase();
+  const countryCode = String(country ?? "")
+    .trim()
+    .toUpperCase();
   return [postal, cityName, countryCode].filter(Boolean).join(" ");
 };
 
@@ -393,7 +400,8 @@ const ActionCell = ({
     (entry) => !isImageUrl(entry.url),
   );
   const hasInfo = Boolean(effectiveNoteText || effectiveFileEntries.length > 0);
-  const showInfoTrigger = hasInfo || (shouldFetchDetailInfo && isFetchingDetailInfo);
+  const showInfoTrigger =
+    hasInfo || (shouldFetchDetailInfo && isFetchingDetailInfo);
   const [infoCardPosition, setInfoCardPosition] =
     useState<OrderInfoCardPosition | null>(null);
   const closeInfoCardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
@@ -407,7 +415,9 @@ const ActionCell = ({
   const openInfoCard = useCallback(
     (target: HTMLElement) => {
       cancelCloseInfoCard();
-      setInfoCardPosition(getOrderInfoCardPosition(target.getBoundingClientRect()));
+      setInfoCardPosition(
+        getOrderInfoCardPosition(target.getBoundingClientRect()),
+      );
     },
     [cancelCloseInfoCard],
   );
@@ -442,7 +452,8 @@ const ActionCell = ({
           >
             <CircleAlert className="w-4 h-4 text-blue-600" />
           </Button>
-          {infoCardPosition && typeof document !== "undefined" &&
+          {infoCardPosition &&
+            typeof document !== "undefined" &&
             createPortal(
               <div
                 onMouseEnter={cancelCloseInfoCard}
@@ -454,118 +465,121 @@ const ActionCell = ({
                   maxHeight: infoCardPosition.maxHeight,
                 }}
               >
-            <div className="border-b border-slate-100 px-4 py-3">
-              <div className="text-sm font-semibold">
-                Order info {marketplaceOrderId ? `#${marketplaceOrderId}` : ""}
-              </div>
-              <div className="text-xs text-slate-500">
-                Note, images and uploaded files
-              </div>
-            </div>
-
-            <div
-              className="space-y-4 overflow-y-auto p-4"
-              style={{ maxHeight: Math.max(160, infoCardPosition.maxHeight - 72) }}
-            >
-              <section className="space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Note
+                <div className="border-b border-slate-100 px-4 py-3">
+                  <div className="text-sm font-semibold">
+                    Order info{" "}
+                    {marketplaceOrderId ? `#${marketplaceOrderId}` : ""}
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    Note, images and uploaded files
+                  </div>
                 </div>
-                {effectiveNoteText ? (
-                  <div className="max-h-40 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm whitespace-pre-wrap break-words">
-                    {effectiveNoteText}
-                  </div>
-                ) : (
-                  <div className="rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">
-                    No note.
-                  </div>
-                )}
-              </section>
 
-              <section className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Images
-                  </div>
-                  <span className="text-xs text-slate-400">
-                    {imageFiles.length}
-                  </span>
+                <div
+                  className="space-y-4 overflow-y-auto p-4"
+                  style={{
+                    maxHeight: Math.max(160, infoCardPosition.maxHeight - 72),
+                  }}
+                >
+                  <section className="space-y-2">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Note
+                    </div>
+                    {effectiveNoteText ? (
+                      <div className="max-h-40 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm whitespace-pre-wrap break-words">
+                        {effectiveNoteText}
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">
+                        No note.
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Images
+                      </div>
+                      <span className="text-xs text-slate-400">
+                        {imageFiles.length}
+                      </span>
+                    </div>
+                    {imageFiles.length > 0 ? (
+                      <div className="grid grid-cols-3 gap-2">
+                        {imageFiles.map((entry) => {
+                          const fileName = getFileNameFromUrl(entry.url);
+
+                          return (
+                            <a
+                              key={entry.key}
+                              href={entry.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="group overflow-hidden rounded-xl border border-slate-200 bg-white hover:border-blue-300"
+                            >
+                              <div className="relative h-24 w-full bg-slate-100">
+                                <Image
+                                  src={entry.url}
+                                  alt={fileName}
+                                  fill
+                                  sizes="150px"
+                                  unoptimized
+                                  className="object-cover transition-transform group-hover:scale-105"
+                                />
+                              </div>
+                              <div className="truncate px-2 py-1.5 text-xs text-slate-600">
+                                {fileName}
+                              </div>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">
+                        No images.
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Files
+                      </div>
+                      <span className="text-xs text-slate-400">
+                        {documentFiles.length}
+                      </span>
+                    </div>
+                    {documentFiles.length > 0 ? (
+                      <div className="space-y-2">
+                        {documentFiles.map((entry) => {
+                          const fileName = getFileNameFromUrl(entry.url);
+
+                          return (
+                            <a
+                              key={entry.key}
+                              href={entry.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm hover:border-blue-300 hover:bg-blue-50"
+                            >
+                              <FileText className="size-4 shrink-0 text-slate-500" />
+                              <span className="min-w-0 flex-1 truncate">
+                                {fileName}
+                              </span>
+                              <ExternalLink className="size-3.5 shrink-0 text-slate-400" />
+                            </a>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">
+                        No files.
+                      </div>
+                    )}
+                  </section>
                 </div>
-                {imageFiles.length > 0 ? (
-                  <div className="grid grid-cols-3 gap-2">
-                    {imageFiles.map((entry) => {
-                      const fileName = getFileNameFromUrl(entry.url);
-
-                      return (
-                        <a
-                          key={entry.key}
-                          href={entry.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="group overflow-hidden rounded-xl border border-slate-200 bg-white hover:border-blue-300"
-                        >
-                          <div className="relative h-24 w-full bg-slate-100">
-                            <Image
-                              src={entry.url}
-                              alt={fileName}
-                              fill
-                              sizes="150px"
-                              unoptimized
-                              className="object-cover transition-transform group-hover:scale-105"
-                            />
-                          </div>
-                          <div className="truncate px-2 py-1.5 text-xs text-slate-600">
-                            {fileName}
-                          </div>
-                        </a>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">
-                    No images.
-                  </div>
-                )}
-              </section>
-
-              <section className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Files
-                  </div>
-                  <span className="text-xs text-slate-400">
-                    {documentFiles.length}
-                  </span>
-                </div>
-                {documentFiles.length > 0 ? (
-                  <div className="space-y-2">
-                    {documentFiles.map((entry) => {
-                      const fileName = getFileNameFromUrl(entry.url);
-
-                      return (
-                        <a
-                          key={entry.key}
-                          href={entry.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm hover:border-blue-300 hover:bg-blue-50"
-                        >
-                          <FileText className="size-4 shrink-0 text-slate-500" />
-                          <span className="min-w-0 flex-1 truncate">
-                            {fileName}
-                          </span>
-                          <ExternalLink className="size-3.5 shrink-0 text-slate-400" />
-                        </a>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">
-                    No files.
-                  </div>
-                )}
-              </section>
-            </div>
               </div>,
               document.body,
             )}
@@ -1397,7 +1411,8 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     header: () => <div className="text-center w-full">CARRIER</div>,
     cell: ({ row }) => (
       <div className="text-center uppercase">
-        {row.original.shipment
+        {row.original.shipment &&
+        row.original.shipment.shipping_carrier !== null
           ? row.original.shipment.shipping_carrier
           : row.original.carrier}
       </div>
