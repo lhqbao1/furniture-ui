@@ -55,17 +55,19 @@ const VoucherApplyComapre = ({
   }, [isError]);
 
   const handleApply = () => {
-    if (!code.trim()) return;
-    setSubmitCode(code.trim());
+    const normalizedCode = code.trim().toUpperCase();
+    if (!normalizedCode) return;
+    setCode(normalizedCode);
+    setSubmitCode(normalizedCode);
   };
 
   return (
     <div className="flex items-center gap-2 w-full">
       <Input
         placeholder={t("applyCoupons")}
-        className="flex-1"
+        className="flex-1 uppercase"
         value={code}
-        onChange={(e) => setCode(e.target.value)}
+        onChange={(e) => setCode(e.target.value.toUpperCase())}
       />
 
       <Button

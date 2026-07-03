@@ -53,8 +53,10 @@ const VoucherApply = ({
   }, [isError]);
 
   const handleApply = () => {
-    if (!code.trim()) return;
-    setSubmitCode(code.trim());
+    const normalizedCode = code.trim().toUpperCase();
+    if (!normalizedCode) return;
+    setCode(normalizedCode);
+    setSubmitCode(normalizedCode);
   };
 
   return (
@@ -63,9 +65,9 @@ const VoucherApply = ({
 
       <Input
         placeholder={t("applyCoupons")}
-        className="flex-1"
+        className="flex-1 uppercase"
         value={code}
-        onChange={(e) => setCode(e.target.value)}
+        onChange={(e) => setCode(e.target.value.toUpperCase())}
       />
 
       <Button

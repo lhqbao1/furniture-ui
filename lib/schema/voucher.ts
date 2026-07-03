@@ -2,7 +2,10 @@ import { z } from "zod";
 
 export const voucherSchema = z
   .object({
-    code: z.string().min(1, "code is required"),
+    code: z
+      .string()
+      .min(1, "code is required")
+      .transform((value) => value.toUpperCase()),
     name: z.string().min(1, "name is required"),
     type: z.string().min(1, "type is required"),
     discount_type: z.string().min(1, "discount_type is required"),
@@ -51,7 +54,10 @@ export const voucherDefaultValues: VoucherFormValues = {
 export const voucherUpdateSchema = z.object({
   type: z.string().min(1, "type is required"),
   name: z.string().min(1, "name is required"),
-  code: z.string().min(1, "code is required"),
+  code: z
+    .string()
+    .min(1, "code is required")
+    .transform((value) => value.toUpperCase()),
 
   discount_value: z.number().min(0, "discount_value is required"),
   max_discount: z.number().optional().nullable(),
