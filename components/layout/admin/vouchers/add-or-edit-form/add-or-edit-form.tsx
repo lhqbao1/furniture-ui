@@ -239,7 +239,12 @@ export default function AddOrEditVouchersForm({
                 <FormControl>
                   <Input
                     placeholder="Voucher Code"
+                    className="uppercase"
                     {...field}
+                    value={field.value ?? ""}
+                    onChange={(event) =>
+                      field.onChange(event.target.value.toUpperCase())
+                    }
                   />
                 </FormControl>
                 <FormMessage />
