@@ -89,9 +89,22 @@ const ProductDetailInputs = ({
   const handleDownloadZip = async () => {
     // Lấy dữ liệu realtime từ form
     const { name, id_provider, static_files } = form.watch();
+    const files = Array.isArray(static_files)
+      ? (static_files as Array<{ url?: string }>)
+      : [];
+    const selectedUrlSet = new Set(selectedImageUrls);
+    const filesToDownload =
+      isImageSelectionMode && selectedImageUrls.length > 0
+        ? files.filter((file) => file.url && selectedUrlSet.has(file.url))
+        : files;
 
-    if (!name || !static_files?.length) {
+    if (!name || !files.length) {
       toast.error("No product selected or no images available");
+      return;
+    }
+
+    if (!filesToDownload.length) {
+      toast.error("No images selected");
       return;
     }
 
@@ -106,8 +119,10 @@ const ProductDetailInputs = ({
 
       let totalCount = 0;
 
-      for (const [index, file] of (static_files || []).entries()) {
+      for (const [index, file] of filesToDownload.entries()) {
         try {
+          if (!file.url) continue;
+
           const response = await fetch(file.url);
           if (!response.ok) throw new Error("Failed to fetch");
 
@@ -189,6 +204,13 @@ const ProductDetailInputs = ({
       setIsImageSelectionMode(false);
     }
   }, [listImages]);
+
+  const downloadImageCount = isImageSelectionMode
+    ? selectedImageUrls.length
+    : listImages.length;
+  const downloadButtonLabel = isImageSelectionMode
+    ? `Download selected (${downloadImageCount})`
+    : `Download images (${downloadImageCount})`;
 
   return (
     <div className="space-y-6">
@@ -427,8 +449,12 @@ const ProductDetailInputs = ({
               type="button"
               variant={"secondary"}
               onClick={() => handleDownloadZip()}
+              disabled={
+                !listImages.length ||
+                (isImageSelectionMode && selectedImageUrls.length === 0)
+              }
             >
-              Download images ({listImages.length})
+              {downloadButtonLabel}
             </Button>
             <Button
               type="button"
