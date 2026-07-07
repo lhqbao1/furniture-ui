@@ -14,7 +14,6 @@ import UploadInvoicePdfDialog from "./upload-invoice-pdf-dialog";
 import { toast } from "sonner";
 import { useDeleteCheckoutPdfFile } from "@/features/checkout/hook";
 import { CheckOutMain } from "@/types/checkout";
-import B2BInvoiceDrawer from "../../order-list/b2b-invoice-drawer";
 import { filterMainCheckoutForInvoice } from "@/lib/checkout-filter";
 import BauhausPackSlipDialog from "./bauhaus-pack-slip-dialog";
 
@@ -25,6 +24,7 @@ interface DownloadInvoiceProps {
   invoicePdfFile?: string | null;
   invoicePdfFile2?: string | null;
   mainCheckoutId?: string;
+  onCreateB2BInvoice?: () => void;
 }
 
 const getUploadedFileNameFromUrl = (url: string) => {
@@ -56,6 +56,9 @@ const ensurePdfFileName = (fileName: string, fallbackFileName: string) => {
     : `${normalizedFileName}.pdf`;
 };
 
+const isTruthyB2BValue = (value: unknown) =>
+  value === true || String(value).trim().toLowerCase() === "true";
+
 const DownloadInvoice = ({
   checkoutId,
   type,
@@ -63,17 +66,17 @@ const DownloadInvoice = ({
   invoicePdfFile,
   invoicePdfFile2,
   mainCheckoutId,
+  onCreateB2BInvoice,
 }: DownloadInvoiceProps) => {
   const deleteCheckoutPdfFileMutation = useDeleteCheckoutPdfFile();
-  const [openB2BDrawer, setOpenB2BDrawer] = React.useState(false);
   const [openBauhausPackSlipDialog, setOpenBauhausPackSlipDialog] =
     React.useState(false);
-  const [b2bMarketplace, setB2BMarketplace] = React.useState("");
   const normalizedType = String(type ?? "").toLowerCase();
   const isInvoiceType = normalizedType === "invoice";
   const isPackageType = normalizedType === "package";
   const isRefundInvoiceType = normalizedType === "refund-invoice";
-  const isB2BInvoiceOrder = isInvoiceType && Boolean(order?.is_b2b);
+  const isB2BOrder = isTruthyB2BValue(order?.is_b2b);
+  const isB2BInvoiceOrder = isInvoiceType && isB2BOrder;
   const uploadedPackageSlipFiles = React.useMemo(
     () =>
       [
@@ -89,14 +92,6 @@ const DownloadInvoice = ({
   const needsGeneratedDocument = !isB2BInvoiceOrder;
   const effectiveMainCheckoutId = mainCheckoutId || checkoutId;
   const isDeletingPackageSlip = deleteCheckoutPdfFileMutation.isPending;
-  const filteredOrder = React.useMemo(
-    () => filterMainCheckoutForInvoice(order),
-    [order],
-  );
-  const selectedB2BOrders = React.useMemo(
-    () => (filteredOrder ? [filteredOrder] : []),
-    [filteredOrder],
-  );
 
   const { data: checkout, isLoading: isCheckoutLoading } = useQuery({
     queryKey: ["checkout-id", checkoutId],
@@ -220,41 +215,6 @@ const DownloadInvoice = ({
     }
   };
 
-  const handleOpenB2BInvoiceDrawer = () => {
-    if (!order) {
-      toast.error("Cannot create B2B invoice", {
-        description: "Order data is missing.",
-      });
-      return;
-    }
-
-    const errors: string[] = [];
-
-    if (!order.marketplace_order_id?.trim()) {
-      errors.push(`Missing external ID: ${order.checkout_code || order.id}`);
-    }
-
-    if (!order.from_marketplace?.trim()) {
-      errors.push(`Missing marketplace: ${order.checkout_code || order.id}`);
-    }
-
-    if (errors.length > 0) {
-      toast.error("Cannot create B2B invoice", {
-        description: (
-          <div className="flex flex-col gap-1">
-            {errors.map((error) => (
-              <div key={error}>- {error}</div>
-            ))}
-          </div>
-        ),
-      });
-      return;
-    }
-
-    setB2BMarketplace(order.from_marketplace.trim());
-    setOpenB2BDrawer(true);
-  };
-
   const renderPackageSampleDownloadButton = () => {
     if (!isPackageType) return null;
 
@@ -365,7 +325,7 @@ const DownloadInvoice = ({
         <Button
           variant={"outline"}
           type="button"
-          onClick={handleOpenB2BInvoiceDrawer}
+          onClick={onCreateB2BInvoice}
         >
           <DownloadCloud />
         </Button>
@@ -434,12 +394,6 @@ const DownloadInvoice = ({
         />
       ) : null}
 
-      <B2BInvoiceDrawer
-        open={openB2BDrawer}
-        onOpenChange={setOpenB2BDrawer}
-        marketplace={b2bMarketplace}
-        selectedOrders={selectedB2BOrders}
-      />
       {isBauhausPackageSlip && filteredCheckout && filteredInvoice ? (
         <BauhausPackSlipDialog
           open={openBauhausPackSlipDialog}

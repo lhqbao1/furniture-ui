@@ -96,6 +96,9 @@ const formatEur = (value: number) =>
     maximumFractionDigits: 2,
   })} €`;
 
+const roundCurrency = (value: number) =>
+  Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+
 const formatTaxPercent = (tax: unknown) => {
   if (tax === null || tax === undefined) return "-";
 
@@ -357,9 +360,9 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
     { vat19: 0, vat7: 0, otherVat: 0 },
   );
   const roundedTaxBuckets = {
-    vat19: +(netBuckets.vat19 * 0.19).toFixed(3),
-    vat7: +(netBuckets.vat7 * 0.07).toFixed(3),
-    otherVat: +netBuckets.otherVat.toFixed(3),
+    vat19: roundCurrency(netBuckets.vat19 * 0.19),
+    vat7: roundCurrency(netBuckets.vat7 * 0.07),
+    otherVat: roundCurrency(netBuckets.otherVat),
   };
 
   const totalVat19 = isGermanyInvoice ? roundedTaxBuckets.vat19 : 0;
@@ -368,12 +371,12 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
   const grossFromRows = +displayGrossTotal.toFixed(2);
   const totalNet =
     Number.isFinite(displayNetTotal) && displayNetTotal >= 0
-      ? +displayNetTotal.toFixed(2)
+      ? roundCurrency(displayNetTotal)
       : isGermanyInvoice
-        ? +(grossFromRows - totalVat19 - totalVat7 - totalVatOther).toFixed(2)
+        ? roundCurrency(grossFromRows - totalVat19 - totalVat7 - totalVatOther)
         : grossFromRows;
   const totalGross = isGermanyInvoice
-    ? +(totalNet + totalVat19 + totalVat7 + totalVatOther).toFixed(2)
+    ? roundCurrency(totalNet + totalVat19 + totalVat7 + totalVatOther)
     : grossFromRows;
   const intraCommunityVat = !isGermanyInvoice && isEuInvoice ? 0 : null;
 

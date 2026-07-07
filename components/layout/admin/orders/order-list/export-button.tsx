@@ -69,6 +69,7 @@ const formatColumnLabel = (key: string) => {
   const customLabels: Record<string, string> = {
     id: "ID",
     code: "Order Code",
+    netto_buyer: "External Reference",
     marketplace_order_id: "Marketplace Order ID",
     ext_invoice_id: "Invoice ID",
     invoice_name: "Invoice Name",

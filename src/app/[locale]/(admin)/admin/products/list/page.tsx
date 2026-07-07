@@ -352,7 +352,6 @@ const ProductList = () => {
             onSelectedRowsChange={setSelectedProducts}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={handleTableColumnVisibilityChange}
-            enableClientSorting
           />
         )}
       </div>
