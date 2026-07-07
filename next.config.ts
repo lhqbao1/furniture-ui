@@ -46,6 +46,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "www.prestige-home.de",
       },
+      {
+        protocol: "https",
+        hostname: "cdn02.plentymarkets.com",
+      },
     ],
     minimumCacheTTL: 2678400, // 31 ngày
     formats: ["image/webp"],
