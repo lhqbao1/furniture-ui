@@ -6,6 +6,7 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   OnChangeFn,
+  Row,
   SortingState,
   useReactTable,
   VisibilityState,
@@ -45,7 +46,7 @@ interface DataTableProps<TData, TValue> {
   hasCount?: boolean;
   hasHeaderBackGround?: boolean;
   headerClassName?: string;
-  renderRowSubComponent?: (row: any) => React.ReactNode;
+  renderRowSubComponent?: (row: Row<TData>) => React.ReactNode;
   isSticky?: boolean;
   stickyContainerClassName?: string;
   onSelectionChange?: (ids: string[]) => void; // 👈 thêm
@@ -99,9 +100,7 @@ export function ProductTable<TData, TValue>({
     ? "bg-[#EEF8F0]"
     : "bg-white";
   const stripedRowBackgroundClass = "bg-[#F7FBF8]";
-  const [sorting, setSorting] = React.useState<SortingState>([
-    { id: "id_provider", desc: false }, // default sort by id_provider asc
-  ]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
   const [expandedRowIds, setExpandedRowIds] = React.useState<string[]>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -167,7 +166,7 @@ export function ProductTable<TData, TValue>({
     },
     manualPagination: true,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    getSortedRowModel: enableClientSorting ? getSortedRowModel() : undefined,
     onSortingChange: setSorting,
     manualSorting: !enableClientSorting,
     onRowSelectionChange: setRowSelection, // ✅ cập nhật khi người dùng click

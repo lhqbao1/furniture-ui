@@ -16,6 +16,7 @@ interface DocumentColumnsProps {
   invoicePdfFile?: string | null;
   invoicePdfFile2?: string | null;
   mainCheckoutId?: string;
+  onCreateB2BInvoice?: () => void;
 }
 
 export const documentColumns = ({
@@ -23,6 +24,7 @@ export const documentColumns = ({
   invoicePdfFile,
   invoicePdfFile2,
   mainCheckoutId,
+  onCreateB2BInvoice,
 }: DocumentColumnsProps): ColumnDef<DocumentRow>[] => [
   {
     accessorKey: "document",
@@ -51,6 +53,7 @@ export const documentColumns = ({
           invoicePdfFile={invoicePdfFile}
           invoicePdfFile2={invoicePdfFile2}
           mainCheckoutId={mainCheckoutId ?? row.original.checkOutId}
+          onCreateB2BInvoice={onCreateB2BInvoice}
         />
       );
     },

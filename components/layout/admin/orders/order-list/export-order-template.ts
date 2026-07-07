@@ -41,6 +41,14 @@ function clean(val: unknown) {
   return val === null || val === undefined || val === "None" ? "" : val;
 }
 
+function getExternalReference(order: CheckOutMain) {
+  return (
+    (order as CheckOutMain & { netto_buyer?: string | null }).netto_buyer ??
+    order.netto_buyer_id ??
+    ""
+  );
+}
+
 function calculateOrderProductCosts(items: CartItem[]) {
   return items.reduce(
     (totals, item) => {
@@ -188,6 +196,7 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
         id: clean(order.id ?? ""),
         code: clean(order.checkout_code),
         marketplace: clean(order.from_marketplace ?? "Prestige Home"),
+        netto_buyer: clean(getExternalReference(order)),
         marketplace_order_id: clean(order.marketplace_order_id),
         ext_invoice_id: clean(order.ext_invoice_id ?? ""),
         date: clean(formatDateDDMMYYYY(order.created_at)),
