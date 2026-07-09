@@ -121,19 +121,29 @@ const Footer = () => {
         </ul>
       </div>
 
-      {/* <div className="footer-column lg:col-span-4 col-span-6">
-        <h4 className="font-semibold mb-3">{t("companyTitle")}</h4>
+      <div className="footer-column lg:col-span-2 col-span-6 mb-6 lg:mb-0">
+        <h4 className="font-semibold mb-3">Kundenservice</h4>
 
-        <div className="grid items-start">
-          <ul className="space-y-2 text-black-700 text-sm">
-            <li>Prestige Home GmbH</li>
-            <li>{t("email")}: info@prestige-home.de</li>
-            <li>Mo – Fr: 09:00 – 17:00 Uhr</li>
-          </ul>
-        </div>
-      </div> */}
+        <ul className="space-y-2 text-black-700 text-sm">
+          <li>
+            Telefon:{" "}
+            <a href="tel:+4930814537080" className="hover:underline">
+              030 814537080
+            </a>
+          </li>
+          <li>
+            E-Mail:{" "}
+            <a
+              href="mailto:support@prestige-home.de"
+              className="break-words hover:underline"
+            >
+              support@prestige-home.de
+            </a>
+          </li>
+        </ul>
+      </div>
 
-      <div className="footer-column lg:col-span-4 col-span-6">
+      <div className="footer-column lg:col-span-3 col-span-6">
         <h4 className="font-semibold mb-3">Auszeichnungen</h4>
 
         <div className="lg:mt-4 flex items-center gap-4">
@@ -196,7 +206,7 @@ const Footer = () => {
       </div>
 
       {/* Cột 3: Payment Method */}
-      <div className="footer-column lg:col-span-3 col-span-6 lg:space-y-6 mb-6 lg:mb-0">
+      <div className="footer-column lg:col-span-2 col-span-6 lg:space-y-6 mb-6 lg:mb-0">
         <>
           <h4 className="font-semibold mb-3">{t("paymentMethod")}</h4>
 

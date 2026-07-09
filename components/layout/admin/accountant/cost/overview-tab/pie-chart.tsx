@@ -1,6 +1,12 @@
 "use client";
 
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Minus,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import { Pie, PieChart } from "recharts";
 import {
   Card,
@@ -92,6 +98,29 @@ export function ChartPieLabelList({
   previousTotal,
   hasPrevious,
 }: ChartPieLabelListProps) {
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
+  const marketplaceList = React.useMemo(
+    () =>
+      [...data]
+        .sort(
+          (a, b) =>
+            (Number(b.total_amount) || 0) - (Number(a.total_amount) || 0),
+        )
+        .map((item) => ({
+          marketplace: item.marketplace,
+          percentage: Number(item.percentage) || 0,
+          total_amount: Number(item.total_amount) || 0,
+          total_orders: Number(item.total_orders) || 0,
+          fill: MARKETPLACE_COLORS[item.marketplace] ?? OTHERS_COLOR,
+        })),
+    [data],
+  );
+  const visibleMarketplaces = isExpanded
+    ? marketplaceList
+    : marketplaceList.slice(0, 6);
+  const hasExpandableList = marketplaceList.length > 6;
+
   // Sort by revenue, keep top 5, aggregate rest into "Others"
   const chartData = React.useMemo(() => {
     const sorted = [...data].sort(
@@ -194,45 +223,78 @@ export function ChartPieLabelList({
             </p>
           </div>
 
-          <div className="grid content-start gap-2">
-            {chartData.map((item) => {
-              const share = Math.max(0, Math.min(100, Number(item.percentage) || 0));
-              return (
-                <div
-                  key={item.marketplace}
-                  className="rounded-xl border bg-background/80 p-3 transition-colors hover:bg-muted/20"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <span
-                        className="h-2.5 w-2.5 shrink-0 rounded-full"
-                        style={{ backgroundColor: item.fill }}
-                      />
-                      <p className="truncate text-sm font-medium">
-                        {formatMarketplaceLabel(item.marketplace)}
-                      </p>
+          <div className="flex min-h-0 flex-col gap-2">
+            <div className="grid h-[610px] content-start gap-2 overflow-y-auto pr-1">
+              {visibleMarketplaces.map((item) => {
+                const share = Math.max(
+                  0,
+                  Math.min(100, Number(item.percentage) || 0),
+                );
+                return (
+                  <div
+                    key={item.marketplace}
+                    className="rounded-xl border bg-background/80 p-3 transition-colors hover:bg-muted/20"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span
+                          className="h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: item.fill }}
+                        />
+                        <p className="truncate text-sm font-medium">
+                          {formatMarketplaceLabel(item.marketplace)}
+                        </p>
+                      </div>
+                      <span className="text-sm font-semibold">
+                        {share.toLocaleString("de-DE", {
+                          minimumFractionDigits: share % 1 ? 1 : 0,
+                          maximumFractionDigits: 1,
+                        })}
+                        %
+                      </span>
                     </div>
-                    <span className="text-sm font-semibold">
-                      {share.toLocaleString("de-DE", {
-                        minimumFractionDigits: share % 1 ? 1 : 0,
-                        maximumFractionDigits: 1,
-                      })}
-                      %
-                    </span>
+                    <div className="mt-2 h-1.5 rounded-full bg-muted">
+                      <div
+                        className="h-1.5 rounded-full"
+                        style={{
+                          width: `${share}%`,
+                          backgroundColor: item.fill,
+                        }}
+                      />
+                    </div>
+                    <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{formatCurrency(Number(item.total_amount) || 0)}</span>
+                      <span>
+                        {(Number(item.total_orders) || 0).toLocaleString(
+                          "de-DE",
+                        )}{" "}
+                        orders
+                      </span>
+                    </div>
                   </div>
-                  <div className="mt-2 h-1.5 rounded-full bg-muted">
-                    <div
-                      className="h-1.5 rounded-full"
-                      style={{ width: `${share}%`, backgroundColor: item.fill }}
-                    />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{formatCurrency(Number(item.total_amount) || 0)}</span>
-                    <span>{(Number(item.total_orders) || 0).toLocaleString("de-DE")} orders</span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            {hasExpandableList ? (
+              <div className="flex items-center justify-between gap-2 pt-1">
+                <p className="text-xs text-muted-foreground">
+                  Showing {visibleMarketplaces.length} of{" "}
+                  {marketplaceList.length} marketplaces
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded((current) => !current)}
+                  className="inline-flex h-8 items-center gap-1 rounded-full border bg-background px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
+                >
+                  {isExpanded ? "Collapse" : "Expand"}
+                  {isExpanded ? (
+                    <ChevronUp className="h-3.5 w-3.5" />
+                  ) : (
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
       </CardContent>
