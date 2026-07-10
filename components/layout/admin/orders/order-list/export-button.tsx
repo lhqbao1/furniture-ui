@@ -72,6 +72,7 @@ const formatColumnLabel = (key: string) => {
     netto_buyer: "External Reference",
     marketplace_order_id: "Marketplace Order ID",
     ext_invoice_id: "Invoice ID",
+    estimated_delivery: "Estimated Delivery",
     invoice_name: "Invoice Name",
     invoice_company_name: "Invoice Company Name",
     invoice_tax_number: "Invoice Tax Number",

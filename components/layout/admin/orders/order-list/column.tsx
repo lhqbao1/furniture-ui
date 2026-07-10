@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useQuery } from "@tanstack/react-query";
 import { getMainCheckOutByMainCheckOutId } from "@/features/checkout/api";
+import { formatDeliveryRangeLabel } from "./delivery-range";
 
 const toNumber = (value: unknown) => {
   const parsed = Number(value);
@@ -151,41 +152,6 @@ function getOrderInfoCardPosition(rect: DOMRect): OrderInfoCardPosition {
     maxHeight,
   };
 }
-
-const parseDateValue = (value?: string | Date | null): Date | null => {
-  if (!value) return null;
-  const directDate = new Date(value);
-  if (!Number.isNaN(directDate.getTime())) return directDate;
-
-  const fallback = `${value}Z`;
-  const fallbackDate = new Date(fallback);
-  if (!Number.isNaN(fallbackDate.getTime())) return fallbackDate;
-
-  return null;
-};
-
-const formatDeliveryRangeLabel = (
-  fromValue?: string | Date | null,
-  toValue?: string | Date | null,
-): string => {
-  const fromDate = parseDateValue(fromValue);
-  const toDate = parseDateValue(toValue);
-
-  if (!fromDate && !toDate) return "-";
-
-  const formatDate = (date: Date) =>
-    date.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "numeric",
-      year: "2-digit",
-    });
-
-  if (fromDate && toDate) {
-    return `${formatDate(fromDate)} - ${formatDate(toDate)}`;
-  }
-
-  return formatDate(fromDate ?? toDate!);
-};
 
 const TAG_COLOR_BY_LABEL: Record<string, string> = {
   "exchange in progress": "bg-[#1E3A8A]",

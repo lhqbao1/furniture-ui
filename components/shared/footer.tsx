@@ -132,6 +132,12 @@ const Footer = () => {
             </a>
           </li>
           <li>
+            Telefon:{" "}
+            <a href="tel:+4930814537080" className="hover:underline">
+              030 814537070
+            </a>
+          </li>
+          <li>
             E-Mail:{" "}
             <a
               href="mailto:support@prestige-home.de"
