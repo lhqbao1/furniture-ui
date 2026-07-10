@@ -7,6 +7,7 @@ import { CheckOutMain } from "@/types/checkout";
 import { CartItem } from "@/types/cart";
 import { formatDateDDMMYYYY } from "@/lib/date-formated";
 import { calculateProductVAT } from "@/lib/caculate-vat";
+import { formatDeliveryRangeLabel } from "./delivery-range";
 
 const EXCLUDED_EXCHANGE_CHECKOUT_STATUSES = new Set([
   "exchange",
@@ -200,6 +201,9 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
         marketplace_order_id: clean(order.marketplace_order_id),
         ext_invoice_id: clean(order.ext_invoice_id ?? ""),
         date: clean(formatDateDDMMYYYY(order.created_at)),
+        estimated_delivery: clean(
+          formatDeliveryRangeLabel(order.delivery_from, order.delivery_to),
+        ),
         status: clean(getStatusStyle(order.status).text),
         payment_method: clean(order.payment_method),
         note: clean(order.note ?? ""),
