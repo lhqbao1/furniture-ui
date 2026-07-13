@@ -8,6 +8,7 @@ import {
   Check,
   Copy,
   Eye,
+  Info,
   Loader2,
   Pencil,
   Upload,
@@ -164,6 +165,7 @@ function EditableNameCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.name);
   const [editing, setEditing] = useState(false);
   const EditProductMutation = useEditProduct();
+  const noteText = product.note?.trim();
 
   const handleEditProductName = () => {
     const toastId = toast.loading("Updating product name...");
@@ -228,11 +230,35 @@ function EditableNameCell({ product }: { product: ProductItem }) {
           )}
         />
       ) : (
-        <div
-          className="cursor-pointer text-wrap"
-          onClick={() => setEditing(true)}
-        >
-          {product.name}
+        <div className="flex items-start gap-1.5 text-wrap">
+          <span className="cursor-pointer" onClick={() => setEditing(true)}>
+            {product.name}
+          </span>
+
+          {noteText && (
+            <HoverCard openDelay={100} closeDelay={100}>
+              <HoverCardTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="View product note"
+                  className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <Info className="h-3.5 w-3.5" />
+                </button>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80 rounded-2xl border border-slate-200 bg-white p-0 text-slate-950 shadow-2xl">
+                <div className="border-b border-slate-100 px-4 py-3">
+                  <div className="text-sm font-semibold">Product note</div>
+                </div>
+                <div className="p-4">
+                  <div className="max-h-40 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm whitespace-pre-wrap break-words">
+                    {noteText}
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          )}
         </div>
       )}
     </div>
