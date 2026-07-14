@@ -377,7 +377,7 @@ export default function ManualAdditionalInformation({
           render={({ field }) => (
             <FormItem className="flex flex-col col-span-1">
               <FormLabel className="text-black font-semibold text-sm">
-                Discount
+                Discount (gross)
               </FormLabel>
               <FormControl>
                 <div className="relative flex items-center w-full">
