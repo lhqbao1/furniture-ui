@@ -53,7 +53,8 @@ export const resolveAvailableStockForDisplay = (
   }
 
   const stock = toFiniteNumber(product.stock);
-  const reservedStock = toFiniteNumber(product.reserved_stock);
+  const reservedStock =
+    toFiniteNumber(product.reserved_stock) ?? toFiniteNumber(product.result_stock);
 
   if (stock === null) {
     return {
@@ -65,7 +66,7 @@ export const resolveAvailableStockForDisplay = (
   if (reservedStock === null) {
     return {
       value: null,
-      error: "Missing reserved_stock",
+      error: "Missing reserved_stock/result_stock",
     };
   }
 
