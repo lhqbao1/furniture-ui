@@ -335,8 +335,9 @@ export function calculateOrderTaxWithDiscount(
     totalGrossBeforeDiscount += b.gross;
   }
 
+  const normalizedDiscountGross = Math.abs(Number(discountGross) || 0);
   const appliedDiscountGross = Math.min(
-    discountGross,
+    normalizedDiscountGross,
     totalGrossBeforeDiscount,
   );
 
@@ -498,7 +499,7 @@ export function calculateDisplayOrderTaxSummary(
     .toFixed(2);
   const totalGrossBeforeDiscount = +(totalNet + totalVat).toFixed(2);
   const appliedDiscountGross = +Math.min(
-    Math.max(0, Number(discountGross) || 0),
+    Math.abs(Number(discountGross) || 0),
     totalGrossBeforeDiscount,
   ).toFixed(2);
   const totalGross = +(totalGrossBeforeDiscount - appliedDiscountGross).toFixed(

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/hover-card";
 import { Link } from "@/src/i18n/navigation";
 import { calculateProductVAT } from "@/lib/caculate-vat";
-import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { resolveAvailableStockForDisplay } from "@/hooks/calculate_available_stock";
 import OrderProductEditDrawer from "./order-product-edit-drawer";
 
 export const orderListExpandColumns = (
@@ -210,9 +210,20 @@ export const orderListExpandColumns = (
       return <div className="text-center">STOCK LEFT</div>;
     },
     cell: ({ row }) => {
-      const computedStock = calculateAvailableStock(row.original.products);
+      const stockState = resolveAvailableStockForDisplay(row.original.products);
 
-      return <div className="text-center">{computedStock} pcs.</div>;
+      if (stockState.error) {
+        return (
+          <div
+            className="mx-auto w-fit rounded-xl bg-red-50 px-2 py-1 text-center text-xs font-semibold text-red-600"
+            title={stockState.error}
+          >
+            Stock error
+          </div>
+        );
+      }
+
+      return <div className="text-center">{stockState.value} pcs.</div>;
     },
   },
 

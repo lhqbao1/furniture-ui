@@ -66,7 +66,7 @@ import { getCarrierLogo } from "@/lib/getCarrierImage";
 import { getProductActivationMissingFields } from "@/lib/product-activation";
 import { CategoryResponse } from "@/types/categories";
 import { CARRIERS, tags as PRODUCT_TAGS } from "@/data/data";
-import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { resolveAvailableStockForDisplay } from "@/hooks/calculate_available_stock";
 import EditProductDrawer from "../marketplace/edit-product-drawer";
 import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 import { getIncomingDisplayItems } from "@/lib/product-incoming-stock";
@@ -2065,7 +2065,24 @@ export const getProductColumns = (
       );
     },
     cell: ({ row }) => {
-      const computedStock = calculateAvailableStock(row.original);
+      const stockState = resolveAvailableStockForDisplay(row.original);
+
+      if (stockState.error) {
+        return (
+          <ProductStockDialog product={row.original}>
+            <button
+              type="button"
+              className="rounded-xl bg-red-50 px-2 py-1 text-center text-xs font-semibold text-red-600 transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+              title={stockState.error}
+              aria-label={`Stock data error for ${row.original.name}: ${stockState.error}`}
+            >
+              Stock error
+            </button>
+          </ProductStockDialog>
+        );
+      }
+
+      const computedStock = stockState.value ?? 0;
 
       return (
         <ProductStockDialog product={row.original}>

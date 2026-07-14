@@ -48,6 +48,7 @@ const SelectOrderItems = ({
   const { setValue } = form;
   const priceMode = form.watch("price_mode") ?? "gross";
   const totalShippingInput = Number(form.watch("total_shipping") ?? 0) || 0;
+  const totalDiscountInput = Number(form.watch("total_discount") ?? 0) || 0;
   const fromMarketplace = String(form.watch("from_marketplace") ?? "").toLowerCase();
   const countryCode = getCountryCode(form.watch("invoice_country"));
   const taxId = form.watch("tax_id") ?? null;
@@ -189,8 +190,37 @@ const SelectOrderItems = ({
       },
     );
 
+    const applyGrossDiscount = (grossTotal: number, netTotal: number) => {
+      const discountGross = Math.min(
+        Math.max(0, Number(totalDiscountInput) || 0),
+        Math.max(0, grossTotal),
+      );
+
+      if (discountGross <= 0 || grossTotal <= 0) {
+        return {
+          gross: grossTotal,
+          net: netTotal,
+        };
+      }
+
+      const netRatio = netTotal > 0 ? netTotal / grossTotal : 0;
+      const discountNet = discountGross * netRatio;
+
+      return {
+        gross: Math.max(0, grossTotal - discountGross),
+        net: Math.max(0, netTotal - discountNet),
+      };
+    };
+
     const shippingInput = Math.max(0, Number(totalShippingInput) || 0);
-    if (shippingInput <= 0) return totals;
+    if (shippingInput <= 0) {
+      const discountedTotals = applyGrossDiscount(totals.gross, totals.net);
+      return {
+        ...totals,
+        gross: discountedTotals.gross,
+        net: discountedTotals.net,
+      };
+    }
 
     if (priceMode === "net") {
       const convertedShipping = calculateShippingGrossFromNet(
@@ -204,10 +234,15 @@ const SelectOrderItems = ({
         effectiveTaxIdForVat,
       );
 
+      const discountedTotals = applyGrossDiscount(
+        totals.gross + (Number(convertedShipping.gross) || 0),
+        totals.net + shippingInput,
+      );
+
       return {
         ...totals,
-        gross: totals.gross + (Number(convertedShipping.gross) || 0),
-        net: totals.net + shippingInput,
+        gross: discountedTotals.gross,
+        net: discountedTotals.net,
       };
     }
 
@@ -218,16 +253,22 @@ const SelectOrderItems = ({
       effectiveTaxIdForVat,
     );
 
+    const discountedTotals = applyGrossDiscount(
+      totals.gross + shippingInput,
+      totals.net + (Number(shippingVatInfo.net) || 0),
+    );
+
     return {
       ...totals,
-      gross: totals.gross + shippingInput,
-      net: totals.net + (Number(shippingVatInfo.net) || 0),
+      gross: discountedTotals.gross,
+      net: discountedTotals.net,
     };
   }, [
     countryCode,
     effectiveTaxIdForVat,
     listProducts,
     priceMode,
+    totalDiscountInput,
     totalShippingInput,
   ]);
 
