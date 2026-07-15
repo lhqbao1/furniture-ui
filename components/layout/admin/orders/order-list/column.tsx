@@ -257,6 +257,24 @@ const getOrderCustomerEmail = (
   return invoiceEmail;
 };
 
+const getOrderListInvoiceDisplayAmount = (order: CheckOutMain): number => {
+  const totalAmount = toNumber(order.total_amount);
+  const discountAmount = Math.max(
+    Math.abs(toNumber(order.voucher_amount)),
+    Math.abs(toNumber(order.coupon_amount)),
+  );
+
+  if (
+    totalAmount < 0 &&
+    discountAmount > 0 &&
+    Math.abs(totalAmount) <= discountAmount + 0.01
+  ) {
+    return 0;
+  }
+
+  return totalAmount;
+};
+
 const deliveryPreviewColumns: ColumnDef<CartItem>[] = [
   {
     accessorKey: "id_provider",
@@ -1025,15 +1043,17 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
     accessorKey: "value",
     header: () => <div className="text-center w-full">INVOICE</div>,
     cell: ({ row }) => {
+      const displayAmount = getOrderListInvoiceDisplayAmount(row.original);
+
       return (
         <div className="flex gap-1 items-center justify-end">
           <div
             className={`${
-              row.original.total_amount < 0 ? "text-red-500" : "text-[#4D4D4D]"
+              displayAmount < 0 ? "text-red-500" : "text-[#4D4D4D]"
             }`}
           >
             €
-            {row.original.total_amount.toLocaleString("de-DE", {
+            {displayAmount.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
@@ -1197,15 +1217,17 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
     accessorKey: "value",
     header: () => <div className="text-center w-full">INVOICE</div>,
     cell: ({ row }) => {
+      const displayAmount = getOrderListInvoiceDisplayAmount(row.original);
+
       return (
         <div className="flex gap-1 items-center justify-end">
           <div
             className={`${
-              row.original.total_amount < 0 ? "text-red-500" : "text-[#4D4D4D]"
+              displayAmount < 0 ? "text-red-500" : "text-[#4D4D4D]"
             }`}
           >
             €
-            {row.original.total_amount.toLocaleString("de-DE", {
+            {displayAmount.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
