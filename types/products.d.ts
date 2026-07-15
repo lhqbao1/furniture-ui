@@ -210,7 +210,6 @@ export type ProductItem = {
   collection?: string | null;
   stock: number;
   result_stock?: number;
-  reserved_stock?: number | string | null;
   computed_stock?: number | string | null;
   incomming_stock?: number;
   sku: string;

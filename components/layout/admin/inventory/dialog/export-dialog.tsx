@@ -13,12 +13,17 @@ import { SupplierResponse } from "@/types/supplier";
 import SupplierSelect from "../../products/products-list/toolbar/supplier-select";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
+type InventoryExportStatus = "active" | "inactive" | "all";
+
 const ExportInventoryDialog = () => {
   const [supplier, setSupplier] = useState<string>("");
-  const [status, setStatus] = useState<"active" | "inactive" | "all">("all");
+  const [status, setStatus] = useState<InventoryExportStatus>("all");
 
   const buildParams = () => {
-    const params: any = {};
+    const params: {
+      all_products?: boolean;
+      supplier_id?: string;
+    } = {};
 
     if (status === "active") {
       params.all_products = true;
@@ -34,13 +39,13 @@ const ExportInventoryDialog = () => {
     return params;
   };
 
-  const { data, isFetching, refetch } = useQuery({
+  const { isFetching, refetch } = useQuery({
     queryKey: ["all-products", supplier, status],
     queryFn: () => getAllProductsSelect(buildParams()),
     enabled: false,
   });
 
-  const { data: suppliers, isLoading, isError } = useGetSuppliers();
+  const { data: suppliers } = useGetSuppliers();
   if (!suppliers) return <>Loading...</>;
 
   const handleExport = async () => {
@@ -48,8 +53,6 @@ const ExportInventoryDialog = () => {
     const data = res.data;
 
     if (!data?.length) return;
-
-    const clean = (val: any) => (val === null || val === undefined ? "" : val);
 
     const exportData = data.map((p) => {
       const available = calculateAvailableStock(p);
@@ -70,7 +73,7 @@ const ExportInventoryDialog = () => {
         // === stock === (value)
         available_stock: available,
 
-        reserved_stock:
+        result_stock:
           typeof p.result_stock === "number" ? p.result_stock : undefined,
 
         physical_stock: typeof p.stock === "number" ? p.stock : undefined,
@@ -155,7 +158,18 @@ const ExportInventoryDialog = () => {
         {/* Status Filter */}
         <div className="space-y-2">
           <Label>Status</Label>
-          <RadioGroup value={status} onValueChange={(v) => setStatus(v as any)}>
+          <RadioGroup
+            value={status}
+            onValueChange={(value) => {
+              if (
+                value === "active" ||
+                value === "inactive" ||
+                value === "all"
+              ) {
+                setStatus(value);
+              }
+            }}
+          >
             <div className="flex items-center gap-2">
               <RadioGroupItem value="active" id="status-active" />
               <Label htmlFor="status-active">Active</Label>
