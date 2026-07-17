@@ -50,17 +50,14 @@ function getExternalReference(order: CheckOutMain) {
   );
 }
 
-function calculateOrderProductCosts(items: CartItem[]) {
-  return items.reduce(
-    (totals, item) => {
-      const quantity = Number(item.quantity) || 0;
-      totals.productsCost += (Number(item.products?.cost) || 0) * quantity;
-      totals.freightCost +=
-        (Number(item.products?.delivery_cost) || 0) * quantity;
-      return totals;
-    },
-    { productsCost: 0, freightCost: 0 },
-  );
+function formatOrderTags(order: CheckOutMain) {
+  const tags = Array.isArray(order.tags)
+    ? order.tags
+        .map((item) => String(item?.tag ?? "").trim())
+        .filter(Boolean)
+    : [];
+
+  return Array.from(new Set(tags)).join(" | ");
 }
 
 function calculateOrderNetValues(order: CheckOutMain) {
@@ -158,6 +155,48 @@ function calculateOrderNetValues(order: CheckOutMain) {
   };
 }
 
+function getCartItemUnitGross(item?: CartItem) {
+  return (
+    Number(
+      item?.purchased_products?.final_price ??
+        item?.products?.final_price ??
+        item?.final_price ??
+        item?.item_price ??
+        0,
+    ) || 0
+  );
+}
+
+function getCartItemExportValues(
+  item: CartItem | undefined,
+  countryCode: string,
+  taxId: string,
+) {
+  const quantity = Number(item?.quantity) || 0;
+  const unitGross = getCartItemUnitGross(item);
+  const taxValue = item?.products?.tax ?? item?.purchased_products?.tax ?? null;
+  const vatResult = calculateProductVAT(unitGross, taxValue, countryCode, taxId);
+  const unitNet = +Number(vatResult.net || 0).toFixed(2);
+  const lineGross = +(unitGross * quantity).toFixed(2);
+  const lineNet = +(unitNet * quantity).toFixed(2);
+  const taxRate = +((Number(vatResult.vatRate) || 0) * 100).toFixed(2);
+  const productCost = +((Number(item?.products?.cost) || 0) * quantity).toFixed(2);
+  const freightCost = +(
+    (Number(item?.products?.delivery_cost) || 0) * quantity
+  ).toFixed(2);
+
+  return {
+    quantity,
+    unitGross,
+    unitNet,
+    lineGross,
+    lineNet,
+    taxRate,
+    productCost,
+    freightCost,
+  };
+}
+
 export function mapOrderListTemplateRows(data: CheckOutMain[]) {
   return data.flatMap((order) => {
     const hasChildCheckouts = Array.isArray(order.checkouts) && order.checkouts.length > 0;
@@ -170,7 +209,11 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
     const user = checkout?.user;
     const allItems = exportableCheckouts.flatMap((c) => c.cart?.items ?? []);
     const { netAmount, shippingNet } = calculateOrderNetValues(order);
-    const { productsCost, freightCost } = calculateOrderProductCosts(allItems);
+    const countryCode =
+      shipping?.country ?? invoice?.country ?? "DE";
+    const taxId = user?.tax_id ?? "";
+    const rowItems: Array<CartItem | undefined> =
+      allItems.length > 0 ? allItems : [undefined];
 
     const buyerAddressRow = {
       invoice_name: clean(invoice?.recipient_name ?? ""),
@@ -192,61 +235,63 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
       shipping_country: clean(shipping?.country ?? ""),
     };
 
-    return [
-      {
-        id: clean(order.id ?? ""),
-        code: clean(order.checkout_code),
-        marketplace: clean(order.from_marketplace ?? "Prestige Home"),
-        netto_buyer: clean(getExternalReference(order)),
-        marketplace_order_id: clean(order.marketplace_order_id),
-        ext_invoice_id: clean(order.ext_invoice_id ?? ""),
-        date: clean(formatDateDDMMYYYY(order.created_at)),
-        estimated_delivery: clean(
-          formatDeliveryRangeLabel(order.delivery_from, order.delivery_to),
-        ),
-        status: clean(getStatusStyle(order.status).text),
-        payment_method: clean(order.payment_method),
-        note: clean(order.note ?? ""),
+    const orderRow = {
+      id: clean(order.id ?? ""),
+      code: clean(order.checkout_code),
+      marketplace: clean(order.from_marketplace ?? "Prestige Home"),
+      netto_buyer: clean(getExternalReference(order)),
+      marketplace_order_id: clean(order.marketplace_order_id),
+      ext_invoice_id: clean(order.ext_invoice_id ?? ""),
+      date: clean(formatDateDDMMYYYY(order.created_at)),
+      estimated_delivery: clean(
+        formatDeliveryRangeLabel(order.delivery_from, order.delivery_to),
+      ),
+      status: clean(getStatusStyle(order.status).text),
+      tag: clean(formatOrderTags(order)),
+      payment_method: clean(order.payment_method),
+      note: clean(order.note ?? ""),
+      discount_amout: clean(order.voucher_amount),
+      total_amount: clean(order.total_amount),
+      net_amount: clean(netAmount),
+      shipping_amount: clean(shippingNet),
+      ...buyerAddressRow,
+      carrier: clean(checkout?.shipment?.shipping_carrier ?? ""),
+      shipping_date: clean(
+        checkout?.shipment?.shipper_date
+          ? formatDateDDMMYYYY(checkout.shipment.shipper_date)
+          : "",
+      ),
+      tracking_number: clean(checkout?.shipment?.tracking_number ?? ""),
+      shipping_code: clean(checkout?.shipment?.ship_code ?? ""),
+    };
+
+    return rowItems.map((item) => {
+      const product = item?.products;
+      const purchasedProduct = item?.purchased_products;
+      const itemValues = getCartItemExportValues(item, countryCode, taxId);
+      const supplierName = item
+        ? product?.owner?.business_name || "Prestige Home"
+        : "";
+
+      return {
+        ...orderRow,
         product_id: clean(
-          allItems
-            .map((i) => i.products.id_provider)
-            .filter(Boolean)
-            .join(" | "),
+          purchasedProduct?.id_provider ?? product?.id_provider ?? "",
         ),
-        product_names: clean(
-          allItems
-            .map((i) => i.products.name)
-            .filter(Boolean)
-            .join(" | "),
-        ),
-        total_quantity: allItems.reduce((sum, i) => sum + (i.quantity ?? 0), 0),
-        discount_amout: clean(order.voucher_amount),
-        total_amount: clean(order.total_amount),
-        net_amount: clean(netAmount),
-        shipping_amount: clean(shippingNet),
-        products_cost: clean(+productsCost.toFixed(2)),
-        freight_cost: clean(+freightCost.toFixed(2)),
-        ...buyerAddressRow,
-        carrier: clean(checkout?.shipment?.shipping_carrier ?? ""),
-        suppliers: clean(
-          allItems
-            .map((i) =>
-              i.products.owner?.business_name
-                ? i.products.owner.business_name
-                : "Prestige Home",
-            )
-            .filter(Boolean)
-            .join(" | "),
-        ),
-        shipping_date: clean(
-          checkout?.shipment?.shipper_date
-            ? formatDateDDMMYYYY(checkout.shipment.shipper_date)
-            : "",
-        ),
-        tracking_number: clean(checkout?.shipment?.tracking_number ?? ""),
-        shipping_code: clean(checkout?.shipment?.ship_code ?? ""),
-      },
-    ];
+        product_sku: clean(purchasedProduct?.sku ?? product?.sku ?? ""),
+        product_ean: clean(purchasedProduct?.ean ?? product?.ean ?? ""),
+        product_names: clean(purchasedProduct?.name ?? product?.name ?? ""),
+        total_quantity: clean(itemValues.quantity),
+        product_unit_price: clean(+itemValues.unitGross.toFixed(2)),
+        product_line_total: clean(itemValues.lineGross),
+        product_unit_net: clean(itemValues.unitNet),
+        product_line_net: clean(itemValues.lineNet),
+        product_tax_rate: clean(itemValues.taxRate),
+        products_cost: clean(itemValues.productCost),
+        freight_cost: clean(itemValues.freightCost),
+        suppliers: clean(supplierName),
+      };
+    });
   });
 }
 

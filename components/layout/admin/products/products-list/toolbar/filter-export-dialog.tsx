@@ -208,10 +208,10 @@ const FilterExportForm = () => {
   );
 
   const openColumnPicker = () => {
-    if (!hasExportFilters) {
-      toast.warning("Please apply at least one filter before exporting.");
-      return;
-    }
+    // if (!hasExportFilters) {
+    //   toast.warning("Please apply at least one filter before exporting.");
+    //   return;
+    // }
 
     setSelectedColumns(availableColumns.map((column) => column.key));
     setColumnSearch("");

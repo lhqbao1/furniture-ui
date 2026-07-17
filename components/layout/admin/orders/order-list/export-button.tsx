@@ -20,9 +20,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
-  getAllCheckOutMain,
+  getCheckOutMain,
   getCheckOutRefundOrders,
 } from "@/features/checkout/api";
+import type { SearchBy } from "@/features/checkout/api";
 import { formatDateDDMMYYYY } from "@/lib/date-formated";
 import { cn } from "@/lib/utils";
 import { CheckOutMain } from "@/types/checkout";
@@ -49,6 +50,11 @@ const parseCsvParam = (value: string | null) =>
     .map((item) => item.trim())
     .filter(Boolean);
 
+const parseStatusParam = (value: string | null) =>
+  Array.from(
+    new Set(parseCsvParam(value).map((status) => status.toUpperCase())),
+  );
+
 const parseBooleanParam = (value: string | null): boolean | undefined => {
   if (!value) return undefined;
   const normalized = value.trim().toLowerCase();
@@ -62,6 +68,19 @@ const parseShipmentFilterParam = (value: string | null): boolean | undefined => 
   return value.trim().toLowerCase() === "true" ? true : undefined;
 };
 
+const parseSearchByParam = (value: string | null): SearchBy => {
+  if (value === "product" || value === "shipping_address") return value;
+  return "order";
+};
+
+const parseCountryParam = (value: string | null): string | undefined => {
+  const normalized = String(value ?? "")
+    .trim()
+    .toUpperCase();
+  if (!normalized) return undefined;
+  return normalized === "UK" ? "GB" : normalized;
+};
+
 const clean = (val: unknown) =>
   val === null || val === undefined || val === "None" ? "" : val;
 
@@ -69,6 +88,7 @@ const formatColumnLabel = (key: string) => {
   const customLabels: Record<string, string> = {
     id: "ID",
     code: "Order Code",
+    tag: "Tag",
     netto_buyer: "External Reference",
     marketplace_order_id: "Marketplace Order ID",
     ext_invoice_id: "Invoice ID",
@@ -89,11 +109,18 @@ const formatColumnLabel = (key: string) => {
     shipping_city: "Shipping City",
     shipping_postal_code: "Shipping Postal Code",
     shipping_country: "Shipping Country",
-    product_id: "Product IDs",
-    product_names: "Product Names",
-    total_quantity: "Total Quantity",
+    product_id: "Product ID",
+    product_sku: "Product SKU",
+    product_ean: "Product EAN",
+    product_names: "Product Name",
+    product_unit_price: "Product Unit Price",
+    product_line_total: "Product Line Total",
+    product_unit_net: "Product Unit Net",
+    product_line_net: "Product Line Net",
+    product_tax_rate: "Product Tax Rate",
+    total_quantity: "Quantity",
     shipping_amount: "Shipping Amount",
-    products_cost: "Products Cost",
+    products_cost: "Product Cost",
     freight_cost: "Freight Cost",
     discount_amout: "Discount Amount",
     total_amount: "Total Amount",
@@ -245,7 +272,9 @@ export default function ExportOrderExcelButton({
     () =>
       Array.from(
         new Set(
-          (presetStatuses ?? []).map((status) => status.trim()).filter(Boolean),
+          (presetStatuses ?? [])
+            .map((status) => status.trim().toUpperCase())
+            .filter(Boolean),
         ),
       ),
     [presetStatuses],
@@ -257,7 +286,7 @@ export default function ExportOrderExcelButton({
   );
 
   const statusValuesFromFilter = useMemo(
-    () => parseCsvParam(searchParams.get("status")),
+    () => parseStatusParam(searchParams.get("status")),
     [searchParams],
   );
 
@@ -278,6 +307,7 @@ export default function ExportOrderExcelButton({
   ]);
 
   const search = (searchParams.get("search") ?? "").trim();
+  const searchBy = parseSearchByParam(searchParams.get("search_by"));
   const multiSearchRaw = searchParams.get("multi_search") ?? "";
   const multiSearchValues = useMemo(
     () =>
@@ -298,6 +328,8 @@ export default function ExportOrderExcelButton({
   const isClaimedMarketplace = parseBooleanParam(
     searchParams.get("is_claimed_marketplace"),
   );
+  const country = parseCountryParam(searchParams.get("country"));
+  const isB2B = parseBooleanParam(searchParams.get("is_b2b"));
 
   const hasExportFilters = useMemo(
     () => {
@@ -314,8 +346,11 @@ export default function ExportOrderExcelButton({
       return (
         statusValues.length > 0 ||
         channelValues.length > 0 ||
+        Boolean(search) ||
         Boolean(fromDate) ||
         Boolean(toDate) ||
+        Boolean(country) ||
+        isB2B !== undefined ||
         filterByShipment !== undefined ||
         Boolean(multiSearchValues.length)
       );
@@ -323,8 +358,10 @@ export default function ExportOrderExcelButton({
     [
       expandByProductRefund,
       channelValues.length,
+      country,
       filterByShipment,
       fromDate,
+      isB2B,
       isClaimedFactory,
       isClaimedMarketplace,
       multiSearchValues.length,
@@ -341,9 +378,12 @@ export default function ExportOrderExcelButton({
       channelValues.join(","),
       statusValues.join(","),
       search,
+      searchBy,
       multiSearchRaw,
       fromDate ?? null,
       toDate ?? null,
+      country ?? null,
+      isB2B ?? null,
       filterByShipment ?? null,
       isClaimedFactory ?? null,
       isClaimedMarketplace ?? null,
@@ -366,15 +406,22 @@ export default function ExportOrderExcelButton({
         return response.items;
       }
 
-      return getAllCheckOutMain({
+      const response = await getCheckOutMain({
+        page: 1,
+        page_size: 5000,
         ...(channelValues.length > 0 ? { channel: channelValues } : {}),
         ...(statusValues.length > 0 ? { status: statusValues } : {}),
+        ...(search ? { search, search_by: searchBy } : {}),
         ...(fromDate ? { from_date: fromDate } : {}),
         ...(toDate ? { to_date: toDate } : {}),
+        ...(country ? { country } : {}),
+        ...(isB2B !== undefined ? { is_b2b: isB2B } : {}),
         ...(filterByShipment !== undefined
           ? { filter_by_shipment: filterByShipment }
           : {}),
       });
+
+      return response.items;
     },
     enabled: false,
   });

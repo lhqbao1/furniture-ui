@@ -21,6 +21,18 @@ import AssignVoucherToProducts from "./columns/assign-voucher-product";
 import AssignVoucherToUsers from "./columns/assign-voucher-user";
 import { VOUCHER_TYPE } from "@/data/data";
 
+const toFiniteNumber = (value: unknown): number | null => {
+  if (value === null || value === undefined || value === "") return null;
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : null;
+};
+
+const formatEuro = (value: number) =>
+  value.toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
 export const voucherColumns: ColumnDef<VoucherItem>[] = [
   {
     id: "select",
@@ -73,46 +85,56 @@ export const voucherColumns: ColumnDef<VoucherItem>[] = [
   {
     accessorKey: "discount_value",
     header: () => <div className="text-center">DISCOUNT VALUE</div>,
-    cell: ({ row }) => (
-      <div className="text-center">
-        {row.original.discount_type === "fixed" && "€"}
-        {row.original.discount_type === "fixed"
-          ? row.original.discount_value.toLocaleString("de-DE", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-          : row.original.discount_value}
-        {row.original.discount_type === "percent" && "%"}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const discountValue = toFiniteNumber(row.original.discount_value);
+
+      if (discountValue === null) {
+        return <div className="text-center">None</div>;
+      }
+
+      return (
+        <div className="text-center">
+          {row.original.discount_type === "fixed" && "€"}
+          {row.original.discount_type === "fixed"
+            ? formatEuro(discountValue)
+            : discountValue}
+          {row.original.discount_type === "percent" && "%"}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "max_discount",
     header: () => <div className="text-center">MAX DISCOUNT</div>,
-    cell: ({ row }) => (
-      <div className="text-center">
-        {row.original.max_discount === 0 ? "None" : row.original.max_discount}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const maxDiscount = toFiniteNumber(row.original.max_discount);
+
+      return (
+        <div className="text-center">
+          {!maxDiscount ? "None" : maxDiscount}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "min_order_value",
     header: "MIN ORDER VALUE",
-    cell: ({ row }) => (
-      <div>
-        {row.original.min_order_value === 0 ? (
-          "None"
-        ) : (
-          <>
-            €
-            {row.original.min_order_value.toLocaleString("de-DE", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </>
-        )}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const minOrderValue = toFiniteNumber(row.original.min_order_value);
+
+      return (
+        <div>
+          {!minOrderValue ? (
+            "None"
+          ) : (
+            <>
+              €
+              {formatEuro(minOrderValue)}
+            </>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "total_usage_limit",
