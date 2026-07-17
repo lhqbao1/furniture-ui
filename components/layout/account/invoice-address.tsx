@@ -18,6 +18,14 @@ interface InvoiceAddressProps {
   userId: string;
 }
 
+function EmptyInvoiceAddressMessage({ label }: { label: string }) {
+  return (
+    <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm text-muted-foreground">
+      {label}
+    </div>
+  );
+}
+
 const InvoiceAddress = ({ userId }: InvoiceAddressProps) => {
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const t = useTranslations();
@@ -29,9 +37,9 @@ const InvoiceAddress = ({ userId }: InvoiceAddressProps) => {
 
   if (isLoading) return <InvoiceAddressSkeleton />;
   if (isError)
-    return <div className="text-red-500">{t("noInvoiceAddress")}</div>;
+    return <EmptyInvoiceAddressMessage label={t("noInvoiceAddressShort")} />;
   if (!address)
-    return <div className="text-red-500">{t("noInvoiceAddress")}</div>;
+    return <EmptyInvoiceAddressMessage label={t("noInvoiceAddressShort")} />;
 
   return (
     <Card className={"border-secondary border-2"}>

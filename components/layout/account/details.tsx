@@ -38,17 +38,16 @@ interface AccountDetailsProps {
 const AccountDetails = ({ user }: AccountDetailsProps) => {
   const t = useTranslations();
 
-  const [openAddressDialog, setOpenAddressDialog] = useState(false);
+  const [openShippingAddressDialog, setOpenShippingAddressDialog] =
+    useState(false);
+  const [openInvoiceAddressDialog, setOpenInvoiceAddressDialog] =
+    useState(false);
   const [openUserDialog, setOpenUserDialog] = useState(false);
   const [isNotified, setIsNotified] = useState<boolean>(
     user.is_notified ?? false,
   );
 
-  const {
-    data: invoiceAddress,
-    isLoading,
-    isError,
-  } = useGetInvoiceAddressByUserId(user.id);
+  const { data: invoiceAddress } = useGetInvoiceAddressByUserId(user.id);
 
   const updateUserMutation = useUpdateUser();
 
@@ -63,10 +62,10 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
         },
       },
       {
-        onSuccess(data, variables, context) {
+        onSuccess() {
           toast.success(t("turnOnNotificationsSuccess"));
         },
-        onError(error, variables, context) {
+        onError() {
           toast.error(t("turnOnNotificationsError"));
         },
       },
@@ -141,20 +140,20 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
                 </div>
               </div>
               <Dialog
-                open={openAddressDialog}
-                onOpenChange={setOpenAddressDialog}
+                open={openShippingAddressDialog}
+                onOpenChange={setOpenShippingAddressDialog}
               >
                 <PlusSquare
                   className="w-7 h-7 cursor-pointer"
                   strokeWidth={1}
-                  onClick={() => setOpenAddressDialog(true)}
+                  onClick={() => setOpenShippingAddressDialog(true)}
                 />
                 <DialogContent className="lg:w-[800px]">
                   <DialogHeader>
-                    <DialogTitle>{t("addShippingAddress")}</DialogTitle>
+                    <DialogTitle>{t("addShippingAddressTitle")}</DialogTitle>
                     <AddressForm
-                      setOpen={setOpenAddressDialog}
-                      open={openAddressDialog}
+                      setOpen={setOpenShippingAddressDialog}
+                      open={openShippingAddressDialog}
                       userId={user.id}
                     />
                   </DialogHeader>
@@ -185,8 +184,8 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
                 </div>
               </div>
               <Dialog
-                open={openAddressDialog}
-                onOpenChange={setOpenAddressDialog}
+                open={openInvoiceAddressDialog}
+                onOpenChange={setOpenInvoiceAddressDialog}
               >
                 {invoiceAddress ? (
                   ""
@@ -194,15 +193,15 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
                   <PlusSquare
                     className="w-7 h-7 cursor-pointer"
                     strokeWidth={1}
-                    onClick={() => setOpenAddressDialog(true)}
+                    onClick={() => setOpenInvoiceAddressDialog(true)}
                   />
                 )}
                 <DialogContent className="lg:w-[800px]">
                   <DialogHeader>
-                    <DialogTitle>{t("addInvoiceAddress")}</DialogTitle>
+                    <DialogTitle>{t("addInvoiceAddressTitle")}</DialogTitle>
                     <AddressForm
-                      setOpen={setOpenAddressDialog}
-                      open={openAddressDialog}
+                      setOpen={setOpenInvoiceAddressDialog}
+                      open={openInvoiceAddressDialog}
                       userId={user.id}
                       isInvoice={true}
                     />

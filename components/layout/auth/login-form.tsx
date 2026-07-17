@@ -8,14 +8,14 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Mail, Loader2 } from "lucide-react";
+import { KeyRound, Loader2, Mail, ShieldCheck } from "lucide-react";
 import {
   useCheckMailExist,
-  useLogin,
   useLoginOtp,
   useSendOtpAffiliate,
   useSendOtp,
@@ -23,7 +23,7 @@ import {
 } from "@/features/auth/hook";
 import { toast } from "sonner";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useSyncLocalCart } from "@/features/cart/hook";
@@ -31,6 +31,13 @@ import LoginGoogleButton from "@/components/shared/login-google-button";
 import ResendOtp from "./resend-otp";
 import { useAtom } from "jotai";
 import { adminIdAtom, userIdAtom } from "@/store/auth";
+import { cn } from "@/lib/utils";
+
+const inputClassName =
+  "h-12 rounded-xl border-slate-200 bg-white pl-10 text-base shadow-sm transition-[border-color,box-shadow] placeholder:text-slate-400 focus-visible:border-secondary/70 focus-visible:ring-secondary/20 md:text-sm";
+
+const otpInputClassName =
+  "h-12 min-w-0 flex-1 rounded-xl border-slate-200 bg-white text-center text-lg font-semibold shadow-sm transition-[border-color,box-shadow] focus-visible:border-secondary/70 focus-visible:ring-secondary/20";
 
 interface LoginFormProps {
   isAdmin?: boolean;
@@ -43,15 +50,13 @@ export default function LoginForm({
   isAffiliate = false,
   redirectTo,
 }: LoginFormProps) {
-  const [userId, setUserId] = useAtom(userIdAtom);
-  const [adminUserId, setAdminUserId] = useAtom(adminIdAtom);
+  const [, setUserId] = useAtom(userIdAtom);
+  const [, setAdminUserId] = useAtom(adminIdAtom);
   const [seePassword, setSeePassword] = useState(false);
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const [resendCountdown, setResendCountdown] = useState(60);
-  const [canResend, setCanResend] = useState(false);
 
   const formSchema = z.object({
     username: z.string().min(1, t("emailRequired")).email(t("invalidEmail")),
@@ -65,24 +70,6 @@ export default function LoginForm({
     },
   });
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (seePassword && !canResend) {
-      setResendCountdown(60);
-      timer = setInterval(() => {
-        setResendCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            setCanResend(true);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [seePassword, canResend]);
-
   const loginAdminMutation = useSendOtpAdmin();
   const loginAffiliateMutation = useSendOtpAffiliate();
   const syncLocalCartMutation = useSyncLocalCart();
@@ -90,6 +77,19 @@ export default function LoginForm({
   const submitOtpMutation = useLoginOtp();
   const checkMailExistMutation = useCheckMailExist();
   const isAdminOrAffiliate = isAdmin || isAffiliate;
+  const isSendingOtp =
+    checkMailExistMutation.isPending ||
+    sendOtpMutation.isPending ||
+    loginAdminMutation.isPending ||
+    loginAffiliateMutation.isPending;
+  const isButtonLoading = isSendingOtp || submitOtpMutation.isPending;
+  const loginSubtitle = seePassword
+    ? t("loginOtpSubtitle")
+    : isAdmin
+      ? t("adminLoginSubtitle")
+      : isAffiliate
+        ? t("affiliateLoginSubtitle")
+        : t("loginSubtitle");
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (!seePassword && !isAdminOrAffiliate) {
@@ -99,17 +99,17 @@ export default function LoginForm({
             toast.error(t("emailNotRegistered"));
           } else {
             sendOtpMutation.mutate(values.username, {
-              onSuccess: (data) => {
+              onSuccess: () => {
                 toast.success(t("sendedEmail"));
                 setSeePassword(true);
               },
-              onError(error, variables, context) {
+              onError() {
                 toast.error(t("invalidEmail"));
               },
             });
           }
         },
-        onError(error, variables, context) {
+        onError(error) {
           console.log(error);
         },
       });
@@ -146,7 +146,7 @@ export default function LoginForm({
 
             toast.success(t("loginSuccess"));
           },
-          onError(error, variables, context) {
+          onError() {
             toast.error(t("invalidCredentials"));
           },
         },
@@ -168,7 +168,7 @@ export default function LoginForm({
             // Có thể lưu userId nếu cần
             toast.success(t("loginSuccess"));
           },
-          onError(error, variables, context) {
+          onError() {
             toast.error(t("invalidCredentials"));
           },
         },
@@ -213,7 +213,7 @@ export default function LoginForm({
             router.push(redirectTo ?? "/admin", { locale });
             toast.success(t("loginSuccess"));
           },
-          onError(error) {
+          onError() {
             toast.error(t("invalidOTP"));
           },
         },
@@ -222,22 +222,46 @@ export default function LoginForm({
   };
 
   return (
-    <div className="p-6 bg-white rounded-2xl lg:w-3/4 w-full">
-      <div className="flex flex-col items-center mb-12 gap-3">
-        {/* Logo giả */}
-        <Image src={"/new-logo.svg"} width={100} height={100} alt="" />
-        <h1 className="text-3xl font-semibold text-secondary text-center space-x-2 lg:block flex flex-col">
-          <span>{t("welcomeTo")}</span>
-          <span className="text-primary" translate="no">
-            Prestige Home
-          </span>
-        </h1>
+    <div className="w-full max-w-md rounded-3xl border border-secondary/10 bg-white/90 p-5 shadow-2xl shadow-slate-200/70 backdrop-blur sm:p-8 xl:p-10">
+      <div className="mb-8 flex flex-col items-center gap-4 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-secondary/10 bg-white shadow-sm">
+          <Image
+            src="/new-logo.svg"
+            width={52}
+            height={52}
+            alt="Prestige Home"
+            priority
+          />
+        </div>
+        <div className="space-y-3">
+          <h1 className="text-balance text-3xl font-semibold tracking-tight text-secondary">
+            {isAdmin || isAffiliate ? (
+              isAdmin ? (
+                t("adminLoginTitle")
+              ) : (
+                t("affiliateLoginTitle")
+              )
+            ) : (
+              <>
+                <span>{t("welcomeTo")}</span>
+                <span
+                  className="ml-2 text-primary"
+                  translate="no"
+                >
+                  Prestige Home
+                </span>
+              </>
+            )}
+          </h1>
+          <p className="text-sm leading-6 text-muted-foreground">
+            {loginSubtitle}
+          </p>
+        </div>
       </div>
 
-      {/* <h2 className="text-2xl font-bold mb-6 lg:text-start text-center">Log In</h2> */}
       <Form {...form}>
         <form
-          className="space-y-6"
+          className="space-y-5"
           onSubmit={form.handleSubmit(
             (values) => {
               handleSubmit(values);
@@ -248,21 +272,32 @@ export default function LoginForm({
             },
           )}
         >
-          {" "}
-          {/* Email */}
           <FormField
             control={form.control}
             name="username"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-medium text-slate-700">
+                  {t("email")}
+                </FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                    <Mail
+                      aria-hidden="true"
+                      className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                    />
                     <Input
                       placeholder={t("email")}
-                      {...field}
-                      className="pl-12 py-3 h-fit"
+                      type="email"
+                      autoComplete="email"
+                      inputMode="email"
+                      spellCheck={false}
+                      className={cn(
+                        inputClassName,
+                        seePassword && "bg-slate-50 text-slate-500",
+                      )}
                       disabled={seePassword}
+                      {...field}
                     />
                   </div>
                 </FormControl>
@@ -270,16 +305,24 @@ export default function LoginForm({
               </FormItem>
             )}
           />
-          {/* Password */}
           {seePassword ? (
             <FormField
               control={form.control}
               name="code"
               render={({ field }) => {
                 return (
-                  <FormItem>
+                  <FormItem className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <KeyRound
+                        aria-hidden="true"
+                        className="h-4 w-4 text-secondary"
+                      />
+                      <FormLabel className="text-sm font-medium text-slate-700">
+                        {t("verifyOTP")}
+                      </FormLabel>
+                    </div>
                     <FormControl>
-                      <div className="flex gap-2 justify-center mb-4 w-full">
+                      <div className="flex w-full justify-center gap-2">
                         {Array.from({ length: 6 }).map((_, idx) => (
                           <Input
                             key={idx}
@@ -362,7 +405,7 @@ export default function LoginForm({
                                 handleAutoSubmitOtp(finalValue);
                               }
                             }}
-                            className="h-12 flex-1 text-center text-lg"
+                            className={otpInputClassName}
                             maxLength={1}
                             inputMode="numeric" // ✅ hiển thị bàn phím số trên mobile
                             pattern="[0-9]*" // ✅ chỉ chấp nhận số
@@ -377,30 +420,19 @@ export default function LoginForm({
                 );
               }}
             />
-          ) : (
-            ""
-          )}
+          ) : null}
           <Button
             type="submit"
-            className="w-full bg-secondary/95 hover:bg-secondary"
+            className="h-12 w-full rounded-xl bg-primary px-6 text-base font-semibold text-white shadow-lg shadow-primary/20 transition-[background-color,box-shadow,transform] hover:bg-primary/90 hover:shadow-primary/30"
             hasEffect
-            disabled={
-              submitOtpMutation.isPending ||
-              sendOtpMutation.isPending ||
-              loginAdminMutation.isPending
-            }
+            disabled={isButtonLoading}
           >
-            {sendOtpMutation.isPending || loginAdminMutation.isPending ? (
-              <Loader2 className="animate-spin" />
-            ) : seePassword ? (
-              submitOtpMutation.isPending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                t("login")
-              )
+            {isButtonLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              t("getOtp")
+              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
             )}
+            <span>{seePassword ? t("login") : t("getOtp")}</span>
           </Button>
           {seePassword && (
             <ResendOtp
@@ -414,13 +446,12 @@ export default function LoginForm({
         </form>
       </Form>
 
-      {/* Sign up link */}
       {!isAdmin && (
-        <div className="text-sm text-center mt-6 space-x-1">
+        <div className="mt-6 rounded-2xl bg-slate-50 p-3 text-center text-sm text-muted-foreground">
           <span>{t("noAccount")}</span>
           <Link
             href={`/sign-up`}
-            className="text-sm text-secondary hover:underline"
+            className="ml-1 font-medium text-secondary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/30"
           >
             {t("createAccount")}
           </Link>

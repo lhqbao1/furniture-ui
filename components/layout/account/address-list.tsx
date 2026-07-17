@@ -23,6 +23,14 @@ interface AddressListProps {
   userId: string;
 }
 
+function EmptyAddressMessage({ label }: { label: string }) {
+  return (
+    <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm text-muted-foreground">
+      {label}
+    </div>
+  );
+}
+
 const AddressList = ({ userId }: AddressListProps) => {
   const {
     addresses,
@@ -43,9 +51,9 @@ const AddressList = ({ userId }: AddressListProps) => {
 
   if (isLoading) return <AddressListSkeleton />;
   if (isError)
-    return <div className="text-red-500">{t("noShippingAddress")}</div>;
+    return <EmptyAddressMessage label={t("noShippingAddressShort")} />;
   if (!addresses || addresses.length === 0)
-    return <div className="text-red-500">{t("noShippingAddress")}</div>;
+    return <EmptyAddressMessage label={t("noShippingAddressShort")} />;
 
   return (
     <div className="grid grid-cols-2 gap-4">
