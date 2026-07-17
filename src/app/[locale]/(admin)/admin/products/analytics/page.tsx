@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useGetProductsCheckOutDashboard } from "@/features/checkout/hook";
 import { useGetAllProductAndSold } from "@/features/products/hook";
 import { getAllProductAndSold } from "@/features/products/api";
@@ -51,6 +52,13 @@ import { Calendar } from "@/components/ui/calendar";
 import type { DateRange } from "react-day-picker";
 
 const STOCK_PAGE_SIZE = 20;
+const STOCK_SEARCH_URL_KEY = "stock_search";
+const STOCK_FROM_URL_KEY = "stock_from";
+const STOCK_TO_URL_KEY = "stock_to";
+const STOCK_SCOPE_URL_KEY = "stock_scope";
+const STOCK_SORT_URL_KEY = "stock_sort";
+const STOCK_PAGE_URL_KEY = "stock_page";
+
 type SoldStockSort = "asc" | "desc";
 
 type IncomingDisplayItem = {
@@ -71,6 +79,42 @@ type EconeloFilterValue = "all" | "true" | "false";
 
 const toNumber = (value: unknown): number =>
   typeof value === "number" ? value : Number(value) || 0;
+
+const parsePositiveIntegerParam = (value: string | null): number => {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1) return 1;
+  return parsed;
+};
+
+const parseSoldStockSortParam = (value: string | null): SoldStockSort =>
+  value === "asc" ? "asc" : "desc";
+
+const parseEconeloFilterParam = (value: string | null): EconeloFilterValue => {
+  if (value === "true" || value === "false") return value;
+  return "all";
+};
+
+const parseStockSearchParam = (value: string | null): string[] =>
+  Array.from(
+    new Set(
+      (value ?? "")
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean),
+    ),
+  );
+
+const parseUrlDateParam = (value: string | null): Date | undefined => {
+  if (!value) return undefined;
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return date;
+};
+
+const formatUrlDateParam = (value: Date | undefined): string | undefined => {
+  if (!value || Number.isNaN(value.getTime())) return undefined;
+  return format(value, "yyyy-MM-dd");
+};
 
 const formatCurrency = (value: number): string =>
   new Intl.NumberFormat("de-DE", {
@@ -401,18 +445,48 @@ function StockDateRangePicker({
 }
 
 export default function ProductAnalyticsPage() {
-  const [stockPage, setStockPage] = React.useState(1);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchParamsString = searchParams.toString();
+  const initialStockFromDate = parseUrlDateParam(
+    searchParams.get(STOCK_FROM_URL_KEY),
+  );
+  const initialStockToDate = parseUrlDateParam(
+    searchParams.get(STOCK_TO_URL_KEY),
+  );
+
+  const [stockPage, setStockPage] = React.useState(() =>
+    parsePositiveIntegerParam(searchParams.get(STOCK_PAGE_URL_KEY)),
+  );
   const [searchInput, setSearchInput] = React.useState("");
-  const [searchTerms, setSearchTerms] = React.useState<string[]>([]);
+  const [searchTerms, setSearchTerms] = React.useState<string[]>(() =>
+    parseStockSearchParam(searchParams.get(STOCK_SEARCH_URL_KEY)),
+  );
   const [soldStockSort, setSoldStockSort] =
-    React.useState<SoldStockSort>("desc");
+    React.useState<SoldStockSort>(() =>
+      parseSoldStockSortParam(searchParams.get(STOCK_SORT_URL_KEY)),
+    );
   const [isExportingStockExcel, setIsExportingStockExcel] =
     React.useState(false);
   const [isEconeloFilter, setIsEconeloFilter] =
-    React.useState<EconeloFilterValue>("all");
+    React.useState<EconeloFilterValue>(() =>
+      parseEconeloFilterParam(searchParams.get(STOCK_SCOPE_URL_KEY)),
+    );
   const [stockDateRange, setStockDateRange] = React.useState<
     DateRange | undefined
-  >(undefined);
+  >(() =>
+    initialStockFromDate
+      ? {
+          from: initialStockFromDate,
+          to:
+            initialStockToDate &&
+            initialStockToDate.getTime() >= initialStockFromDate.getTime()
+              ? initialStockToDate
+              : undefined,
+        }
+      : undefined,
+  );
   const [revenueFromDate, setRevenueFromDate] = React.useState("");
   const [revenueToDate, setRevenueToDate] = React.useState("");
   const [revenueCustomerType, setRevenueCustomerType] =
@@ -439,11 +513,39 @@ export default function ProductAnalyticsPage() {
       const merged = new Set([...prev, ...nextTerms]);
       return Array.from(merged);
     });
+    setStockPage(1);
     setSearchInput("");
   }, [parseSearchTerms, searchInput]);
 
   const removeSearchTerm = React.useCallback((targetTerm: string) => {
     setSearchTerms((prev) => prev.filter((term) => term !== targetTerm));
+    setStockPage(1);
+  }, []);
+
+  const clearSearchTerms = React.useCallback(() => {
+    setSearchTerms([]);
+    setStockPage(1);
+  }, []);
+
+  const handleStockDateRangeChange = React.useCallback(
+    (range: DateRange | undefined) => {
+      setStockDateRange(range);
+      setStockPage(1);
+    },
+    [],
+  );
+
+  const handleEconeloFilterChange = React.useCallback(
+    (value: EconeloFilterValue) => {
+      setIsEconeloFilter(value);
+      setStockPage(1);
+    },
+    [],
+  );
+
+  const toggleSoldStockSort = React.useCallback(() => {
+    setSoldStockSort((prev) => (prev === "desc" ? "asc" : "desc"));
+    setStockPage(1);
   }, []);
 
   const normalizedSearchTerms = React.useMemo(
@@ -493,13 +595,64 @@ export default function ProductAnalyticsPage() {
   );
 
   React.useEffect(() => {
-    setStockPage(1);
+    const nextParams = new URLSearchParams(searchParamsString);
+    const stockSearchValue = normalizedSearchTerms.join(",");
+    const stockFromValue = formatUrlDateParam(stockDateRange?.from);
+    const stockToValue = formatUrlDateParam(stockDateRange?.to);
+
+    if (stockSearchValue) {
+      nextParams.set(STOCK_SEARCH_URL_KEY, stockSearchValue);
+    } else {
+      nextParams.delete(STOCK_SEARCH_URL_KEY);
+    }
+
+    if (stockFromValue) {
+      nextParams.set(STOCK_FROM_URL_KEY, stockFromValue);
+    } else {
+      nextParams.delete(STOCK_FROM_URL_KEY);
+    }
+
+    if (stockFromValue && stockToValue) {
+      nextParams.set(STOCK_TO_URL_KEY, stockToValue);
+    } else {
+      nextParams.delete(STOCK_TO_URL_KEY);
+    }
+
+    if (isEconeloFilter === "all") {
+      nextParams.delete(STOCK_SCOPE_URL_KEY);
+    } else {
+      nextParams.set(STOCK_SCOPE_URL_KEY, isEconeloFilter);
+    }
+
+    if (soldStockSort === "desc") {
+      nextParams.delete(STOCK_SORT_URL_KEY);
+    } else {
+      nextParams.set(STOCK_SORT_URL_KEY, soldStockSort);
+    }
+
+    if (stockPage <= 1) {
+      nextParams.delete(STOCK_PAGE_URL_KEY);
+    } else {
+      nextParams.set(STOCK_PAGE_URL_KEY, String(stockPage));
+    }
+
+    const nextParamsString = nextParams.toString();
+    if (nextParamsString === searchParamsString) return;
+
+    router.replace(
+      `${pathname}${nextParamsString ? `?${nextParamsString}` : ""}`,
+      { scroll: false },
+    );
   }, [
-    stockSearchParam,
+    isEconeloFilter,
+    normalizedSearchTerms,
+    pathname,
+    router,
+    searchParamsString,
     soldStockSort,
-    stockIsEconeloParam,
     stockDateRange?.from,
     stockDateRange?.to,
+    stockPage,
   ]);
 
   const {
@@ -655,6 +808,7 @@ export default function ProductAnalyticsPage() {
                         ) {
                           event.preventDefault();
                           setSearchTerms((prev) => prev.slice(0, -1));
+                          setStockPage(1);
                         }
                       }}
                       placeholder="Type keyword and press Enter (multiple search)"
@@ -696,7 +850,7 @@ export default function ProductAnalyticsPage() {
                         variant="ghost"
                         size="sm"
                         className="h-7 px-2 text-xs"
-                        onClick={() => setSearchTerms([])}
+                        onClick={clearSearchTerms}
                       >
                         Clear all
                       </Button>
@@ -707,14 +861,12 @@ export default function ProductAnalyticsPage() {
                 <div className="flex w-full flex-col gap-2 md:w-auto md:flex-row md:items-center">
                   <StockDateRangePicker
                     range={stockDateRange}
-                    onRangeChange={setStockDateRange}
+                    onRangeChange={handleStockDateRangeChange}
                   />
 
                   <Select
                     value={isEconeloFilter}
-                    onValueChange={(value: EconeloFilterValue) =>
-                      setIsEconeloFilter(value)
-                    }
+                    onValueChange={handleEconeloFilterChange}
                   >
                     <SelectTrigger className="h-10 w-full rounded-md border border-secondary/40 bg-white shadow-sm transition-colors hover:border-secondary/60 focus:ring-2 focus:ring-secondary/30 md:w-[210px]">
                       <SelectValue placeholder="Filter by brand scope" />
@@ -730,11 +882,7 @@ export default function ProductAnalyticsPage() {
                     type="button"
                     variant="outline"
                     className="h-10 w-full border-secondary/25 bg-white md:w-auto"
-                    onClick={() =>
-                      setSoldStockSort((prev) =>
-                        prev === "desc" ? "asc" : "desc",
-                      )
-                    }
+                    onClick={toggleSoldStockSort}
                   >
                     {soldStockSort === "asc" ? (
                       <ArrowUp className="h-4 w-4" />
@@ -793,11 +941,7 @@ export default function ProductAnalyticsPage() {
                               type="button"
                               variant="ghost"
                               className="ml-auto h-auto px-0 text-right font-medium hover:bg-transparent"
-                              onClick={() =>
-                                setSoldStockSort((prev) =>
-                                  prev === "desc" ? "asc" : "desc",
-                                )
-                              }
+                              onClick={toggleSoldStockSort}
                             >
                               Physical stock
                               {soldStockSort === "asc" ? (

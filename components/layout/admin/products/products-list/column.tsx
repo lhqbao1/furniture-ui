@@ -66,13 +66,18 @@ import { getCarrierLogo } from "@/lib/getCarrierImage";
 import { getProductActivationMissingFields } from "@/lib/product-activation";
 import { CategoryResponse } from "@/types/categories";
 import { CARRIERS, tags as PRODUCT_TAGS } from "@/data/data";
-import { resolveAvailableStockForDisplay } from "@/hooks/calculate_available_stock";
 import EditProductDrawer from "../marketplace/edit-product-drawer";
 import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 import { getIncomingDisplayItems } from "@/lib/product-incoming-stock";
 import ProductStockDialog from "./product-stock-dialog";
 
 const PRESTIGE_OWNER_VALUE = "__PRESTIGE__";
+const RESERVED_ORDER_STATUS_FILTER = [
+  "tock_reserved",
+  "paid",
+  "preparation_shipping",
+  "canceled_no_stock",
+].join(",");
 
 const germanCurrencyFormatter = new Intl.NumberFormat("de-DE", {
   style: "currency",
@@ -87,6 +92,87 @@ const formatGermanCurrency = (value: unknown) => {
 
   return germanCurrencyFormatter.format(numericValue);
 };
+
+const toStockNumber = (value: unknown): number => {
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : 0;
+};
+
+const getPhysicalStockPillClass = (stock: number) =>
+  cn(
+    "rounded-xl px-2 py-1 text-center text-white transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+    stock === 0
+      ? "bg-red-500 text-white"
+      : stock < 10
+        ? "bg-gray-400"
+        : stock <= 20
+          ? "bg-primary"
+          : "bg-secondary",
+  );
+
+function ProductPhysicalStockCell({ product }: { product: ProductItem }) {
+  const physicalStock = toStockNumber(product.stock);
+
+  return (
+    <div className="flex justify-center">
+      <ProductStockDialog product={product}>
+        <button
+          type="button"
+          className={getPhysicalStockPillClass(physicalStock)}
+          aria-label={`View and edit physical stock for ${product.name}`}
+        >
+          {physicalStock} pcs.
+        </button>
+      </ProductStockDialog>
+    </div>
+  );
+}
+
+function ProductReservedStockCell({ product }: { product: ProductItem }) {
+  const locale = useLocale();
+  const reservedStock = toStockNumber(product.result_stock);
+  const productSearchValue = String(product.id_provider ?? "").trim();
+  const canOpenReservedOrders = productSearchValue.length > 0;
+
+  const handleOpenReservedOrders = () => {
+    if (!canOpenReservedOrders) return;
+
+    const params = new URLSearchParams({
+      search: productSearchValue,
+      search_by: "product",
+      status: RESERVED_ORDER_STATUS_FILTER,
+      page: "1",
+    });
+
+    window.open(
+      `/${locale}/admin/orders/list?${params.toString()}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+  };
+
+  return (
+    <div className="flex justify-center">
+      <button
+        type="button"
+        className={cn(
+          "rounded-xl px-2 py-1 text-center text-white transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
+          reservedStock === 0 ? "bg-gray-400" : "bg-amber-500",
+        )}
+        disabled={!canOpenReservedOrders}
+        onClick={handleOpenReservedOrders}
+        aria-label={`View reserved orders for ${product.name}`}
+        title={
+          canOpenReservedOrders
+            ? "View reserved orders"
+            : "Missing product provider ID"
+        }
+      >
+        {reservedStock} pcs.
+      </button>
+    </div>
+  );
+}
 
 const sortByHasValue = (
   rowA: Row<ProductItem>,
@@ -2040,7 +2126,6 @@ export const getProductColumns = (
     cell: ({ row }) => <EditableCategoryCell product={row.original} />,
   },
 
-  // ✅ Cột STOCK — thêm sort server-side logic ở đây
   {
     accessorKey: "stock",
     header: ({ column }) => {
@@ -2049,7 +2134,7 @@ export const getProductColumns = (
       return (
         <Button
           variant="ghost"
-          className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
+          className="mx-auto flex w-fit items-center justify-center gap-1 px-0 font-semibold"
           onClick={() => {
             column.toggleSorting(direction === "asc");
             const nextDirection: "asc" | "desc" =
@@ -2057,7 +2142,7 @@ export const getProductColumns = (
             setSortByStock(nextDirection);
           }}
         >
-          <div>STOCK</div>
+          <div>PHYSICAL STOCK</div>
           <div className="mb-0.5">
             {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
           </div>
@@ -2065,47 +2150,17 @@ export const getProductColumns = (
       );
     },
     cell: ({ row }) => {
-      const stockState = resolveAvailableStockForDisplay(row.original);
-
-      if (stockState.error) {
-        return (
-          <ProductStockDialog product={row.original}>
-            <button
-              type="button"
-              className="rounded-xl bg-red-50 px-2 py-1 text-center text-xs font-semibold text-red-600 transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-              title={stockState.error}
-              aria-label={`Stock data error for ${row.original.name}: ${stockState.error}`}
-            >
-              Stock error
-            </button>
-          </ProductStockDialog>
-        );
-      }
-
-      const computedStock = stockState.value ?? 0;
-
-      return (
-        <ProductStockDialog product={row.original}>
-          <button
-            type="button"
-            className={cn(
-              "rounded-xl px-2 py-1 text-center text-white transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-              computedStock === 0
-                ? "bg-red-500 text-white"
-                : computedStock < 10
-                  ? "bg-gray-400"
-                  : computedStock <= 20
-                    ? "bg-primary"
-                    : "bg-secondary",
-            )}
-            aria-label={`View and edit stock for ${row.original.name}`}
-          >
-            {computedStock} pcs.
-          </button>
-        </ProductStockDialog>
-      );
+      return <ProductPhysicalStockCell product={row.original} />;
     },
     enableSorting: true,
+  },
+
+  {
+    accessorKey: "result_stock",
+    header: () => <div className="w-full text-center">RESERVED STOCK</div>,
+    cell: ({ row }) => {
+      return <ProductReservedStockCell product={row.original} />;
+    },
   },
 
   {

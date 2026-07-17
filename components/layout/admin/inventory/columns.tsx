@@ -243,6 +243,7 @@ function ReservedStockCell({ product }: { product: ProductItem }) {
         onClick={() => {
           const params = new URLSearchParams({
             search: product.id_provider ?? "",
+            search_by: "product",
             status: RESERVED_ORDER_STATUS_FILTER,
             page: "1",
           });
