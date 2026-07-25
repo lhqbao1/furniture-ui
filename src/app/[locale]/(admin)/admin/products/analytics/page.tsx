@@ -58,6 +58,7 @@ const STOCK_TO_URL_KEY = "stock_to";
 const STOCK_SCOPE_URL_KEY = "stock_scope";
 const STOCK_SORT_URL_KEY = "stock_sort";
 const STOCK_PAGE_URL_KEY = "stock_page";
+const STOCK_EXPORT_DEFAULT_PAGE_SIZE = 500;
 
 type SoldStockSort = "asc" | "desc";
 
@@ -205,6 +206,48 @@ const getMinStockValue = (product: ProductAndSoldItem): number | null => {
   }
 
   return toNumber(rawValue);
+};
+
+const getStockProductKey = (
+  product: ProductAndSoldItem,
+): string | undefined => {
+  const candidates = [
+    product.id_provider,
+    product.id,
+    product.sku,
+    product.ean,
+  ];
+
+  for (const candidate of candidates) {
+    if (candidate === null || candidate === undefined) continue;
+
+    const value = String(candidate).trim();
+    if (value) return value;
+  }
+
+  return undefined;
+};
+
+const getUniqueStockProducts = (
+  products: ProductAndSoldItem[],
+): ProductAndSoldItem[] => {
+  const seen = new Set<string>();
+  const uniqueProducts: ProductAndSoldItem[] = [];
+
+  products.forEach((product) => {
+    const key = getStockProductKey(product);
+    if (!key) {
+      uniqueProducts.push(product);
+      return;
+    }
+
+    if (seen.has(key)) return;
+
+    seen.add(key);
+    uniqueProducts.push(product);
+  });
+
+  return uniqueProducts;
 };
 
 const getIncomingDisplayItems = (
@@ -676,31 +719,77 @@ export default function ProductAnalyticsPage() {
         page_size: STOCK_PAGE_SIZE,
       });
 
-      const totalPagesForExport = Math.max(
-        1,
-        firstPage?.pagination?.total_pages ?? 1,
-      );
+      const firstPageItems = firstPage?.items ?? [];
+      const totalItemsForExport =
+        firstPage?.pagination?.total_items ?? firstPageItems.length;
 
-      const exportItems: ProductAndSoldItem[] = [...(firstPage?.items ?? [])];
+      let exportItems: ProductAndSoldItem[] = firstPageItems;
 
-      if (totalPagesForExport > 1) {
-        const pageRequests = Array.from(
-          { length: totalPagesForExport - 1 },
-          (_, index) =>
-            getAllProductAndSold({
-              ...stockQueryParams,
-              page: index + 2,
-              page_size: STOCK_PAGE_SIZE,
-            }),
+      if (totalItemsForExport > STOCK_PAGE_SIZE) {
+        const requestedPageSize = Math.max(
+          STOCK_EXPORT_DEFAULT_PAGE_SIZE,
+          totalItemsForExport,
+        );
+        const allProductsPage = await getAllProductAndSold({
+          ...stockQueryParams,
+          page: 1,
+          page_size: requestedPageSize,
+        });
+
+        exportItems = allProductsPage?.items ?? [];
+
+        const resolvedPageSize = Math.max(
+          1,
+          allProductsPage?.pagination?.page_size ?? requestedPageSize,
+        );
+        const totalPagesForExport = Math.max(
+          1,
+          Math.ceil(totalItemsForExport / resolvedPageSize),
         );
 
-        const pageResponses = await Promise.all(pageRequests);
-        pageResponses.forEach((response) => {
-          exportItems.push(...(response?.items ?? []));
-        });
+        if (exportItems.length < totalItemsForExport && totalPagesForExport > 1) {
+          for (let page = 2; page <= totalPagesForExport; page += 1) {
+            const nextPage = await getAllProductAndSold({
+              ...stockQueryParams,
+              page,
+              page_size: resolvedPageSize,
+            });
+
+            exportItems.push(...(nextPage?.items ?? []));
+          }
+        }
       }
 
-      const exportRows = exportItems.map((product) => ({
+      let uniqueExportItems = getUniqueStockProducts(exportItems);
+
+      if (
+        totalItemsForExport > uniqueExportItems.length &&
+        totalItemsForExport > STOCK_PAGE_SIZE
+      ) {
+        const fallbackItems: ProductAndSoldItem[] = [...firstPageItems];
+        const fallbackTotalPages = Math.max(
+          1,
+          firstPage?.pagination?.total_pages ??
+            Math.ceil(totalItemsForExport / STOCK_PAGE_SIZE),
+        );
+
+        for (let page = 2; page <= fallbackTotalPages; page += 1) {
+          const nextPage = await getAllProductAndSold({
+            ...stockQueryParams,
+            page,
+            page_size: STOCK_PAGE_SIZE,
+          });
+
+          fallbackItems.push(...(nextPage?.items ?? []));
+        }
+
+        uniqueExportItems = getUniqueStockProducts([
+          ...exportItems,
+          ...fallbackItems,
+        ]);
+      }
+
+      const exportRows = uniqueExportItems.map((product) => ({
         "Product ID": String(product.id_provider ?? "-"),
         SKU: product.sku?.trim() || "-",
         Name: product.name?.trim() || "-",
