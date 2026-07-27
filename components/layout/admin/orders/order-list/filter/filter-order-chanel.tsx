@@ -45,6 +45,7 @@ export const CHANEL_OPTIONS = [
   { key: "moebelix", label: "Moebelix", icon: "mobelix.png" },
   { key: "otto", label: "Otto", icon: "otto.png" },
   { key: "rieberg", label: "Rieberg", icon: "reiberg.jpg" },
+  { key: "temu", label: "Temu", icon: "temu.jpg" },
 
   { key: "docmorris", label: "Docmorris", icon: "docmorris.png" },
 ];
