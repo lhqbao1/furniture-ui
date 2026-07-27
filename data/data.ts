@@ -35,7 +35,8 @@ export const affiliateIconConfigs: AffiliateIconConfig[] = [
     code: "GM",
     aliases: ["google merchant", "google merchant center", "merchant center"],
     label: "G",
-    imageUrl: "https://www.google.com/images/branding/product/2x/merchant_center_48dp.png",
+    imageUrl:
+      "https://www.google.com/images/branding/product/2x/merchant_center_48dp.png",
     background: "#eef2ff",
     foreground: "#2563eb",
     ring: "#c7d2fe",
@@ -937,6 +938,11 @@ export const listChanel = [
     id: 23,
     name: "docmorris",
     icon: "docmorris.png",
+  },
+  {
+    id: 25,
+    name: "rieberg",
+    icon: "rieberg.jpg",
   },
 ];
 
