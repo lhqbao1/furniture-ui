@@ -110,6 +110,7 @@ const CHANNEL_OPTIONS = [
   { value: "moebelix", label: "Moebelix" },
   { value: "otto", label: "Otto" },
   { value: "rieberg", label: "Rieberg" },
+  { value: "temu", label: "Temu" },
   { value: "docmorris", label: "Docmorris" },
 ] as const;
 

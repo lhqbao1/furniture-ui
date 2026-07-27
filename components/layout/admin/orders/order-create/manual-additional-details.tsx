@@ -129,6 +129,7 @@ export default function ManualAdditionalInformation({
         { value: "otto", label: "Otto" },
         { value: "docmorris", label: "Docmorris" },
         { value: "rieberg", label: "Rieberg" },
+        { value: "temu", label: "Temu" },
       ].sort((a, b) =>
         a.label.localeCompare(b.label, undefined, { sensitivity: "base" }),
       ),
