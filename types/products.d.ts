@@ -209,6 +209,7 @@ export type ProductItem = {
   tax: string;
   collection?: string | null;
   stock: number;
+  available_stock?: number | string | null;
   result_stock?: number;
   computed_stock?: number | string | null;
   incomming_stock?: number;

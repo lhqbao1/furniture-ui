@@ -107,6 +107,14 @@ const PRESET_BY_MARKETPLACE: Record<
     invoice_postal_code: "22179",
     invoice_country: "DE",
   },
+  rieberg: {
+    company_name: "RIEBERG Brand Factory 1971 GmbH",
+    tax_id: "DE234420910",
+    invoice_address: "Lange Straße 21",
+    invoice_city: "Anröchte",
+    invoice_postal_code: "59609",
+    invoice_country: "DE",
+  },
 };
 
 export function useManualCheckoutLogic(

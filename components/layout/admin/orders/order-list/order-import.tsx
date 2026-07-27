@@ -109,6 +109,7 @@ const CHANNEL_OPTIONS = [
   { value: "prestige", label: "Prestige Home" },
   { value: "moebelix", label: "Moebelix" },
   { value: "otto", label: "Otto" },
+  { value: "rieberg", label: "Rieberg" },
   { value: "docmorris", label: "Docmorris" },
 ] as const;
 
@@ -208,6 +209,14 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
     invoice_city: "Heerlen",
     invoice_postal_code: "6422 RA",
     invoice_country: "NL",
+  },
+  rieberg: {
+    company_name: "RIEBERG Brand Factory 1971 GmbH",
+    tax_id: "DE234420910",
+    invoice_address: "Lange Straße 21",
+    invoice_city: "Anröchte",
+    invoice_postal_code: "59609",
+    invoice_country: "DE",
   },
   // thêm sau nếu cần:
   praktiker: null,

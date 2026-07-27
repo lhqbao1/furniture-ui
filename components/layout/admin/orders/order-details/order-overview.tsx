@@ -165,6 +165,14 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplaceInvoicePreset> = {
     invoice_postal_code: "22179",
     invoice_country: "DE",
   },
+  rieberg: {
+    company_name: "RIEBERG Brand Factory 1971 GmbH",
+    tax_id: "DE234420910",
+    invoice_address: "Lange Straße 21",
+    invoice_city: "Anröchte",
+    invoice_postal_code: "59609",
+    invoice_country: "DE",
+  },
 };
 
 const normalizeChannelValue = (value?: string | null) =>
@@ -191,7 +199,9 @@ const getMarketplacePreset = (value?: string | null) => {
   )?.[1];
 };
 
-const mapPresetToInvoiceAddressPayload = (preset: MarketplaceInvoicePreset) => ({
+const mapPresetToInvoiceAddressPayload = (
+  preset: MarketplaceInvoicePreset,
+) => ({
   address_line: preset.invoice_address,
   city: preset.invoice_city,
   country: preset.invoice_country,
@@ -391,10 +401,7 @@ const OrderDetailOverView = ({
               aria-label="Edit external reference"
               className="size-7 text-primary hover:bg-primary/10 hover:text-primary"
               onClick={() =>
-                openOrderFieldDialog(
-                  "ext_reference",
-                  order.netto_buyer_id,
-                )
+                openOrderFieldDialog("ext_reference", order.netto_buyer_id)
               }
             >
               <Pencil className="size-3.5" />
@@ -601,9 +608,7 @@ const OrderDetailOverView = ({
 
           <Input
             value={editableOrderFieldValue}
-            onChange={(event) =>
-              setEditableOrderFieldValue(event.target.value)
-            }
+            onChange={(event) => setEditableOrderFieldValue(event.target.value)}
             placeholder={
               editableOrderField
                 ? EDITABLE_ORDER_FIELD_CONFIG[editableOrderField].label

@@ -128,6 +128,7 @@ export default function ManualAdditionalInformation({
         { value: "moebelix", label: "Moebelix" },
         { value: "otto", label: "Otto" },
         { value: "docmorris", label: "Docmorris" },
+        { value: "rieberg", label: "Rieberg" },
       ].sort((a, b) =>
         a.label.localeCompare(b.label, undefined, { sensitivity: "base" }),
       ),

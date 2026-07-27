@@ -170,6 +170,11 @@ export function AdminSideBar() {
           icon: CornerDownRight,
         },
         {
+          title: "File Manager",
+          url: "/admin/crm/file-manager",
+          icon: CornerDownRight,
+        },
+        {
           title: "DS Prices",
           url: "/admin/crm/ds/list",
           icon: CornerDownRight,
