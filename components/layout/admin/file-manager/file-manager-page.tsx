@@ -150,6 +150,69 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
+function getPreviewType(node: FileNode) {
+  if (node.type !== "FILE" || !node.storage_key) return "none";
+
+  const source = `${node.name} ${node.storage_key}`.toLowerCase();
+  if (/\.(png|jpe?g|gif|webp|svg)(\?|#|$)/.test(source)) return "image";
+  if (/\.pdf(\?|#|$)/.test(source)) return "pdf";
+
+  return "file";
+}
+
+function FileNodePreview({ node }: { node: FileNode }) {
+  const previewType = getPreviewType(node);
+
+  if (node.type !== "FILE") {
+    return (
+      <div className="rounded-lg border border-amber-100 bg-amber-50/60 p-4 text-sm text-amber-800">
+        Open this folder to view its contents.
+      </div>
+    );
+  }
+
+  if (!node.storage_key) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+        This file has no storage key.
+      </div>
+    );
+  }
+
+  if (previewType === "file") {
+    return (
+      <div className="flex min-h-[180px] flex-col items-center justify-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
+        <FileIcon className="size-10 text-sky-500" />
+        <div>
+          <div className="font-semibold text-slate-900">Preview unavailable</div>
+          <div className="mt-1 text-sm text-slate-500">
+            Open the file in a new tab to review it.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+      <div className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase text-slate-500">
+        Preview
+      </div>
+      <object
+        data={node.storage_key}
+        type={previewType === "pdf" ? "application/pdf" : undefined}
+        className="h-[260px] w-full bg-white"
+        aria-label={`Preview ${node.name}`}
+      >
+        <div className="flex h-[260px] flex-col items-center justify-center gap-2 p-4 text-center text-sm text-slate-500">
+          <FileIcon className="size-9 text-sky-500" />
+          Preview could not be loaded in this panel.
+        </div>
+      </object>
+    </div>
+  );
+}
+
 function FolderTreeNode({
   node,
   level,
@@ -303,10 +366,14 @@ export function FileManagerPage() {
       ),
     [moveBrowserItemsQuery.data, moveNodeTarget?.id],
   );
+  const selectedNodeFromList =
+    folderItems.find((node) => node.id === selectedNodeId) ?? null;
   const selectedNode =
-    selectedNodeQuery.data ??
-    folderItems.find((node) => node.id === selectedNodeId) ??
-    null;
+    selectedNodeQuery.data ?? selectedNodeFromList ?? null;
+  const shouldShowDetailLoading =
+    Boolean(selectedNodeId) && selectedNodeQuery.isLoading && !selectedNodeFromList;
+  const shouldShowDetailError =
+    Boolean(selectedNodeId) && selectedNodeQuery.isError && !selectedNodeFromList;
 
   const filteredItems = useMemo(() => {
     const keyword = searchValue.trim().toLowerCase();
@@ -616,20 +683,20 @@ export function FileManagerPage() {
           <div className="flex flex-wrap items-center gap-1 border-b border-slate-200 bg-slate-50 px-3 py-2">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={() => setNewFolderOpen(true)}
-              className="h-9 px-3"
+              className="h-9 border-emerald-200 bg-emerald-50 px-3 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800"
             >
               <Plus className="size-4" />
               New folder
             </Button>
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={() => setUploadOpen(true)}
-              className="h-9 px-3"
+              className="h-9 border-sky-200 bg-sky-50 px-3 text-sky-700 hover:bg-sky-100 hover:text-sky-800"
             >
               <Upload className="size-4" />
               Upload
@@ -637,11 +704,11 @@ export function FileManagerPage() {
             <Separator orientation="vertical" className="mx-1 h-7" />
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
               disabled={!selectedNode}
               onClick={openSelectedNode}
-              className="h-9 px-3"
+              className="h-9 border-indigo-200 bg-indigo-50 px-3 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800 disabled:opacity-50"
             >
               {selectedNode?.type === "FILE" ? (
                 <ExternalLink className="size-4" />
@@ -652,33 +719,44 @@ export function FileManagerPage() {
             </Button>
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
               disabled={!selectedNode}
               onClick={() => selectedNode && openRenameDialog(selectedNode)}
-              className="h-9 px-3"
+              className="h-9 border-amber-200 bg-amber-50 px-3 text-amber-700 hover:bg-amber-100 hover:text-amber-800 disabled:opacity-50"
             >
               <Pencil className="size-4" />
               Rename
             </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={!selectedNode}
+                    onClick={() => selectedNode && openMoveDialog(selectedNode)}
+                    className="h-9 border-orange-200 bg-orange-50 px-3 text-orange-700 hover:bg-orange-100 hover:text-orange-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <MoveRight className="size-4" />
+                    Move
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                {selectedNode
+                  ? "Move selected file or folder"
+                  : "Select a file or folder before moving"}
+              </TooltipContent>
+            </Tooltip>
             <Button
               type="button"
-              variant="ghost"
-              size="sm"
-              disabled={!selectedNode}
-              onClick={() => selectedNode && openMoveDialog(selectedNode)}
-              className="h-9 px-3"
-            >
-              <MoveRight className="size-4" />
-              Move
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
               disabled={!selectedNode}
               onClick={() => selectedNode && setDeleteNodeTarget(selectedNode)}
-              className="h-9 px-3 text-red-600 hover:text-red-700"
+              className="h-9 border-red-200 bg-red-50 px-3 text-red-600 hover:bg-red-100 hover:text-red-700 disabled:opacity-50"
             >
               <Trash2 className="size-4" />
               Delete
@@ -688,11 +766,11 @@ export function FileManagerPage() {
                 <TooltipTrigger asChild>
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     size="icon"
                     onClick={() => folderItemsQuery.refetch()}
                     disabled={folderItemsQuery.isFetching}
-                    className="size-9"
+                    className="size-9 border-slate-200 bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"
                   >
                     <RefreshCw
                       className={cn(
@@ -1046,7 +1124,7 @@ export function FileManagerPage() {
               </div>
 
               <div className="h-[676px] overflow-y-auto p-4">
-                {selectedNodeId && selectedNodeQuery.isLoading ? (
+                {shouldShowDetailLoading ? (
                   <div className="space-y-4">
                     <Skeleton className="h-12 w-12 rounded-md" />
                     <Skeleton className="h-6 w-2/3" />
@@ -1062,7 +1140,7 @@ export function FileManagerPage() {
                   </div>
                 ) : null}
 
-                {selectedNodeId && selectedNodeQuery.isError ? (
+                {shouldShowDetailError ? (
                   <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
                     <Database className="size-10 text-red-400" />
                     <div>
@@ -1082,7 +1160,7 @@ export function FileManagerPage() {
                   </div>
                 ) : null}
 
-                {selectedNode && !selectedNodeQuery.isLoading ? (
+                {selectedNode && !shouldShowDetailLoading ? (
                   <div className="space-y-5">
                     <div className="flex flex-col items-center gap-3 text-center">
                       <div
@@ -1108,6 +1186,8 @@ export function FileManagerPage() {
                         </div>
                       </div>
                     </div>
+
+                    <FileNodePreview node={selectedNode} />
 
                     <Separator />
 
