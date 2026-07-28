@@ -16,12 +16,21 @@ type NormalizedIncomingInventoryItem = {
 };
 
 const normalizeFutureIncomingInventory = (
-  inventory: IncomingInventoryItem[],
+  inventory:
+    | IncomingInventoryItem[]
+    | IncomingInventoryItem
+    | null
+    | undefined,
 ): NormalizedIncomingInventoryItem[] => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const inventoryItems = Array.isArray(inventory)
+    ? inventory
+    : inventory
+      ? [inventory]
+      : [];
 
-  const normalized = (inventory ?? []).flatMap((item) => {
+  const normalized = inventoryItems.flatMap((item) => {
     const quantity = Number(item?.quantity ?? 0);
     if (!Number.isFinite(quantity) || quantity <= 0) return [];
     if (!item?.list_delivery_date) return [];
@@ -39,7 +48,13 @@ const normalizeFutureIncomingInventory = (
   return normalized.sort((a, b) => a.date.getTime() - b.date.getTime());
 };
 
-export function getLatestInventory(inventory: IncomingInventoryItem[]) {
+export function getLatestInventory(
+  inventory:
+    | IncomingInventoryItem[]
+    | IncomingInventoryItem
+    | null
+    | undefined,
+) {
   const futureItems = normalizeFutureIncomingInventory(inventory);
   if (futureItems.length === 0) return null;
 
@@ -47,7 +62,11 @@ export function getLatestInventory(inventory: IncomingInventoryItem[]) {
 }
 
 export function getIncomingDateForRequiredQuantity(
-  inventory: IncomingInventoryItem[],
+  inventory:
+    | IncomingInventoryItem[]
+    | IncomingInventoryItem
+    | null
+    | undefined,
   requiredQuantity: number,
 ): Date | null {
   const futureItems = normalizeFutureIncomingInventory(inventory);
@@ -138,7 +157,7 @@ export function calculateProductDeliveryRange(
   const isBundleProduct = (product.bundles?.length ?? 0) > 0;
 
   const incomingInventorySource =
-    Array.isArray(options.inventoryPo) && options.inventoryPo.length > 0
+    options.inventoryPo !== null && options.inventoryPo !== undefined
       ? options.inventoryPo
       : product.inventory_pos ?? [];
 
