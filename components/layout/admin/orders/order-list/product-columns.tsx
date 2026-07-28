@@ -10,6 +10,11 @@ import { Link } from "@/src/i18n/navigation";
 import { calculateProductVAT } from "@/lib/caculate-vat";
 import OrderProductEditDrawer from "./order-product-edit-drawer";
 
+const toStockNumber = (value: unknown) => {
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : 0;
+};
+
 export const orderListExpandColumns = (
   supplier_name: string | null,
   country?: string,
@@ -209,20 +214,11 @@ export const orderListExpandColumns = (
       return <div className="text-center">STOCK LEFT</div>;
     },
     cell: ({ row }) => {
-      const availableStock = Number(row.original.products?.available_stock);
+      const stock = toStockNumber(row.original.products?.stock);
+      const resultStock = toStockNumber(row.original.products?.result_stock);
+      const stockLeft = stock - resultStock;
 
-      if (!Number.isFinite(availableStock)) {
-        return (
-          <div
-            className="mx-auto w-fit rounded-xl bg-red-50 px-2 py-1 text-center text-xs font-semibold text-red-600"
-            title="Missing available_stock"
-          >
-            Stock error
-          </div>
-        );
-      }
-
-      return <div className="text-center">{availableStock} pcs.</div>;
+      return <div className="text-center">{stockLeft} pcs.</div>;
     },
   },
 
