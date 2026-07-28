@@ -1,4 +1,4 @@
-import { apiAdmin } from "@/lib/axios";
+import { apiAdmin, apiPublic } from "@/lib/axios";
 import {
   CreateFileNodeInput,
   FileNode,
@@ -6,6 +6,7 @@ import {
   MoveFileNodeInput,
   UpdateFileNodeInput,
 } from "@/types/file-manager";
+import { StaticFileResponse } from "@/types/products";
 
 const FOLDER_API_PATH = "/folder";
 
@@ -55,4 +56,14 @@ export async function getFolderItems(params: GetFolderItemsParams = {}) {
   });
 
   return data as FileNode[];
+}
+
+export async function uploadFileManagerFiles(file: FormData) {
+  const { data } = await apiPublic.post("/static/upload", file, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return data as StaticFileResponse;
 }

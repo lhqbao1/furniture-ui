@@ -5,6 +5,7 @@ import {
   getFileNode,
   getFolderItems,
   moveFileNode,
+  uploadFileManagerFiles,
   updateFileNode,
 } from "./api";
 import {
@@ -99,5 +100,11 @@ export function useDeleteFileNode() {
       queryClient.invalidateQueries({ queryKey: fileManagerKeys.lists() });
       queryClient.removeQueries({ queryKey: fileManagerKeys.detail(nodeId) });
     },
+  });
+}
+
+export function useUploadFileManagerFiles() {
+  return useMutation({
+    mutationFn: (file: FormData) => uploadFileManagerFiles(file),
   });
 }

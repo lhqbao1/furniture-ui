@@ -1,7 +1,7 @@
 // hooks/checkout/useCheckoutSubmit.ts
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useAtom } from "jotai";
@@ -59,6 +59,36 @@ const calculateCheckoutDeliveryRange = (cartData: CartResponse) => {
   return { from, to };
 };
 
+const normalizeCheckoutCartResponse = (value: unknown): CartResponse => {
+  if (Array.isArray(value)) return value as CartResponse;
+
+  if (!value || typeof value !== "object") return [];
+
+  const response = value as {
+    items?: unknown;
+    data?: unknown;
+    results?: unknown;
+  };
+
+  if (Array.isArray(response.items)) {
+    const firstItem = response.items[0];
+    if (
+      firstItem &&
+      typeof firstItem === "object" &&
+      Array.isArray((firstItem as { items?: unknown }).items)
+    ) {
+      return response.items as CartResponse;
+    }
+
+    return [response as unknown as CartResponse[number]];
+  }
+
+  if (Array.isArray(response.data)) return response.data as CartResponse;
+  if (Array.isArray(response.results)) return response.results as CartResponse;
+
+  return [];
+};
+
 const calculateAffiliateOrderNetAmount = ({
   items,
   shippingGross,
@@ -114,15 +144,11 @@ const calculateAffiliateOrderNetAmount = ({
 };
 
 export function useCheckoutSubmit({
-  form,
   user,
   addresses,
   invoiceAddress,
   cartItems,
-  localCart,
   shippingCost,
-  locale,
-  currentUserId,
 }: {
   form: UseFormReturn<CreateOrderFormValues>; // form RHF
   user: User | undefined; // user login hoặc guest
@@ -136,11 +162,11 @@ export function useCheckoutSubmit({
 }) {
   const t = useTranslations();
   const [userLoginId, setUserLoginId] = useAtom(userIdAtom);
-  const [userGuestId, setUserGuestId] = useAtom(userIdGuestAtom);
+  const [, setUserGuestId] = useAtom(userIdGuestAtom);
 
-  const [paymentId, setPaymentId] = useAtom(paymentIdAtom);
-  const [checkoutId, setCheckoutId] = useAtom(checkOutIdAtom);
-  const [voucherId, setVoucherId] = useAtom(currentVoucherAtom);
+  const [, setPaymentId] = useAtom(paymentIdAtom);
+  const [, setCheckoutId] = useAtom(checkOutIdAtom);
+  const [, setVoucherId] = useAtom(currentVoucherAtom);
 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
@@ -160,17 +186,29 @@ export function useCheckoutSubmit({
   const createShipping = useCreateAddress();
   const syncLocalCart = useSyncLocalCartCheckOut();
   const trackAffiliateOrder = useTrackAffiliateOrder();
+  const checkoutInFlightRef = useRef(false);
+  const otpInFlightRef = useRef(false);
+  const [checkoutPending, setCheckoutPending] = useState(false);
+  const [otpPending, setOtpPending] = useState(false);
 
   const submitting =
+    checkoutPending ||
+    otpPending ||
     createCheckOut.isPending ||
     createInvoice.isPending ||
+    updateInvoice.isPending ||
     createPayment.isPending ||
     createShipping.isPending ||
     createUser.isPending ||
+    syncLocalCart.isPending ||
     trackAffiliateOrder.isPending;
 
   const handleSubmit = useCallback(
     async (data: CreateOrderFormValues) => {
+      if (checkoutInFlightRef.current) return;
+
+      checkoutInFlightRef.current = true;
+      setCheckoutPending(true);
       let cleanupNeeded = false;
 
       try {
@@ -209,11 +247,13 @@ export function useCheckoutSubmit({
           });
         }
 
-        cartData = await getCartByUserId(finalUserId ?? "");
+        cartData = normalizeCheckoutCartResponse(
+          await getCartByUserId(finalUserId ?? ""),
+        );
         const deliveryRange = calculateCheckoutDeliveryRange(cartData);
 
         const normalized = normalizeCartItems(
-          cartData.flatMap((g) => g.items),
+          cartData.flatMap((g) => g?.items ?? []),
           true,
         );
 
@@ -386,6 +426,9 @@ export function useCheckoutSubmit({
           // localStorage.removeItem("userIdGuest");
           // localStorage.removeItem("access_token");
         }
+
+        checkoutInFlightRef.current = false;
+        setCheckoutPending(false);
       }
     },
     [
@@ -393,11 +436,22 @@ export function useCheckoutSubmit({
       addresses,
       invoiceAddress,
       cartItems,
-      localCart,
       shippingCost,
-      locale,
       userLoginId,
+      createCheckOut,
+      createInvoice,
+      createPayment,
+      createShipping,
+      createUser,
+      setCheckoutId,
+      setPaymentId,
+      setUserGuestId,
+      setUserLoginId,
+      setVoucherId,
+      syncLocalCart,
+      t,
       trackAffiliateOrder,
+      updateInvoice,
     ],
   );
 
@@ -406,6 +460,11 @@ export function useCheckoutSubmit({
   // =====================================================================================
   const handleOTP = useCallback(
     async (data: CreateOrderFormValues) => {
+      if (otpInFlightRef.current || checkoutInFlightRef.current) return;
+
+      otpInFlightRef.current = true;
+      setOtpPending(true);
+
       try {
         const isDifferentEmail = user?.email && user.email !== data.email;
 
@@ -423,6 +482,9 @@ export function useCheckoutSubmit({
       } catch (err) {
         console.error(err);
         toast.error(t("orderFail"));
+      } finally {
+        otpInFlightRef.current = false;
+        setOtpPending(false);
       }
     },
     [user, userLoginId, handleSubmit, t],
