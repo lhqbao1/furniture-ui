@@ -1,11 +1,12 @@
 "use client";
 
 import { CartFormValues } from "@/lib/schema/cart";
+import { slugify } from "@/lib/slugify";
 import { useRouter } from "@/src/i18n/navigation";
 import { ProductGroupDetailResponse } from "@/types/product-group";
 import { ProductItem } from "@/types/products";
 import { VariantOptionsResponse } from "@/types/variant";
-import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
@@ -24,7 +25,21 @@ const ListVariant = ({
   const { control, setValue } = useFormContext<CartFormValues>();
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const router = useRouter();
+  const locale = useLocale();
   const normalizeId = (value: unknown) => String(value ?? "");
+  const getProductSlug = (product: ProductItem) => {
+    const urlKey = product.url_key?.trim();
+    if (urlKey) return urlKey;
+
+    const productName = product.name?.trim();
+    const idProvider = product.id_provider?.trim();
+
+    if (productName && idProvider) {
+      return `${slugify(productName)}-${idProvider}`;
+    }
+
+    return "";
+  };
 
   useEffect(() => {
     if (!currentProduct?.options?.length) return;
@@ -68,9 +83,13 @@ const ListVariant = ({
       );
     });
 
-    if (matchedProduct?.url_key) {
+    const matchedProductSlug = matchedProduct
+      ? getProductSlug(matchedProduct)
+      : "";
+
+    if (matchedProductSlug) {
       setTimeout(() => {
-        router.push(`/product/${matchedProduct.url_key}`);
+        router.push(`/product/${matchedProductSlug}`, { locale });
       }, 0);
       return;
     }
