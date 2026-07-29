@@ -1,16 +1,9 @@
 "use client";
 
-import {
-  ChangeEvent,
-  DragEvent,
-  FormEvent,
-  useMemo,
-  useState,
-} from "react";
+import { ChangeEvent, DragEvent, FormEvent, useMemo, useState } from "react";
 import { format } from "date-fns";
 import {
   ArrowUp,
-  Check,
   ChevronDown,
   ChevronRight,
   Copy,
@@ -62,7 +55,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   useCreateFileNode,
   useDeleteFileNode,
@@ -80,6 +77,11 @@ const EMPTY_FILE_NODES: FileNode[] = [];
 
 type MoveDestination = {
   id: string | null;
+  name: string;
+};
+
+type UploadFileDraft = {
+  file: File;
   name: string;
 };
 
@@ -110,6 +112,10 @@ function formatBytes(value: number) {
 function normalizeValue(value?: string | null) {
   const trimmed = value?.trim();
   return trimmed ? trimmed : null;
+}
+
+function getDefaultUploadName(file: File) {
+  return normalizeValue(file.name) ?? "Untitled file";
 }
 
 function sanitizeUploadFile(file: File) {
@@ -184,7 +190,9 @@ function FileNodePreview({ node }: { node: FileNode }) {
       <div className="flex min-h-[180px] flex-col items-center justify-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
         <FileIcon className="size-10 text-sky-500" />
         <div>
-          <div className="font-semibold text-slate-900">Preview unavailable</div>
+          <div className="font-semibold text-slate-900">
+            Preview unavailable
+          </div>
           <div className="mt-1 text-sm text-slate-500">
             Open the file in a new tab to review it.
           </div>
@@ -308,7 +316,7 @@ export function FileManagerPage() {
   const [newFolderName, setNewFolderName] = useState("");
 
   const [uploadOpen, setUploadOpen] = useState(false);
-  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [uploadFiles, setUploadFiles] = useState<UploadFileDraft[]>([]);
   const [isUploadDropActive, setIsUploadDropActive] = useState(false);
 
   const [renameNode, setRenameNode] = useState<FileNode | null>(null);
@@ -366,14 +374,22 @@ export function FileManagerPage() {
       ),
     [moveBrowserItemsQuery.data, moveNodeTarget?.id],
   );
+  const currentFolderNode = breadcrumbs.at(-1) ?? null;
   const selectedNodeFromList =
     folderItems.find((node) => node.id === selectedNodeId) ?? null;
-  const selectedNode =
-    selectedNodeQuery.data ?? selectedNodeFromList ?? null;
+  const selectedNodeFromCurrentFolder =
+    currentFolderNode?.id === selectedNodeId ? currentFolderNode : null;
+  const selectedNodeFallback =
+    selectedNodeFromList ?? selectedNodeFromCurrentFolder;
+  const selectedNode = selectedNodeQuery.data ?? selectedNodeFallback ?? null;
   const shouldShowDetailLoading =
-    Boolean(selectedNodeId) && selectedNodeQuery.isLoading && !selectedNodeFromList;
+    Boolean(selectedNodeId) &&
+    selectedNodeQuery.isLoading &&
+    !selectedNodeFallback;
   const shouldShowDetailError =
-    Boolean(selectedNodeId) && selectedNodeQuery.isError && !selectedNodeFromList;
+    Boolean(selectedNodeId) &&
+    selectedNodeQuery.isError &&
+    !selectedNodeFallback;
 
   const filteredItems = useMemo(() => {
     const keyword = searchValue.trim().toLowerCase();
@@ -387,8 +403,29 @@ export function FileManagerPage() {
   }, [folderItems, searchValue]);
 
   const currentFolderName = breadcrumbs.at(-1)?.name ?? "Root";
-  const moveBrowserFolderName = moveBrowserBreadcrumbs.at(-1)?.name ?? "Root";
-  const folderCount = folderItems.filter((node) => node.type === "FOLDER").length;
+  const getParentName = (node: FileNode) => {
+    if (!node.parent_id) return "Root";
+
+    const breadcrumbIndex = breadcrumbs.findIndex(
+      (breadcrumb) => breadcrumb.id === node.id,
+    );
+    if (breadcrumbIndex > 0) {
+      return breadcrumbs[breadcrumbIndex - 1]?.name ?? "Root";
+    }
+
+    if (currentFolderId === node.parent_id) return currentFolderName;
+
+    return (
+      breadcrumbs.find((breadcrumb) => breadcrumb.id === node.parent_id)
+        ?.name ??
+      folderItems.find((item) => item.id === node.parent_id)?.name ??
+      rootFolders.find((folder) => folder.id === node.parent_id)?.name ??
+      EMPTY_VALUE
+    );
+  };
+  const folderCount = folderItems.filter(
+    (node) => node.type === "FOLDER",
+  ).length;
   const fileCount = folderItems.filter((node) => node.type === "FILE").length;
   const isCreatingFolder = createFileNodeMutation.isPending;
   const isUploading =
@@ -397,12 +434,15 @@ export function FileManagerPage() {
   const isMoving = moveFileNodeMutation.isPending;
   const isDeleting = deleteFileNodeMutation.isPending;
 
-  const openFolder = (node: FileNode, nextBreadcrumbs = [...breadcrumbs, node]) => {
+  const openFolder = (
+    node: FileNode,
+    nextBreadcrumbs = [...breadcrumbs, node],
+  ) => {
     if (node.type !== "FOLDER") return;
 
     setCurrentFolderId(node.id);
     setBreadcrumbs(nextBreadcrumbs);
-    setSelectedNodeId(null);
+    setSelectedNodeId(node.id);
     setSearchValue("");
   };
 
@@ -416,7 +456,7 @@ export function FileManagerPage() {
   const navigateToBreadcrumb = (node: FileNode, index: number) => {
     setCurrentFolderId(node.id);
     setBreadcrumbs((current) => current.slice(0, index + 1));
-    setSelectedNodeId(null);
+    setSelectedNodeId(node.id);
     setSearchValue("");
   };
 
@@ -432,23 +472,26 @@ export function FileManagerPage() {
     const parent = nextBreadcrumbs.at(-1);
     setCurrentFolderId(parent?.id ?? null);
     setBreadcrumbs(nextBreadcrumbs);
-    setSelectedNodeId(null);
+    setSelectedNodeId(parent?.id ?? null);
     setSearchValue("");
   };
 
   const navigateMoveBrowserToRoot = () => {
     setMoveBrowserFolderId(null);
     setMoveBrowserBreadcrumbs([]);
+    setMoveDestination({ id: null, name: "Root" });
   };
 
   const navigateMoveBrowserToFolder = (node: FileNode, path?: FileNode[]) => {
     setMoveBrowserFolderId(node.id);
     setMoveBrowserBreadcrumbs(path ?? [...moveBrowserBreadcrumbs, node]);
+    setMoveDestination({ id: node.id, name: node.name });
   };
 
   const navigateMoveBrowserToBreadcrumb = (node: FileNode, index: number) => {
     setMoveBrowserFolderId(node.id);
     setMoveBrowserBreadcrumbs((current) => current.slice(0, index + 1));
+    setMoveDestination({ id: node.id, name: node.name });
   };
 
   const selectMoveDestination = (destination: MoveDestination) => {
@@ -513,11 +556,27 @@ export function FileManagerPage() {
   const handleUploadFileList = (fileList?: FileList | null) => {
     if (!fileList?.length) return;
 
-    setUploadFiles((current) => [...current, ...Array.from(fileList)]);
+    setUploadFiles((current) => [
+      ...current,
+      ...Array.from(fileList).map((file) => ({
+        file,
+        name: getDefaultUploadName(file),
+      })),
+    ]);
+  };
+
+  const updateUploadFileName = (index: number, name: string) => {
+    setUploadFiles((current) =>
+      current.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, name } : item,
+      ),
+    );
   };
 
   const removeUploadFile = (index: number) => {
-    setUploadFiles((current) => current.filter((_, itemIndex) => itemIndex !== index));
+    setUploadFiles((current) =>
+      current.filter((_, itemIndex) => itemIndex !== index),
+    );
   };
 
   const resetUploadDialog = () => {
@@ -542,8 +601,15 @@ export function FileManagerPage() {
       return;
     }
 
+    if (uploadFiles.some((item) => !normalizeValue(item.name))) {
+      toast.error("File name is required");
+      return;
+    }
+
     const formData = new FormData();
-    const sanitizedFiles = uploadFiles.map(sanitizeUploadFile);
+    const sanitizedFiles = uploadFiles.map((item) =>
+      sanitizeUploadFile(item.file),
+    );
     sanitizedFiles.forEach((file) => formData.append("files", file));
 
     try {
@@ -559,6 +625,7 @@ export function FileManagerPage() {
         uploadedFiles.map((file, index) =>
           createFileNodeMutation.mutateAsync({
             name:
+              normalizeValue(uploadFiles[index]?.name) ??
               normalizeValue(file.filename) ??
               sanitizedFiles[index]?.name ??
               `Uploaded file ${index + 1}`,
@@ -640,9 +707,22 @@ export function FileManagerPage() {
     deleteFileNodeMutation.mutate(deleteNodeTarget.id, {
       onSuccess: () => {
         toast.success("Node deleted");
-        if (selectedNodeId === deleteNodeTarget.id) {
+        const deletedBreadcrumbIndex = breadcrumbs.findIndex(
+          (node) => node.id === deleteNodeTarget.id,
+        );
+
+        if (deletedBreadcrumbIndex >= 0) {
+          const nextBreadcrumbs = breadcrumbs.slice(0, deletedBreadcrumbIndex);
+          const parent = nextBreadcrumbs.at(-1) ?? null;
+
+          setCurrentFolderId(parent?.id ?? null);
+          setBreadcrumbs(nextBreadcrumbs);
+          setSelectedNodeId(parent?.id ?? null);
+          setSearchValue("");
+        } else if (selectedNodeId === deleteNodeTarget.id) {
           setSelectedNodeId(null);
         }
+
         setDeleteNodeTarget(null);
       },
       onError: () => toast.error("Could not delete file node"),
@@ -701,66 +781,61 @@ export function FileManagerPage() {
               <Upload className="size-4" />
               Upload
             </Button>
-            <Separator orientation="vertical" className="mx-1 h-7" />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={!selectedNode}
-              onClick={openSelectedNode}
-              className="h-9 border-indigo-200 bg-indigo-50 px-3 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800 disabled:opacity-50"
-            >
-              {selectedNode?.type === "FILE" ? (
-                <ExternalLink className="size-4" />
-              ) : (
-                <FolderOpen className="size-4" />
-              )}
-              Open
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={!selectedNode}
-              onClick={() => selectedNode && openRenameDialog(selectedNode)}
-              className="h-9 border-amber-200 bg-amber-50 px-3 text-amber-700 hover:bg-amber-100 hover:text-amber-800 disabled:opacity-50"
-            >
-              <Pencil className="size-4" />
-              Rename
-            </Button>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="inline-flex">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={!selectedNode}
-                    onClick={() => selectedNode && openMoveDialog(selectedNode)}
-                    className="h-9 border-orange-200 bg-orange-50 px-3 text-orange-700 hover:bg-orange-100 hover:text-orange-800 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <MoveRight className="size-4" />
-                    Move
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                {selectedNode
-                  ? "Move selected file or folder"
-                  : "Select a file or folder before moving"}
-              </TooltipContent>
-            </Tooltip>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={!selectedNode}
-              onClick={() => selectedNode && setDeleteNodeTarget(selectedNode)}
-              className="h-9 border-red-200 bg-red-50 px-3 text-red-600 hover:bg-red-100 hover:text-red-700 disabled:opacity-50"
-            >
-              <Trash2 className="size-4" />
-              Delete
-            </Button>
+            {!selectedNode ? (
+              <>
+                <Separator orientation="vertical" className="mx-1 h-7" />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled
+                  onClick={openSelectedNode}
+                  className="h-9 border-indigo-200 bg-indigo-50 px-3 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800 disabled:opacity-50"
+                >
+                  <FolderOpen className="size-4" />
+                  Open
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled
+                  className="h-9 border-amber-200 bg-amber-50 px-3 text-amber-700 hover:bg-amber-100 hover:text-amber-800 disabled:opacity-50"
+                >
+                  <Pencil className="size-4" />
+                  Rename
+                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled
+                        className="h-9 border-orange-200 bg-orange-50 px-3 text-orange-700 hover:bg-orange-100 hover:text-orange-800 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <MoveRight className="size-4" />
+                        Move
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Select a file or folder before moving
+                  </TooltipContent>
+                </Tooltip>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled
+                  className="h-9 border-red-200 bg-red-50 px-3 text-red-600 hover:bg-red-100 hover:text-red-700 disabled:opacity-50"
+                >
+                  <Trash2 className="size-4" />
+                  Delete
+                </Button>
+              </>
+            ) : null}
             <div className="ml-auto">
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -1041,7 +1116,9 @@ export function FileManagerPage() {
                                       className="w-44"
                                     >
                                       <DropdownMenuItem
-                                        onClick={() => setSelectedNodeId(node.id)}
+                                        onClick={() =>
+                                          setSelectedNodeId(node.id)
+                                        }
                                       >
                                         <Database className="size-4" />
                                         Details
@@ -1080,7 +1157,9 @@ export function FileManagerPage() {
                                       </DropdownMenuItem>
                                       <DropdownMenuSeparator />
                                       <DropdownMenuItem
-                                        onClick={() => copyText(node.id, "Node ID")}
+                                        onClick={() =>
+                                          copyText(node.id, "Node ID")
+                                        }
                                       >
                                         <Copy className="size-4" />
                                         Copy ID
@@ -1192,10 +1271,12 @@ export function FileManagerPage() {
                     <Separator />
 
                     <div className="space-y-3">
-                      <DetailRow label="ID" value={selectedNode.id} />
-                      <DetailRow label="Parent ID" value={selectedNode.parent_id} />
                       <DetailRow
-                        label="Storage key"
+                        label="Parent name"
+                        value={getParentName(selectedNode)}
+                      />
+                      <DetailRow
+                        label="File url"
                         value={selectedNode.storage_key}
                       />
                       <DetailRow
@@ -1246,6 +1327,15 @@ export function FileManagerPage() {
                       >
                         <MoveRight className="size-4" />
                         Move
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="col-span-2 border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700"
+                        onClick={() => setDeleteNodeTarget(selectedNode)}
+                      >
+                        <Trash2 className="size-4" />
+                        Delete
                       </Button>
                     </div>
                   </div>
@@ -1351,26 +1441,38 @@ export function FileManagerPage() {
               </label>
 
               {uploadFiles.length > 0 ? (
-                <div className="max-h-56 overflow-y-auto rounded-md border border-slate-200">
-                  {uploadFiles.map((file, index) => (
+                <div className="max-h-72 overflow-y-auto rounded-md border border-slate-200">
+                  {uploadFiles.map((item, index) => (
                     <div
-                      key={`${file.name}-${file.lastModified}-${index}`}
-                      className="flex items-center gap-3 border-b border-slate-100 px-3 py-2 last:border-b-0"
+                      key={`${item.file.name}-${item.file.lastModified}-${index}`}
+                      className="flex items-start gap-3 border-b border-slate-100 px-3 py-3 last:border-b-0"
                     >
-                      <FileIcon className="size-4 shrink-0 text-sky-600" />
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium">
-                          {file.name}
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          {formatBytes(file.size)}
+                      <FileIcon className="mt-8 size-4 shrink-0 text-sky-600" />
+                      <div className="min-w-0 flex-1 space-y-1.5">
+                        <Label
+                          htmlFor={`upload-file-name-${index}`}
+                          className="text-xs font-medium text-slate-500"
+                        >
+                          Name
+                        </Label>
+                        <Input
+                          id={`upload-file-name-${index}`}
+                          value={item.name}
+                          onChange={(event) =>
+                            updateUploadFileName(index, event.target.value)
+                          }
+                          placeholder="File name"
+                        />
+                        <div className="truncate text-xs text-slate-500">
+                          Original: {item.file.name} ·{" "}
+                          {formatBytes(item.file.size)}
                         </div>
                       </div>
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="size-8"
+                        className="mt-7 size-8"
                         onClick={() => removeUploadFile(index)}
                       >
                         <X className="size-4" />
@@ -1396,7 +1498,9 @@ export function FileManagerPage() {
                   void submitUploadFiles();
                 }}
               >
-                {isUploading ? <Loader2 className="size-4 animate-spin" /> : null}
+                {isUploading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : null}
                 Submit
               </Button>
             </DialogFooter>
@@ -1404,7 +1508,10 @@ export function FileManagerPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={Boolean(renameNode)} onOpenChange={() => setRenameNode(null)}>
+      <Dialog
+        open={Boolean(renameNode)}
+        onOpenChange={() => setRenameNode(null)}
+      >
         <DialogContent className="max-w-[480px]">
           <form onSubmit={handleRenameNode} className="space-y-5">
             <DialogHeader>
@@ -1431,7 +1538,9 @@ export function FileManagerPage() {
                 Cancel
               </Button>
               <Button type="submit" disabled={isRenaming}>
-                {isRenaming ? <Loader2 className="size-4 animate-spin" /> : null}
+                {isRenaming ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : null}
                 Save
               </Button>
             </DialogFooter>
@@ -1486,27 +1595,17 @@ export function FileManagerPage() {
                       variant="ghost"
                       size="sm"
                       className="h-8 max-w-[180px] justify-start px-2"
-                      onClick={() => navigateMoveBrowserToBreadcrumb(node, index)}
+                      onClick={() =>
+                        navigateMoveBrowserToBreadcrumb(node, index)
+                      }
                     >
                       <span className="truncate">{node.name}</span>
                     </Button>
                   </div>
                 ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="ml-auto h-8"
-                  onClick={() =>
-                    selectMoveDestination({
-                      id: moveBrowserFolderId,
-                      name: moveBrowserFolderName,
-                    })
-                  }
-                >
-                  <Check className="size-4" />
-                  Choose this folder
-                </Button>
+                <div className="ml-auto rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-500 shadow-sm">
+                  Click a folder row to select it
+                </div>
               </div>
 
               <div className="h-[300px] overflow-y-auto bg-white">
@@ -1530,12 +1629,24 @@ export function FileManagerPage() {
                   ? moveBrowserFolders.map((folder) => (
                       <div
                         key={folder.id}
-                        className="flex items-center gap-2 border-b border-slate-100 px-3 py-2 last:border-b-0"
+                        className={cn(
+                          "flex items-center gap-2 border-b border-slate-100 px-3 py-2 last:border-b-0",
+                          moveDestination.id === folder.id && "bg-emerald-50",
+                        )}
                       >
                         <button
                           type="button"
-                          className="flex min-w-0 flex-1 items-center gap-3 rounded-md px-2 py-2 text-left hover:bg-slate-50"
-                          onClick={() => navigateMoveBrowserToFolder(folder)}
+                          className={cn(
+                            "flex min-w-0 flex-1 items-center gap-3 rounded-md px-2 py-2 text-left transition-colors hover:bg-emerald-50",
+                            moveDestination.id === folder.id &&
+                              "bg-emerald-100 text-emerald-900",
+                          )}
+                          onClick={() =>
+                            selectMoveDestination({
+                              id: folder.id,
+                              name: folder.name,
+                            })
+                          }
                         >
                           <Folder className="size-5 shrink-0 text-amber-500" />
                           <span className="min-w-0">
@@ -1547,21 +1658,20 @@ export function FileManagerPage() {
                             </span>
                           </span>
                         </button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-8"
-                          onClick={() =>
-                            selectMoveDestination({
-                              id: folder.id,
-                              name: folder.name,
-                            })
-                          }
-                        >
-                          <Check className="size-4" />
-                          Choose
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="size-8 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                              onClick={() => navigateMoveBrowserToFolder(folder)}
+                            >
+                              <ChevronRight className="size-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Open folder</TooltipContent>
+                        </Tooltip>
                       </div>
                     ))
                   : null}
