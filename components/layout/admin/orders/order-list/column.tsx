@@ -47,6 +47,16 @@ const toNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const CANCELLABLE_EXCHANGE_STATUSES = new Set([
+  "exchange",
+  "exchange_initiated",
+  "exchange_stock_reserved",
+  "exchange_preparation_shipping",
+]);
+
+const canCancelExchangeOrder = (status?: string | null) =>
+  CANCELLABLE_EXCHANGE_STATUSES.has(status?.toLowerCase().trim() ?? "");
+
 function isImageUrl(url: string) {
   return /\.(png|jpe?g|gif|webp|bmp|svg|avif)(\?.*)?$/i.test(url);
 }
@@ -813,7 +823,7 @@ const ActionCellChild = ({
           </DialogContent>
         </Dialog>
       )}
-      {status?.toLowerCase() === "exchange" && (
+      {canCancelExchangeOrder(status) && (
         <CancelExchangeDialog id={checkoutId} main_checkout_id={checkoutId} />
       )}
 
