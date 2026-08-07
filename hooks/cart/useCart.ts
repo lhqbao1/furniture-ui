@@ -15,12 +15,49 @@ import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
 import { useQueryClient } from "@tanstack/react-query";
 import { getProductById } from "@/features/products/api";
+import type { ProductItem } from "@/types/products";
 
 interface CartActionsProps {
   userId: string | null;
   displayedCart: CartResponse | CartItemLocal[];
   setIsLoginOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+type ProductWithIncomingAliases = ProductItem & {
+  inventories_po?: ProductItem["inventory_pos"] | null;
+  inventory_po?: ProductItem["inventory_pos"] | null;
+};
+
+type CartValidationReason = "ok" | "inactive" | "stock" | "check_failed";
+
+const normalizeProductForCartValidation = (
+  product?: ProductItem | null,
+): ProductItem | null => {
+  if (!product) return null;
+
+  const productWithAliases = product as ProductWithIncomingAliases;
+
+  return {
+    ...product,
+    inventory_pos:
+      product.inventory_pos ??
+      productWithAliases.inventories_po ??
+      productWithAliases.inventory_po ??
+      [],
+  };
+};
+
+const getProductLabel = (
+  latestProduct?: ProductItem | null,
+  fallback?: Partial<ProductItem> | CartItemLocal | null,
+) => {
+  if (latestProduct?.name) return latestProduct.name;
+  if (!fallback) return "Produkt";
+  if ("product_name" in fallback) {
+    return fallback.product_name ?? fallback.id_provider ?? "Produkt";
+  }
+  return fallback?.name ?? fallback?.sku ?? "Produkt";
+};
 
 export function useCartData() {
   const [userId, setUserId] = useAtom(userIdAtom);
@@ -138,33 +175,84 @@ export function CartActions({
         return;
       }
 
-      const invalidItems = activeItems.filter((item) => {
-        const isProductActive = item.products?.is_active === true;
-        if (!isProductActive) return true;
+      const serverValidationResults = await Promise.all(
+        activeItems.map(async (item) => {
+          try {
+            const latestProduct = normalizeProductForCartValidation(
+              await getProductById(item.products.id),
+            );
+            const label = getProductLabel(latestProduct, item.products);
+            const isProductActive = latestProduct?.is_active === true;
 
-        const baseStock = calculateAvailableStock(item.products);
-        const incomingStock = calculateIncomingStockSummary(
-          item.products,
-        ).incomingStock;
-        const maxStock = Math.max(0, baseStock + incomingStock);
-        return maxStock <= 0 || item.quantity > maxStock;
-      });
+            if (!isProductActive) {
+              return {
+                item,
+                isValid: false,
+                reason: "inactive" as CartValidationReason,
+                label,
+              };
+            }
+
+            const baseStock = calculateAvailableStock(latestProduct);
+            const incomingStock = calculateIncomingStockSummary(
+              latestProduct,
+            ).incomingStock;
+            const maxStock = Math.max(0, baseStock + incomingStock);
+            const quantity = Number(item.quantity) || 0;
+
+            if (maxStock <= 0 || quantity > maxStock) {
+              return {
+                item,
+                isValid: false,
+                reason: "stock" as CartValidationReason,
+                label,
+              };
+            }
+
+            return {
+              item,
+              isValid: true,
+              reason: "ok" as CartValidationReason,
+              label,
+            };
+          } catch {
+            return {
+              item,
+              isValid: false,
+              reason: "check_failed" as CartValidationReason,
+              label: getProductLabel(null, item.products),
+            };
+          }
+        }),
+      );
+
+      const checkFailedItems = serverValidationResults.filter(
+        (result) => result.reason === "check_failed",
+      );
+      if (checkFailedItems.length > 0) {
+        toast.error(
+          "Der Bestand einiger Warenkorb-Artikel konnte nicht geprüft werden. Bitte erneut versuchen.",
+        );
+        return;
+      }
+
+      const invalidItems = serverValidationResults.filter(
+        (result) => !result.isValid,
+      );
 
       if (invalidItems.length > 0) {
-        for (const item of invalidItems) {
-          const isProductActive = item.products?.is_active === true;
-          const itemLabel = item.products?.name ?? item.products?.sku ?? "Produkt";
-          const removeReason = isProductActive
+        for (const result of invalidItems) {
+          const removeReason = result.reason === "stock"
             ? `${t("notEnoughStock")}. Aus dem Warenkorb entfernt.`
             : "Dieses Produkt ist inaktiv. Aus dem Warenkorb entfernt.";
 
           try {
-            await deleteCartItem(item.id);
-            toast.error(`${itemLabel}: ${removeReason}`);
+            await deleteCartItem(result.item.id);
+            toast.error(`${result.label}: ${removeReason}`);
           } catch {
             toast.error(
-              `${itemLabel}: ${
-                isProductActive
+              `${result.label}: ${
+                result.reason === "stock"
                   ? t("notEnoughStock")
                   : "Dieses Produkt ist inaktiv"
               }. Konnte nicht automatisch aus dem Warenkorb entfernt werden.`,
@@ -192,7 +280,9 @@ export function CartActions({
     const localValidationResults = await Promise.all(
       activeItems.map(async (item) => {
         try {
-          const latestProduct = await getProductById(item.product_id);
+          const latestProduct = normalizeProductForCartValidation(
+            await getProductById(item.product_id),
+          );
           const isProductActive = latestProduct?.is_active === true;
           const baseStock = calculateAvailableStock(latestProduct);
           const incomingStock = calculateIncomingStockSummary(
@@ -205,11 +295,7 @@ export function CartActions({
               item,
               isValid: false,
               reason: "inactive" as const,
-              label:
-                latestProduct?.name ??
-                item.product_name ??
-                item.id_provider ??
-                "Produkt",
+              label: getProductLabel(latestProduct, item),
             };
           }
 
@@ -218,11 +304,7 @@ export function CartActions({
               item,
               isValid: false,
               reason: "stock" as const,
-              label:
-                latestProduct?.name ??
-                item.product_name ??
-                item.id_provider ??
-                "Produkt",
+              label: getProductLabel(latestProduct, item),
             };
           }
 
@@ -230,11 +312,7 @@ export function CartActions({
             item,
             isValid: true,
             reason: "ok" as const,
-            label:
-              latestProduct?.name ??
-              item.product_name ??
-              item.id_provider ??
-              "Produkt",
+            label: getProductLabel(latestProduct, item),
           };
         } catch {
           return {

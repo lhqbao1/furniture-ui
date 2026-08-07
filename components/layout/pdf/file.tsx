@@ -240,7 +240,7 @@ export const InvoicePDF = ({
   const resolvedPaymentTermDays =
     Number.isFinite(paymentTermDays) && paymentTermDays > 0
       ? String(paymentTermDays)
-      : "XX";
+      : "14";
   const shipperDateRaw = primaryCheckout?.shipment?.shipper_date?.trim();
   const hasServicePeriod = Boolean(shipperDateRaw);
   const servicePeriodValue = hasServicePeriod

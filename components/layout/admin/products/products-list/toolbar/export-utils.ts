@@ -157,6 +157,7 @@ export const buildProductExportData = (
           : 5.95,
       ),
       vat,
+      physical_stock: clean(product.stock),
       stock: clean(calculateAvailableStock(product)),
       incoming_stock: getIncomingStockExportLabel(product),
       img_url: clean(

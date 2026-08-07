@@ -3,12 +3,27 @@
 
 import { usePathname } from "next/navigation";
 import Script from "next/script";
+import { useEffect, useState } from "react";
 
 export function TrustedShops() {
   const pathname = usePathname();
+  const [isDesktopViewport, setIsDesktopViewport] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const updateViewportState = () => setIsDesktopViewport(mediaQuery.matches);
+
+    updateViewportState();
+    mediaQuery.addEventListener("change", updateViewportState);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateViewportState);
+    };
+  }, []);
 
   // Internal tools should not load storefront trust widgets.
   if (
+    !isDesktopViewport ||
     pathname.includes("/admin") ||
     pathname.includes("/affiliate") ||
     pathname.includes("/login") ||

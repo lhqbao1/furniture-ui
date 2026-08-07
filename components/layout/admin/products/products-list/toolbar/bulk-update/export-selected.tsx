@@ -47,6 +47,7 @@ const formatColumnLabel = (key: string) => {
     amazon_price: "Amazon Price",
     ebay_price: "Ebay Price",
     kaufland_price: "Kaufland Price",
+    physical_stock: "Physical Stock",
   };
 
   if (customLabels[key]) return customLabels[key];

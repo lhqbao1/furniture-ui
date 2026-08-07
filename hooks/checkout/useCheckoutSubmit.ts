@@ -38,7 +38,11 @@ const formatCheckoutDateTime = (date: Date): string =>
 const calculateCheckoutDeliveryRange = (cartData: CartResponse) => {
   const itemRanges = cartData
     .flatMap((group) => group?.items ?? [])
-    .map((item) => calculateProductDeliveryRange(item?.products))
+    .map((item) =>
+      calculateProductDeliveryRange(item?.products, {
+        quantity: item?.quantity,
+      }),
+    )
     .filter(
       (range): range is { from: Date; to: Date } =>
         !!range &&
