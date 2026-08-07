@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import {
-  aggregatePackages,
-  calcDeliveryCost,
+  calcProductDeliveryCost,
+  expandPackagesByBundleQuantity,
 } from "@/lib/shipping/delivery-cost";
 import { ProductInput } from "@/lib/schema/product";
 import { ProductItem } from "@/types/products";
@@ -169,22 +169,25 @@ export const submitProduct = async ({
 
   const latestValues = form.getValues();
 
-  const mergedPackage = aggregatePackages(
+  const shippingPackages = expandPackagesByBundleQuantity(
     latestValues.packages ?? [],
     latestValues.bundles ?? [],
   );
   const normalizedCarrier = String(latestValues.carrier ?? "")
     .toLowerCase()
     .trim();
-  const mergedWeight = Number(mergedPackage?.weight ?? 0);
+  const maxPackageWeight = shippingPackages.reduce((maxWeight, pkg) => {
+    const weight = Number(pkg.weight ?? 0);
+    return Number.isFinite(weight) ? Math.max(maxWeight, weight) : maxWeight;
+  }, 0);
   const isAmmOrSpeditionCarrier =
     normalizedCarrier.includes("amm") ||
     normalizedCarrier.includes("spedition");
   const isGlsCarrier = normalizedCarrier === "gls";
 
   if (
-    Number.isFinite(mergedWeight) &&
-    mergedWeight > 31 &&
+    Number.isFinite(maxPackageWeight) &&
+    maxPackageWeight > 31 &&
     !isAmmOrSpeditionCarrier &&
     !isGlsCarrier
   ) {
@@ -193,8 +196,9 @@ export const submitProduct = async ({
     );
   }
 
-  const { error } = calcDeliveryCost(
-    mergedPackage ? [mergedPackage] : [],
+  const { error } = calcProductDeliveryCost(
+    latestValues.packages ?? [],
+    latestValues.bundles ?? [],
     latestValues.carrier,
   );
   if (error) {

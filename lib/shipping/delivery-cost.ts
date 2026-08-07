@@ -125,6 +125,27 @@ function pickRate(
   return rates.find((rate) => weightKg <= rate.maxKg) ?? null;
 }
 
+function toFiniteNumberOrNull(value: unknown) {
+  if (value === null || value === undefined || value === "") return null;
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizePackageInput(pkg: PackageInput | null | undefined) {
+  return {
+    weight: toFiniteNumberOrNull(pkg?.weight),
+    length: toFiniteNumberOrNull(pkg?.length),
+    width: toFiniteNumberOrNull(pkg?.width),
+    height: toFiniteNumberOrNull(pkg?.height),
+  };
+}
+
+function getBundleQuantity(bundle: BundleInput) {
+  const parsed = Number(bundle?.quantity ?? 1);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 1;
+}
+
 function getPackageGirthCm(length: number, width: number, height: number) {
   const longest = Math.max(length, width, height);
   const sum = length + width + height;
@@ -288,13 +309,12 @@ export function getSuggestedCarrier(
   packages: PackageInput[] | null | undefined,
   bundles?: BundleInput[],
 ): CarrierRecommendation | null {
-  const mergedPackage = aggregatePackages(packages, bundles);
-  if (!mergedPackage) return null;
+  if (!packages || packages.length === 0) return null;
 
   let recommendation: CarrierRecommendation | null = null;
 
   for (const carrier of CARRIER_RECOMMENDATION_OPTIONS) {
-    const { cost } = calcDeliveryCost([mergedPackage], carrier.id);
+    const { cost } = calcProductDeliveryCost(packages, bundles, carrier.id);
     if (cost == null) continue;
 
     if (!recommendation || cost < recommendation.cost) {
@@ -306,6 +326,39 @@ export function getSuggestedCarrier(
   }
 
   return recommendation;
+}
+
+export function expandPackagesByBundleQuantity(
+  packages: PackageInput[] | null | undefined,
+  bundles?: BundleInput[],
+) {
+  if (!packages || packages.length === 0) return [];
+
+  return packages.flatMap((pkg, index) => {
+    const normalizedPackage = normalizePackageInput(pkg);
+    const quantity = getBundleQuantity(bundles?.[index]);
+
+    return Array.from({ length: quantity }, () => normalizedPackage);
+  });
+}
+
+export function calcProductDeliveryCost(
+  packages: PackageInput[] | null | undefined,
+  bundles: BundleInput[] | undefined,
+  carrier: CarrierType,
+) {
+  const rawCarrier = String(carrier ?? "").toLowerCase().trim();
+  const normalizedCarrier = rawCarrier === "spedition" ? "amm" : rawCarrier;
+
+  if (normalizedCarrier === "dpd" || normalizedCarrier === "gls") {
+    return calcDeliveryCost(
+      expandPackagesByBundleQuantity(packages, bundles),
+      carrier,
+    );
+  }
+
+  const mergedPackage = aggregatePackages(packages, bundles);
+  return calcDeliveryCost(mergedPackage ? [mergedPackage] : [], carrier);
 }
 
 export function aggregatePackages(
@@ -320,7 +373,7 @@ export function aggregatePackages(
   let totalHeight = 0;
 
   for (let index = 0; index < packages.length; index += 1) {
-    const pkg = packages[index] ?? {};
+    const pkg = normalizePackageInput(packages[index]);
     const rawQuantity = Number(bundles?.[index]?.quantity ?? 1);
     const quantity =
       Number.isFinite(rawQuantity) && rawQuantity > 0 ? rawQuantity : 1;

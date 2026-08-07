@@ -19,8 +19,8 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import {
-  aggregatePackages,
-  calcDeliveryCost,
+  calcProductDeliveryCost,
+  expandPackagesByBundleQuantity,
   getSuggestedCarrier,
 } from "@/lib/shipping/delivery-cost";
 
@@ -183,21 +183,25 @@ const ProductLogisticsGroup = ({
   }, [fields.length, bundleItems, append]);
 
   useEffect(() => {
-    const mergedPackage = aggregatePackages(
+    const shippingPackages = expandPackagesByBundleQuantity(
       watchedPackages ?? [],
       watchedBundles ?? [],
     );
     const normalizedCarrier = String(watchedCarrier ?? "")
       .toLowerCase()
       .trim();
-    const mergedWeight = Number(mergedPackage?.weight ?? 0);
+    const maxPackageWeight = shippingPackages.reduce((maxWeight, pkg) => {
+      const weight = Number(pkg.weight ?? 0);
+      return Number.isFinite(weight) ? Math.max(maxWeight, weight) : maxWeight;
+    }, 0);
     const isAmmOrSpeditionCarrier =
       normalizedCarrier.includes("amm") ||
       normalizedCarrier.includes("spedition");
     const isGlsCarrier = normalizedCarrier === "gls";
 
-    const { error } = calcDeliveryCost(
-      mergedPackage ? [mergedPackage] : [],
+    const { error } = calcProductDeliveryCost(
+      watchedPackages ?? [],
+      watchedBundles ?? [],
       watchedCarrier,
     );
 
@@ -205,8 +209,8 @@ const ProductLogisticsGroup = ({
     let warningMessage = "";
 
     if (
-      Number.isFinite(mergedWeight) &&
-      mergedWeight > 31 &&
+      Number.isFinite(maxPackageWeight) &&
+      maxPackageWeight > 31 &&
       !isAmmOrSpeditionCarrier &&
       !isGlsCarrier
     ) {

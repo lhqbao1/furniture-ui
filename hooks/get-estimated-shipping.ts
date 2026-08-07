@@ -21,8 +21,9 @@ const normalizeFutureIncomingInventory = (
     | IncomingInventoryItem
     | null
     | undefined,
+  referenceDate: Date = new Date(),
 ): NormalizedIncomingInventoryItem[] => {
-  const today = new Date();
+  const today = new Date(referenceDate);
   today.setHours(0, 0, 0, 0);
   const inventoryItems = Array.isArray(inventory)
     ? inventory
@@ -54,8 +55,12 @@ export function getLatestInventory(
     | IncomingInventoryItem
     | null
     | undefined,
+  referenceDate?: Date,
 ) {
-  const futureItems = normalizeFutureIncomingInventory(inventory);
+  const futureItems = normalizeFutureIncomingInventory(
+    inventory,
+    referenceDate,
+  );
   if (futureItems.length === 0) return null;
 
   return futureItems[0];
@@ -68,8 +73,12 @@ export function getIncomingDateForRequiredQuantity(
     | null
     | undefined,
   requiredQuantity: number,
+  referenceDate?: Date,
 ): Date | null {
-  const futureItems = normalizeFutureIncomingInventory(inventory);
+  const futureItems = normalizeFutureIncomingInventory(
+    inventory,
+    referenceDate,
+  );
   if (futureItems.length === 0) return null;
 
   if (!Number.isFinite(requiredQuantity) || requiredQuantity <= 0) {
@@ -138,7 +147,23 @@ export function addCalendarDays(startDate: Date, days: number) {
 interface CalculateProductDeliveryRangeOptions {
   inventoryPo?: IncomingInventoryItem[] | null;
   referenceDate?: Date;
+  quantity?: number;
 }
+
+const normalizeRequestedQuantity = (quantity: unknown): number => {
+  const parsedQuantity = Number(quantity);
+  if (!Number.isFinite(parsedQuantity) || parsedQuantity <= 0) return 1;
+  return Math.max(1, Math.ceil(parsedQuantity));
+};
+
+const calculateRequiredIncomingQuantity = (
+  currentStock: number,
+  requestedQuantity: number,
+): number => {
+  if (currentStock >= requestedQuantity) return 0;
+  if (currentStock >= 0) return requestedQuantity - currentStock;
+  return Math.abs(currentStock) + requestedQuantity;
+};
 
 export function calculateProductDeliveryRange(
   product?: Partial<ProductItem> | null,
@@ -149,7 +174,12 @@ export function calculateProductDeliveryRange(
   const deliveryRange = getDeliveryDayRange(product.delivery_time);
   if (!deliveryRange) return null;
 
+  const requestedQuantity = normalizeRequestedQuantity(options.quantity);
   const currentStock = calculateAvailableStock(product);
+  const requiredIncomingQuantity = calculateRequiredIncomingQuantity(
+    currentStock,
+    requestedQuantity,
+  );
   const incomingSummary = calculateIncomingStockSummary(product, {
     inventoryPo: options.inventoryPo,
     referenceDate: options.referenceDate,
@@ -165,10 +195,11 @@ export function calculateProductDeliveryRange(
     ? incomingSummary.latestIncomingDate
     : (getIncomingDateForRequiredQuantity(
         incomingInventorySource,
-        Math.abs(currentStock) + 1,
+        requiredIncomingQuantity,
+        options.referenceDate,
       ) ?? incomingSummary.nearestIncomingDate);
 
-  if (currentStock > 0) {
+  if (requiredIncomingQuantity <= 0) {
     const today = options.referenceDate ?? new Date();
     return {
       from: addCalendarDays(today, deliveryRange.min),

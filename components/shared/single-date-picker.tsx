@@ -48,7 +48,12 @@ export const SingleDatePicker = ({
   const today = new Date();
 
   const handleSelect = (d?: Date) => {
-    if (!d) return;
+    if (!d) {
+      onChange(undefined);
+      setOpen(false);
+      return;
+    }
+
     onChange(formatFull(d)); // update state
     setOpen(false); // 🔥 đóng popover khi chọn ngày
   };

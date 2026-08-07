@@ -11,8 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  aggregatePackages,
-  calcDeliveryCost,
+  calcProductDeliveryCost,
 } from "@/lib/shipping/delivery-cost";
 import { BundleInput } from "@/lib/schema/product";
 
@@ -137,9 +136,9 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
     control: form.control,
     name: "carrier",
   });
-  const mergedPackage = aggregatePackages(packages ?? [], bundles ?? []);
-  const { cost, error } = calcDeliveryCost(
-    mergedPackage ? [mergedPackage] : [],
+  const { cost, error } = calcProductDeliveryCost(
+    packages ?? [],
+    bundles ?? [],
     carrier,
   );
   const hasBundles = Array.isArray(bundles) && bundles.length > 0;

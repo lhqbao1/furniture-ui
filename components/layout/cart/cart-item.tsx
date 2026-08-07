@@ -217,6 +217,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     if (cartServer?.products) {
       return calculateProductDeliveryRange(cartServer.products, {
         inventoryPo: inventoryPo,
+        quantity: cartServer.quantity,
       });
     }
 
@@ -230,12 +231,13 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
         },
         {
           inventoryPo: inventoryPo,
+          quantity: localProducts.quantity,
         },
       );
     }
 
     return null;
-  }, [cartServer?.products, localProducts, inventoryPo]);
+  }, [cartServer?.products, cartServer?.quantity, localProducts, inventoryPo]);
 
   const handleAddToWishlist = (id: string) => {
     if (!id) return;

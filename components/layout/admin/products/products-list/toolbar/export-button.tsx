@@ -90,6 +90,7 @@ export default function ExportExcelButton() {
           original_price: clean(p.price),
           sale_price: clean(p.final_price),
           vat: clean(p.tax),
+          physical_stock: clean(p.stock),
           stock: clean(calculateAvailableStock(p)),
           img_url: clean(
             p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),

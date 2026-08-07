@@ -17,6 +17,17 @@ const hasCsvFieldValue = (value: unknown): boolean => {
   return String(value).trim().length > 0;
 };
 
+const normalizeText = (value: unknown) =>
+  typeof value === "string" ? value.trim() : "";
+
+const getDeliveryIncludes = (product: ProductItem) => {
+  const component = normalizeText(product.component);
+  if (component) return component;
+
+  const name = normalizeText(product.name);
+  return name ? `1x ${name}` : "";
+};
+
 const REQUIRED_CSV_FIELD_INDEXES = [
   0, // EAN (GTIN14)
   1, // offer_id
@@ -130,8 +141,7 @@ export async function GET() {
       !!p.brand &&
       typeof p.brand.name === "string" &&
       p.brand.name.trim().length > 0 &&
-      typeof p.component === "string" &&
-      p.component.trim().length > 0 &&
+      getDeliveryIncludes(p).length > 0 &&
       typeof p.carrier === "string" &&
       p.carrier.trim().length > 0 &&
       Array.isArray(p.static_files) &&
@@ -165,6 +175,7 @@ export async function GET() {
         const size = `${p.height} x ${p.width} x ${p.length} cm`;
         const lyingSurface = `${p.width} x ${p.length} cm`;
         const color = p.color.replace(/\s+(and|und)\s+/gi, "/");
+        const deliveryIncludes = getDeliveryIncludes(p);
         const imageUrls = (p.static_files ?? [])
           .map((file) => String(file?.url ?? "").trim())
           .filter(Boolean)
@@ -200,7 +211,7 @@ export async function GET() {
           imageUrls[7] ?? "",
           imageUrls[8] ?? "",
           imageUrls[9] ?? "",
-          p.component ?? "",
+          deliveryIncludes,
           stockAmount,
           `${formatEuro(discountedFinalPrice)} €`,
           `${p.delivery_time} Werktage`,
