@@ -42,6 +42,8 @@ export const CHANEL_OPTIONS = [
   { key: "norma", label: "Norma24", icon: "norma.png" },
   { key: "praktiker", label: "Praktiker", icon: "praktiker.jpg" },
   { key: "XXXLUTZ", label: "XXXLUTZ", icon: "xxxlutz.png" },
+  { key: "hagebau", label: "Hagebau", icon: "hagebau.jpg" },
+
   { key: "moebelix", label: "Moebelix", icon: "mobelix.png" },
   { key: "otto", label: "Otto", icon: "otto.png" },
   { key: "rieberg", label: "Rieberg", icon: "reiberg.jpg" },

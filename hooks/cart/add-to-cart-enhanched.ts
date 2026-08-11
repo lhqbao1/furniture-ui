@@ -24,6 +24,12 @@ export function useAddToCartLocalEnhanced() {
   ) => {
     if (!product) return;
 
+    if (product.is_active !== true) {
+      toast.error(t("outStock"), { duration: TOAST_DURATION });
+      options?.onError?.();
+      return;
+    }
+
     const existingItem = cart.find(
       (item: CartItemLocal) => item.product_id === product.id,
     );

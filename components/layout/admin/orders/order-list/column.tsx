@@ -57,6 +57,25 @@ const CANCELLABLE_EXCHANGE_STATUSES = new Set([
 const canCancelExchangeOrder = (status?: string | null) =>
   CANCELLABLE_EXCHANGE_STATUSES.has(status?.toLowerCase().trim() ?? "");
 
+const getOrderExternalReference = (order: CheckOutMain) =>
+  (order.netto_buyer ?? order.netto_buyer_id ?? "").trim();
+
+const OrderExternalIdCell = ({ order }: { order: CheckOutMain }) => {
+  const externalId = order.marketplace_order_id?.trim();
+  const externalReference = getOrderExternalReference(order);
+
+  return (
+    <div className="flex flex-col leading-tight">
+      <span>{externalId || "-"}</span>
+      {externalReference ? (
+        <span className="mt-1 text-xs text-slate-500">
+          ({externalReference})
+        </span>
+      ) : null}
+    </div>
+  );
+};
+
 function isImageUrl(url: string) {
   return /\.(png|jpe?g|gif|webp|bmp|svg|avif)(\?.*)?$/i.test(url);
 }
@@ -900,7 +919,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
     accessorKey: "external_id",
     header: "EXTERNAL ID",
     cell: ({ row }) => {
-      return <div>{row.original.marketplace_order_id}</div>;
+      return <OrderExternalIdCell order={row.original} />;
     },
   },
 
@@ -1118,7 +1137,7 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
     accessorKey: "external_id",
     header: "EXTERNAL ID",
     cell: ({ row }) => {
-      return <div>{row.original.marketplace_order_id}</div>;
+      return <OrderExternalIdCell order={row.original} />;
     },
   },
   {

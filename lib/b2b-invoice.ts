@@ -94,6 +94,14 @@ export const B2B_INVOICE_PRESET_BY_MARKETPLACE: Record<
     invoice_postal_code: "4600",
     invoice_country: "AT",
   },
+  hagebau: {
+    company_name: "hagebau IT GmbH",
+    tax_id: "DE250235335",
+    invoice_address: "Celler Straße 47",
+    invoice_city: "Soltau",
+    invoice_postal_code: "29614",
+    invoice_country: "DE",
+  },
   moebelix: {
     company_name: "XXXLutz KG",
     tax_id: "ATU65296645",

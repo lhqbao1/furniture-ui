@@ -59,6 +59,27 @@ const getProductLabel = (
   return fallback?.name ?? fallback?.sku ?? "Produkt";
 };
 
+const validateProductCartQuantity = (
+  product: ProductItem | null,
+  quantity: unknown,
+): CartValidationReason => {
+  const requestedQuantity = Number(quantity) || 0;
+  const isProductActive = product?.is_active === true;
+  const baseStock = calculateAvailableStock(product);
+  const incomingStock = calculateIncomingStockSummary(product).incomingStock;
+  const maxStock = Math.max(0, baseStock + incomingStock);
+
+  if (!isProductActive) {
+    return "inactive";
+  }
+
+  if (maxStock <= 0 || requestedQuantity > maxStock) {
+    return "stock";
+  }
+
+  return "ok";
+};
+
 export function useCartData() {
   const [userId, setUserId] = useAtom(userIdAtom);
   const [localQuantities, setLocalQuantities] = useState<
@@ -182,29 +203,16 @@ export function CartActions({
               await getProductById(item.products.id),
             );
             const label = getProductLabel(latestProduct, item.products);
-            const isProductActive = latestProduct?.is_active === true;
-
-            if (!isProductActive) {
-              return {
-                item,
-                isValid: false,
-                reason: "inactive" as CartValidationReason,
-                label,
-              };
-            }
-
-            const baseStock = calculateAvailableStock(latestProduct);
-            const incomingStock = calculateIncomingStockSummary(
+            const reason = validateProductCartQuantity(
               latestProduct,
-            ).incomingStock;
-            const maxStock = Math.max(0, baseStock + incomingStock);
-            const quantity = Number(item.quantity) || 0;
+              item.quantity,
+            );
 
-            if (maxStock <= 0 || quantity > maxStock) {
+            if (reason !== "ok") {
               return {
                 item,
                 isValid: false,
-                reason: "stock" as CartValidationReason,
+                reason,
                 label,
               };
             }
@@ -283,27 +291,16 @@ export function CartActions({
           const latestProduct = normalizeProductForCartValidation(
             await getProductById(item.product_id),
           );
-          const isProductActive = latestProduct?.is_active === true;
-          const baseStock = calculateAvailableStock(latestProduct);
-          const incomingStock = calculateIncomingStockSummary(
+          const reason = validateProductCartQuantity(
             latestProduct,
-          ).incomingStock;
-          const maxStock = Math.max(0, baseStock + incomingStock);
+            item.quantity,
+          );
 
-          if (!isProductActive) {
+          if (reason !== "ok") {
             return {
               item,
               isValid: false,
-              reason: "inactive" as const,
-              label: getProductLabel(latestProduct, item),
-            };
-          }
-
-          if (maxStock <= 0 || item.quantity > maxStock) {
-            return {
-              item,
-              isValid: false,
-              reason: "stock" as const,
+              reason,
               label: getProductLabel(latestProduct, item),
             };
           }

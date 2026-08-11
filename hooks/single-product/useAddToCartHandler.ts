@@ -16,6 +16,10 @@ interface HandleSubmitOptions {
   onSuccess?: () => void;
 }
 
+type AddToCartValues = {
+  quantity: number;
+};
+
 export function useAddToCartHandler(productDetails: ProductItem) {
   const createCartMutation = useAddToCart();
   const addProductToWishlistMutation = useAddToWishList();
@@ -39,8 +43,16 @@ export function useAddToCartHandler(productDetails: ProductItem) {
     );
   };
 
-  const handleSubmitToCart = (values: any, options?: HandleSubmitOptions) => {
+  const handleSubmitToCart = (
+    values: AddToCartValues,
+    options?: HandleSubmitOptions,
+  ) => {
     if (!productDetails) return;
+
+    if (productDetails.is_active !== true) {
+      toast.error(t("outStock"));
+      return;
+    }
 
     // LOCAL CART
     // LOCAL CART
