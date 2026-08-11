@@ -31,10 +31,19 @@ const ProductDetailsLogistic = ({
   const availableStock = calculateAvailableStock(productDetails);
   const { data: inventoryPo } = useInventoryPoByProductId(productDetails.id);
 
+  const incomingInventorySource = useMemo<ProductItem["inventory_pos"]>(() => {
+    if (Array.isArray(inventoryPo) && inventoryPo.length > 0) {
+      return inventoryPo as ProductItem["inventory_pos"];
+    }
+
+    return productDetails.inventory_pos ?? [];
+  }, [inventoryPo, productDetails.inventory_pos]);
+
   const incomingStock = useMemo(() => {
-    return calculateIncomingStockSummary(productDetails, { inventoryPo })
-      .incomingStock;
-  }, [productDetails, inventoryPo]);
+    return calculateIncomingStockSummary(productDetails, {
+      inventoryPo: incomingInventorySource,
+    }).incomingStock;
+  }, [incomingInventorySource, productDetails]);
 
   const totalStock = availableStock + incomingStock;
 

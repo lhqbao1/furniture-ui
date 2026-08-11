@@ -124,6 +124,7 @@ export default function ManualAdditionalInformation({
         { value: "bader", label: "Bader" },
         { value: "euro-tops", label: "Euro Tops" },
         { value: "XXXLUTZ", label: "XXXLUTZ" },
+        { value: "hagebau", label: "Hagebau" },
         { value: "prestige", label: "Prestige Home" },
         { value: "moebelix", label: "Moebelix" },
         { value: "otto", label: "Otto" },

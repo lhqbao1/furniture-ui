@@ -106,6 +106,7 @@ const CHANNEL_OPTIONS = [
   { value: "bader", label: "Bader" },
   { value: "euro-tops", label: "Euro Tops" },
   { value: "XXXLUTZ", label: "XXXLUTZ" },
+  { value: "hagebau", label: "Hagebau" },
   { value: "prestige", label: "Prestige Home" },
   { value: "moebelix", label: "Moebelix" },
   { value: "otto", label: "Otto" },
@@ -186,6 +187,14 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
     invoice_city: "Wels",
     invoice_postal_code: "4600",
     invoice_country: "AT",
+  },
+  hagebau: {
+    company_name: "hagebau IT GmbH",
+    tax_id: "DE250235335",
+    invoice_address: "Celler Straße 47",
+    invoice_city: "Soltau",
+    invoice_postal_code: "29614",
+    invoice_country: "DE",
   },
   moebelix: {
     company_name: "XXXLutz KG",

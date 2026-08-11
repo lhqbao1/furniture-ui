@@ -18,14 +18,14 @@ interface MobileStickyCartProps {
   oldPrice?: number;
   onAddToCart?: (options?: { onSuccess?: () => void }) => void;
   maxStock: number;
-  isActive: boolean;
+  canAddToCart: boolean;
 }
 
 export default function MobileStickyCart({
   price,
   onAddToCart,
   maxStock,
-  isActive,
+  canAddToCart,
 }: MobileStickyCartProps) {
   const t = useTranslations();
   const router = useRouter();
@@ -88,7 +88,7 @@ export default function MobileStickyCart({
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-2 flex-1">
-            {maxStock > 0 && isActive ? (
+            {canAddToCart ? (
               <Button
                 className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
                 type="button"

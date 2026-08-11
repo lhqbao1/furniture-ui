@@ -55,34 +55,60 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
     // initialData: productDe,
   });
 
-  const { handleSubmitToCart, handleAddWishlist } =
-    useAddToCartHandler(productDetails);
-
   const { data: inventoryPo } = useInventoryPoByProductId(productDetails.id);
 
+  const incomingInventorySource = useMemo<ProductItem["inventory_pos"]>(() => {
+    if (Array.isArray(inventoryPo) && inventoryPo.length > 0) {
+      return inventoryPo as ProductItem["inventory_pos"];
+    }
+
+    return productDetails.inventory_pos ?? [];
+  }, [inventoryPo, productDetails.inventory_pos]);
+
+  const productForCart = useMemo<ProductItem>(
+    () => ({
+      ...productDetails,
+      inventory_pos: incomingInventorySource,
+    }),
+    [incomingInventorySource, productDetails],
+  );
+
+  const { handleSubmitToCart, handleAddWishlist } =
+    useAddToCartHandler(productForCart);
+
   const incomingSummary = useMemo(
-    () => calculateIncomingStockSummary(productDetails, { inventoryPo }),
-    [productDetails, inventoryPo],
+    () =>
+      calculateIncomingStockSummary(productForCart, {
+        inventoryPo: incomingInventorySource,
+      }),
+    [incomingInventorySource, productForCart],
   );
 
   const incomingStock = incomingSummary.incomingStock;
 
   const maxStock = useMemo(() => {
-    const baseStock = calculateAvailableStock(productDetails);
+    const baseStock = calculateAvailableStock(productForCart);
     return Math.max(0, baseStock + incomingStock);
-  }, [productDetails, incomingStock]);
+  }, [productForCart, incomingStock]);
+
+  const isPurchasableByStock = useMemo(
+    () => Boolean(productForCart.is_active) && maxStock > 0,
+    [maxStock, productForCart.is_active],
+  );
 
   const hasValidFinalPrice = useMemo(() => {
     const finalPrice = Number(productDetails.final_price);
     return Number.isFinite(finalPrice) && finalPrice > 0;
   }, [productDetails.final_price]);
 
+  const canAddToCart = hasValidFinalPrice && isPurchasableByStock;
+
   const handleSubmitWithStockCheck = React.useCallback(
     (
       values: z.infer<typeof cartFormSchema>,
       options?: { openDrawer?: boolean; onSuccess?: () => void },
     ) => {
-      if (!productDetails?.is_active) {
+      if (!productForCart.is_active) {
         toast.error(t("outStock"));
         return;
       }
@@ -98,7 +124,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
         return;
       }
 
-      if (maxStock <= 0) {
+      if (!isPurchasableByStock) {
         toast.error(t("outStock"));
         return;
       }
@@ -124,8 +150,9 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
     [
       handleSubmitToCart,
       hasValidFinalPrice,
+      isPurchasableByStock,
       maxStock,
-      productDetails.is_active,
+      productForCart.is_active,
       t,
     ],
   );
@@ -175,9 +202,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
             </div>
 
             <div className="space-y-2 lg:basis-2/5 basis-3/5 relative flex gap-2">
-              {maxStock > 0 &&
-              hasValidFinalPrice &&
-              productDetails.is_active ? (
+              {canAddToCart ? (
                 <Button
                   className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
                   type="submit"
@@ -224,14 +249,14 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
             price={productDetails.final_price}
             oldPrice={productDetails.price}
             maxStock={hasValidFinalPrice ? maxStock : 0}
-            isActive={Boolean(productDetails.is_active)}
+            canAddToCart={canAddToCart}
           />
         </form>
       </FormProvider>
       <PostAddToCartDrawer
         open={isPostAddDrawerOpen}
         onOpenChange={setIsPostAddDrawerOpen}
-        product={productDetails}
+        product={productForCart}
         quantity={lastAddedQuantity}
       />
     </>
