@@ -1352,7 +1352,7 @@ export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
   return: ["return_issue", "exchange"],
   exchange: ["return_issue", "exchange"],
   canceled: ["return_issue"],
-  canceled_no_stock: ["return_issue", "canceled"],
+  canceled_no_stock: ["return_issue", "canceled", "exchange"],
   canceled_wrong_price: ["return_issue"],
 
   items_are_checked: ["waiting_for_return"],
