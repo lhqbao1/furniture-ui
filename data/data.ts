@@ -896,7 +896,7 @@ export const listChanel = [
   },
   {
     id: 27,
-    name: "Hagebau",
+    name: "hagebau",
     icon: "hagebau.jpg",
   },
   {
