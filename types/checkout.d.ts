@@ -180,6 +180,7 @@ export interface RefundOrdersResponse {
 export interface CheckOutStatistics {
   count_order: number;
   total_order: number;
+  total_sold_product_quantity?: number;
 
   count_waiting_payment_order: number;
   total_waiting_payment_order: number;
@@ -195,10 +196,12 @@ export interface CheckOutStatistics {
 
   count_cancel_order: number;
   total_cancel_order: number;
+  cancel_product_quantity?: number;
   cancel_rate?: number;
 
   count_return_order: number;
   total_return_order: number;
+  return_product_quantity?: number;
   return_rate?: number;
 
   count_stock_reserved_order: number;
