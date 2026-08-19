@@ -626,9 +626,20 @@ export default function EcommerceDashboard({
   const totalOrders = toNumber(statistic?.count_order);
   // API total_order is gross revenue.
   const grossRevenue = toNumber(statistic?.total_order);
+  const totalSoldProductQuantity = toNumber(
+    statistic?.total_sold_product_quantity,
+  );
   const returnedOrders = toNumber(statistic?.count_return_order);
+  const returnedProductQuantity =
+    statistic?.return_product_quantity != null
+      ? toNumber(statistic.return_product_quantity)
+      : returnedOrders;
   const returnedRevenue = toNumber(statistic?.total_return_order);
   const canceledOrders = toNumber(statistic?.count_cancel_order);
+  const canceledProductQuantity =
+    statistic?.cancel_product_quantity != null
+      ? toNumber(statistic.cancel_product_quantity)
+      : canceledOrders;
   const canceledRevenue = toNumber(statistic?.total_cancel_order);
   const waitingPaymentOrders = toNumber(statistic?.count_waiting_payment_order);
   const waitingPaymentRevenue = toNumber(
@@ -687,7 +698,9 @@ export default function EcommerceDashboard({
       label: "Gross Revenue",
       value: formatCurrency(grossRevenue),
       hint: `${totalOrders.toLocaleString("de-DE")} orders`,
-      detailLines: [],
+      detailLines: [
+        `${totalSoldProductQuantity.toLocaleString("de-DE")} pcs`,
+      ],
       icon: Euro,
       tone: "emerald",
     },
@@ -709,14 +722,14 @@ export default function EcommerceDashboard({
     {
       label: "Return Rate",
       value: formatPercent(returnRate),
-      hint: `${returnedOrders.toLocaleString("de-DE")} returned pcs`,
+      hint: `${returnedProductQuantity.toLocaleString("de-DE")} returned pcs`,
       icon: RotateCcw,
       tone: returnRate >= 7 ? "red" : "orange",
     },
     {
       label: "Cancellation Rate",
       value: formatPercent(cancelRate),
-      hint: `${canceledOrders.toLocaleString("de-DE")} canceled pcs`,
+      hint: `${canceledProductQuantity.toLocaleString("de-DE")} canceled pcs`,
       icon: Ban,
       tone: cancelRate >= 4 ? "red" : "orange",
     },
