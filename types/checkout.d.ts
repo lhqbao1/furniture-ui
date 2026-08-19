@@ -195,9 +195,11 @@ export interface CheckOutStatistics {
 
   count_cancel_order: number;
   total_cancel_order: number;
+  cancel_rate?: number;
 
   count_return_order: number;
   total_return_order: number;
+  return_rate?: number;
 
   count_stock_reserved_order: number;
   total_stock_reserved_order: number;
