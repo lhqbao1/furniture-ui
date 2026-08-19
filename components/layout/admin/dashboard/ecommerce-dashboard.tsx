@@ -642,8 +642,18 @@ export default function EcommerceDashboard({
   const dispatchedRevenue = toNumber(statistic?.total_dispatched_order);
 
   const avgOrderValue = totalOrders > 0 ? grossRevenue / totalOrders : 0;
-  const returnRate = totalOrders > 0 ? (returnedOrders / totalOrders) * 100 : 0;
-  const cancelRate = totalOrders > 0 ? (canceledOrders / totalOrders) * 100 : 0;
+  const returnRate =
+    statistic?.return_rate != null
+      ? toNumber(statistic.return_rate)
+      : totalOrders > 0
+        ? (returnedOrders / totalOrders) * 100
+        : 0;
+  const cancelRate =
+    statistic?.cancel_rate != null
+      ? toNumber(statistic.cancel_rate)
+      : totalOrders > 0
+        ? (canceledOrders / totalOrders) * 100
+        : 0;
   const fulfillmentRate =
     totalOrders > 0 ? (dispatchedOrders / totalOrders) * 100 : 0;
   const netRevenue = Math.max(
@@ -699,14 +709,14 @@ export default function EcommerceDashboard({
     {
       label: "Return Rate",
       value: formatPercent(returnRate),
-      hint: `${returnedOrders.toLocaleString("de-DE")} returned orders`,
+      hint: `${returnedOrders.toLocaleString("de-DE")} returned pcs`,
       icon: RotateCcw,
       tone: returnRate >= 7 ? "red" : "orange",
     },
     {
       label: "Cancellation Rate",
       value: formatPercent(cancelRate),
-      hint: `${canceledOrders.toLocaleString("de-DE")} canceled orders`,
+      hint: `${canceledOrders.toLocaleString("de-DE")} canceled pcs`,
       icon: Ban,
       tone: cancelRate >= 4 ? "red" : "orange",
     },

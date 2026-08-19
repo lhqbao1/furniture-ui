@@ -99,6 +99,21 @@ const getBundleMappedPackage = (bundle: unknown): PackageValue => {
   return normalizePackage(bundleSource);
 };
 
+const getBundleQuantity = (bundle: unknown) => {
+  const bundleSource = (bundle ?? {}) as Record<string, unknown>;
+  const quantity = Number(
+    bundleSource.quantity ?? bundleSource.amount ?? bundleSource.qty ?? 1,
+  );
+
+  return Number.isFinite(quantity) && quantity > 0 ? Math.floor(quantity) : 1;
+};
+
+const getBundleMappedPackages = (bundle: unknown): PackageValue[] => {
+  const quantity = getBundleQuantity(bundle);
+
+  return Array.from({ length: quantity }, () => getBundleMappedPackage(bundle));
+};
+
 const ProductLogisticsGroup = ({
   isDSP = false,
 }: ProductLogisticsGroupProps) => {
@@ -139,6 +154,7 @@ const ProductLogisticsGroup = ({
   const watchedCarrier = useWatch({ control, name: "carrier" });
   const watchedPackages = useWatch({ control, name: "packages" });
   const watchedBundles = bundleItems;
+  const hasBundleItems = Boolean(bundleItems?.length);
   const hasMountedWarningRef = useRef(false);
   const lastWarningKeyRef = useRef("");
   const carrierSuggestion = useMemo(
@@ -148,31 +164,33 @@ const ProductLogisticsGroup = ({
 
   // Thêm effect để đồng bộ bundleItems → number_of_packages + packages
   useEffect(() => {
-    if (!bundleItems || bundleItems.length === 0) return;
+    if (!hasBundleItems) return;
 
-    // ✅ Fill từng gói từ bundle_items (ưu tiên bundle_item.packages)
-    const filledPackages = bundleItems.map((bundle: unknown) =>
-      getBundleMappedPackage(bundle),
+    // Fill one package row for each bundle unit, not just each product row.
+    const filledPackages = bundleItems.flatMap((bundle: unknown) =>
+      getBundleMappedPackages(bundle),
     );
 
     form.setValue("number_of_packages", filledPackages.length);
 
     form.setValue("packages", filledPackages);
-  }, [bundleItems, form]);
+  }, [bundleItems, form, hasBundleItems]);
 
   useEffect(() => {
     const packages = form.getValues("packages") || [];
 
-    const validCount = packages.filter(isValidPackage).length;
+    const validCount = hasBundleItems
+      ? packages.length
+      : packages.filter(isValidPackage).length;
 
     form.setValue("number_of_packages", validCount, {
       shouldDirty: true,
       shouldValidate: true,
     });
-  }, [fields, form]);
+  }, [fields, form, hasBundleItems]);
 
   useEffect(() => {
-    if (!bundleItems?.length && fields.length === 0) {
+    if (!hasBundleItems && fields.length === 0) {
       append({
         length: null,
         height: null,
@@ -180,7 +198,7 @@ const ProductLogisticsGroup = ({
         weight: null,
       });
     }
-  }, [fields.length, bundleItems, append]);
+  }, [fields.length, hasBundleItems, append]);
 
   useEffect(() => {
     const shippingPackages = expandPackagesByBundleQuantity(
@@ -380,7 +398,7 @@ const ProductLogisticsGroup = ({
                   disabled={true} // ✅ disable nếu có bundleItems
                 />
               </FormControl>
-              {bundleItems?.length > 0 && (
+              {hasBundleItems && (
                 <p className="text-xs text-gray-500 italic mt-1">
                   Number of packages is automatically set from bundle items.
                 </p>
@@ -506,7 +524,7 @@ const ProductLogisticsGroup = ({
                   weight: null,
                 });
               }}
-              disabled={bundleItems?.length > 0}
+              disabled={hasBundleItems}
               className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700"
             >
               <span className="text-lg leading-none">+</span>
@@ -528,7 +546,7 @@ const ProductLogisticsGroup = ({
                   <Button
                     type="button"
                     onClick={() => remove(index)}
-                    disabled={bundleItems?.length > 0}
+                    disabled={hasBundleItems}
                     className="text-xs"
                     size={"icon"}
                     variant={"red"}
@@ -562,7 +580,7 @@ const ProductLogisticsGroup = ({
                                       : e.target.valueAsNumber,
                                   )
                                 }
-                                disabled={bundleItems?.length > 0}
+                                disabled={hasBundleItems}
                               />
                             </FormControl>
                             <FormLabel className="text-black font-semibold text-sm capitalize">

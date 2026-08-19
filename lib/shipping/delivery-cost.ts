@@ -146,6 +146,32 @@ function getBundleQuantity(bundle: BundleInput) {
   return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 1;
 }
 
+function getQuantityAlignedBundles(
+  packages: PackageInput[] | null | undefined,
+  bundles?: BundleInput[],
+) {
+  if (!packages || packages.length === 0 || !bundles || bundles.length === 0) {
+    return bundles;
+  }
+
+  const totalBundleQuantity = bundles.reduce(
+    (sum, bundle) => sum + getBundleQuantity(bundle),
+    0,
+  );
+
+  // Product forms can store one package row per bundle unit for clearer UI.
+  // In that case the rows are already quantity-expanded and must not be
+  // multiplied by bundle.quantity again during shipping calculation.
+  if (
+    packages.length === totalBundleQuantity &&
+    packages.length !== bundles.length
+  ) {
+    return packages.map(() => ({ quantity: 1 }));
+  }
+
+  return bundles;
+}
+
 function getPackageGirthCm(length: number, width: number, height: number) {
   const longest = Math.max(length, width, height);
   const sum = length + width + height;
@@ -334,9 +360,11 @@ export function expandPackagesByBundleQuantity(
 ) {
   if (!packages || packages.length === 0) return [];
 
+  const quantityAlignedBundles = getQuantityAlignedBundles(packages, bundles);
+
   return packages.flatMap((pkg, index) => {
     const normalizedPackage = normalizePackageInput(pkg);
-    const quantity = getBundleQuantity(bundles?.[index]);
+    const quantity = getBundleQuantity(quantityAlignedBundles?.[index]);
 
     return Array.from({ length: quantity }, () => normalizedPackage);
   });
@@ -367,6 +395,8 @@ export function aggregatePackages(
 ) {
   if (!packages || packages.length === 0) return null;
 
+  const quantityAlignedBundles = getQuantityAlignedBundles(packages, bundles);
+
   let totalWeight = 0;
   let totalLength = 0;
   let totalWidth = 0;
@@ -374,7 +404,7 @@ export function aggregatePackages(
 
   for (let index = 0; index < packages.length; index += 1) {
     const pkg = normalizePackageInput(packages[index]);
-    const rawQuantity = Number(bundles?.[index]?.quantity ?? 1);
+    const rawQuantity = Number(quantityAlignedBundles?.[index]?.quantity ?? 1);
     const quantity =
       Number.isFinite(rawQuantity) && rawQuantity > 0 ? rawQuantity : 1;
 
