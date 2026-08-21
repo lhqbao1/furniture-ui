@@ -12,7 +12,11 @@ import {
 } from "@/features/checkout/hook";
 import { getPreviousMonthRange } from "@/hooks/get-previous-month";
 import { cn } from "@/lib/utils";
-import { MarketplaceOverviewItem, ProviderItem } from "@/types/checkout";
+import {
+  CheckoutBrandTypeOverviewItem,
+  MarketplaceOverviewItem,
+  ProviderItem,
+} from "@/types/checkout";
 import {
   AlertTriangle,
   ArrowRight,
@@ -21,6 +25,7 @@ import {
   CheckCircle2,
   Clock3,
   Euro,
+  Loader2,
   PackageCheck,
   RotateCcw,
   ShoppingCart,
@@ -46,6 +51,9 @@ interface DashboardMetric {
   value: string;
   hint: string;
   detailLines?: string[];
+  detailError?: string;
+  detailLoadingLabel?: string;
+  isDetailLoading?: boolean;
   icon: React.ComponentType<{ className?: string }>;
   tone: CardTone;
 }
@@ -142,6 +150,28 @@ function formatPercent(value: number): string {
     minimumFractionDigits: hasDecimals ? 1 : 0,
     maximumFractionDigits: 1,
   })}%`;
+}
+
+function getBrandTypeRevenueTotals(items: CheckoutBrandTypeOverviewItem[]) {
+  return items.reduce(
+    (totals, item) => {
+      const brandType = item.brand_type?.toLowerCase();
+      const totalAmount = toNumber(item.total_amount);
+
+      if (brandType === "econelo") {
+        totals.econelo += totalAmount;
+        totals.hasData = true;
+      }
+
+      if (brandType === "non_econelo" || brandType === "rest") {
+        totals.rest += totalAmount;
+        totals.hasData = true;
+      }
+
+      return totals;
+    },
+    { econelo: 0, rest: 0, hasData: false },
+  );
 }
 
 function formatDateLabel(value?: string) {
@@ -572,6 +602,7 @@ export default function EcommerceDashboard({
     data: dashboardEconeloAndRest,
     isLoading: isDashboardEconeloAndRestLoading,
     isError: isDashboardEconeloAndRestError,
+    isFetching: isDashboardEconeloAndRestFetching,
   } = useGetCheckOutDashboardEconeloAndRest({
     from_date: fromDate,
     to_date: toDate,
@@ -675,20 +706,19 @@ export default function EcommerceDashboard({
   const netFromGrossByFormula = (gross: number) =>
     Math.max(0, gross - revenueDeductions);
 
-  const econeloBreakdownByType = dashboardEconeloAndRest?.data ?? [];
-  const econeloBreakdown = econeloBreakdownByType.find(
-    (item) => item.brand_type?.toLowerCase() === "econelo",
+  const brandTypeRevenueTotals = React.useMemo(
+    () => getBrandTypeRevenueTotals(dashboardEconeloAndRest?.data ?? []),
+    [dashboardEconeloAndRest?.data],
   );
-  const restBreakdown = econeloBreakdownByType.find((item) =>
-    ["non_econelo", "rest"].includes(item.brand_type?.toLowerCase()),
-  );
-  const hasEconeloBreakdown = Boolean(econeloBreakdown || restBreakdown);
+  const hasEconeloBreakdown = brandTypeRevenueTotals.hasData;
   const apiBreakdownDetailLines = hasEconeloBreakdown
     ? [
-        `Econelo: ${formatCurrency(toNumber(econeloBreakdown?.total_amount))}`,
-        `Rest: ${formatCurrency(toNumber(restBreakdown?.total_amount))}`,
+        `Econelo: ${formatCurrency(brandTypeRevenueTotals.econelo)}`,
+        `Rest: ${formatCurrency(brandTypeRevenueTotals.rest)}`,
       ]
     : [];
+  const isEconeloBreakdownLoading =
+    isDashboardEconeloAndRestLoading || isDashboardEconeloAndRestFetching;
 
   const operationalBacklog =
     waitingPaymentOrders + stockReservedOrders + preparingOrders;
@@ -709,6 +739,14 @@ export default function EcommerceDashboard({
       value: formatCurrency(netRevenue),
       hint: "gross - returns - cancellations",
       detailLines: apiBreakdownDetailLines,
+      detailError:
+        isDashboardEconeloAndRestError && !hasEconeloBreakdown
+          ? "Econelo/Rest breakdown unavailable"
+          : undefined,
+      detailLoadingLabel: hasEconeloBreakdown
+        ? "Updating Econelo/Rest..."
+        : "Loading Econelo/Rest...",
+      isDetailLoading: isEconeloBreakdownLoading,
       icon: Wallet,
       tone: "blue",
     },
@@ -770,7 +808,7 @@ export default function EcommerceDashboard({
     },
   ];
 
-  const operationalAlerts: OperationalAlert[] = [
+  const operationalAlertCandidates: Array<OperationalAlert | null> = [
     waitingPaymentOrders > 0
       ? {
           key: "waiting-payment",
@@ -843,7 +881,9 @@ export default function EcommerceDashboard({
           icon: AlertTriangle,
         }
       : null,
-  ]
+  ];
+
+  const operationalAlerts = operationalAlertCandidates
     .filter((item): item is OperationalAlert => Boolean(item))
     .sort((a, b) => {
       const priorityRank: Record<AlertSeverity, number> = {
@@ -923,6 +963,17 @@ export default function EcommerceDashboard({
                       </p>
                     ))}
                   </div>
+                ) : null}
+                {metric.isDetailLoading ? (
+                  <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span>{metric.detailLoadingLabel ?? "Loading..."}</span>
+                  </div>
+                ) : null}
+                {metric.detailError && !metric.isDetailLoading ? (
+                  <p className="mt-1 text-xs text-red-600">
+                    {metric.detailError}
+                  </p>
                 ) : null}
               </CardContent>
             </Card>

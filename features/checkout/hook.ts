@@ -24,6 +24,7 @@ import {
   GetAllMainCheckOutsAllParams,
   GetAllCheckoutParams,
   GetRefundOrdersParams,
+  GetSupplierCheckoutItemsParams,
   getCheckOut,
   getCheckOutByCheckOutId,
   getCheckOutByUserId,
@@ -38,6 +39,8 @@ import {
   getCheckOutSupplierByCheckOutId,
   getMainCheckOutByMainCheckOutId,
   getProductsCheckOutDashboard,
+  getAdminSupplierCheckoutItems,
+  getSupplierCheckoutItems,
   makeOrderPaid,
   OrderStatisticsParams,
   returnOrder,
@@ -58,6 +61,11 @@ import {
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
 import React from "react";
 import { getLast6Months } from "@/lib/get-last-6-months";
+
+interface UseGetSupplierCheckoutItemsParams
+  extends Omit<GetSupplierCheckoutItemsParams, "status"> {
+  status?: string[];
+}
 
 export function useGetCheckOut({ page, page_size }: GetAllCheckoutParams = {}) {
   return useQuery({
@@ -97,6 +105,34 @@ export function useGetCheckOutSupplier({
         to_date,
         search,
       }),
+    placeholderData: (previousData) => previousData,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useGetSupplierCheckoutItems({
+  supplier_id,
+  status = ["PENDING"],
+}: UseGetSupplierCheckoutItemsParams) {
+  return useQuery({
+    queryKey: ["supplier-checkout-items", supplier_id, status.join(",")],
+    queryFn: () => getSupplierCheckoutItems({ supplier_id, status }),
+    enabled: Boolean(supplier_id && status.length > 0),
+    placeholderData: (previousData) => previousData,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useGetAdminSupplierCheckoutItems({
+  supplier_id,
+  status = ["PENDING"],
+}: UseGetSupplierCheckoutItemsParams) {
+  return useQuery({
+    queryKey: ["admin-supplier-checkout-items", supplier_id, status.join(",")],
+    queryFn: () => getAdminSupplierCheckoutItems({ supplier_id, status }),
+    enabled: Boolean(supplier_id && status.length > 0),
     placeholderData: (previousData) => previousData,
     retry: false,
     refetchOnWindowFocus: false,
@@ -710,7 +746,9 @@ export const useGetCheckOutDashboardEconeloAndRest = (
       params.is_b2b ?? null,
     ],
     queryFn: () => getCheckOutDashboardEconeloAndRest(params),
+    placeholderData: (previousData) => previousData,
     retry: false,
+    staleTime: 60_000,
   });
 };
 

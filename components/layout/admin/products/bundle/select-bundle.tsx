@@ -41,25 +41,42 @@ const toFiniteNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const pickFiniteNumber = (
+  source: Record<string, unknown>,
+  keys: string[],
+) => {
+  for (const key of keys) {
+    const value = toFiniteNumber(source[key]);
+
+    if (value > 0) return value;
+  }
+
+  return 0;
+};
+
 const getPreferredPackageSize = (product: ProductItem): PackageSize => {
   const firstPackage = Array.isArray(product.packages)
     ? product.packages[0]
     : undefined;
 
   if (firstPackage) {
+    const packageRecord = firstPackage as Record<string, unknown>;
+
     return {
-      length: toFiniteNumber(firstPackage?.length),
-      width: toFiniteNumber(firstPackage?.width),
-      height: toFiniteNumber(firstPackage?.height),
-      weight: toFiniteNumber(firstPackage?.weight),
+      length: pickFiniteNumber(packageRecord, ["length", "package_length"]),
+      width: pickFiniteNumber(packageRecord, ["width", "package_width"]),
+      height: pickFiniteNumber(packageRecord, ["height", "package_height"]),
+      weight: pickFiniteNumber(packageRecord, ["weight", "package_weight"]),
     };
   }
 
+  const productRecord = product as unknown as Record<string, unknown>;
+
   return {
-    length: 0,
-    width: 0,
-    height: 0,
-    weight: 0,
+    length: pickFiniteNumber(productRecord, ["length", "package_length"]),
+    width: pickFiniteNumber(productRecord, ["width", "package_width"]),
+    height: pickFiniteNumber(productRecord, ["height", "package_height"]),
+    weight: pickFiniteNumber(productRecord, ["weight", "package_weight"]),
   };
 };
 
