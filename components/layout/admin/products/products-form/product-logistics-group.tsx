@@ -50,14 +50,27 @@ const toFiniteNumberOrNull = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const pickFiniteNumberOrNull = (
+  source: Record<string, unknown>,
+  keys: string[],
+) => {
+  for (const key of keys) {
+    const value = toFiniteNumberOrNull(source[key]);
+
+    if (value !== null) return value;
+  }
+
+  return null;
+};
+
 const normalizePackage = (value: unknown): PackageValue => {
   const source = (value ?? {}) as Record<string, unknown>;
 
   return {
-    length: toFiniteNumberOrNull(source.length),
-    width: toFiniteNumberOrNull(source.width),
-    height: toFiniteNumberOrNull(source.height),
-    weight: toFiniteNumberOrNull(source.weight),
+    length: pickFiniteNumberOrNull(source, ["length", "package_length"]),
+    width: pickFiniteNumberOrNull(source, ["width", "package_width"]),
+    height: pickFiniteNumberOrNull(source, ["height", "package_height"]),
+    weight: pickFiniteNumberOrNull(source, ["weight", "package_weight"]),
   };
 };
 

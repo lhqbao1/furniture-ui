@@ -224,9 +224,11 @@ export interface CheckoutDashboardResponse {
 }
 
 export interface CheckoutBrandTypeOverviewItem {
+  channel?: string;
   brand_type: string;
   total_orders: number;
   total_amount: number;
+  total_cost?: number;
   percentage: number;
 }
 
@@ -234,8 +236,40 @@ export interface CheckoutBrandTypeOverviewResponse {
   from_date: string | null;
   to_date: string | null;
   grand_total_amount: number;
+  grand_total_cost?: number;
   grand_total_orders: number;
   data: CheckoutBrandTypeOverviewItem[];
+}
+
+export interface SupplierCheckoutItemShippingAddress {
+  id: string;
+  user_id: string;
+  name_address: string | null;
+  city: string;
+  state: string | null;
+  postal_code: string;
+  country: string;
+  phone_number: string;
+  recipient_name: string;
+  address_line: string;
+  additional_address_line: string | null;
+  email: string;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+  checkout_code: string;
+}
+
+export interface SupplierCheckoutItem {
+  quantity: number;
+  name: string;
+  sku: string;
+  weight_per_item: number;
+  list_shipping_address: SupplierCheckoutItemShippingAddress[];
+}
+
+export interface SupplierCheckoutItemsResponse {
+  items: SupplierCheckoutItem[];
 }
 
 export interface CheckoutMainTag {

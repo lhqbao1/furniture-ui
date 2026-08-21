@@ -14,6 +14,7 @@ import {
   CheckOutStatistics,
   ProviderOverviewResponse,
   RefundOrdersResponse,
+  SupplierCheckoutItemsResponse,
 } from "@/types/checkout";
 
 export interface GetAllCheckoutParams {
@@ -52,6 +53,11 @@ export interface GetRefundOrdersParams {
   search?: string;
   is_claimed_factory?: boolean;
   is_claimed_marketplace?: boolean;
+}
+
+export interface GetSupplierCheckoutItemsParams {
+  supplier_id: string;
+  status: string[];
 }
 
 const sanitizeDateTimeParam = (value?: string) => {
@@ -213,6 +219,40 @@ export async function getCheckOutSupplier(params?: GetAllCheckoutParams) {
       qs.stringify(params, { arrayFormat: "repeat" }),
   });
   return data as CheckOutResponse;
+}
+
+export async function getSupplierCheckoutItems({
+  supplier_id,
+  status,
+}: GetSupplierCheckoutItemsParams) {
+  const { data } = await apiDSP.post(
+    `/checkout/supplier/items/${supplier_id}`,
+    status,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  return data as SupplierCheckoutItemsResponse;
+}
+
+export async function getAdminSupplierCheckoutItems({
+  supplier_id,
+  status,
+}: GetSupplierCheckoutItemsParams) {
+  const { data } = await apiAdmin.post(
+    `/checkout/supplier/items/${supplier_id}`,
+    status,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  return data as SupplierCheckoutItemsResponse;
 }
 
 export async function getCheckOutMain(params?: GetAllCheckoutParams) {

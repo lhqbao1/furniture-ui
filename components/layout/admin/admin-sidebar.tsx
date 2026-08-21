@@ -143,6 +143,11 @@ export function AdminSideBar() {
           icon: CornerDownRight,
         },
         {
+          title: "Warehouse",
+          url: "/admin/warehouse",
+          icon: CornerDownRight,
+        },
+        {
           title: "AMM We Avis",
           url: "/admin/amm/we-avis",
           icon: CornerDownRight,
