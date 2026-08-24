@@ -181,6 +181,14 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplaceInvoicePreset> = {
     invoice_postal_code: "59609",
     invoice_country: "DE",
   },
+  metro: {
+    company_name: "METRO Markets GmbH",
+    tax_id: "DE317473290",
+    invoice_address: "Schlüterstraße 5",
+    invoice_city: "Düsseldorf",
+    invoice_postal_code: "40235",
+    invoice_country: "DE",
+  },
 };
 
 const normalizeChannelValue = (value?: string | null) =>

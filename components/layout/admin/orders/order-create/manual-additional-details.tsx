@@ -127,6 +127,7 @@ export default function ManualAdditionalInformation({
         { value: "hagebau", label: "Hagebau" },
         { value: "prestige", label: "Prestige Home" },
         { value: "moebelix", label: "Moebelix" },
+        { value: "metro", label: "Metro" },
         { value: "otto", label: "Otto" },
         { value: "docmorris", label: "Docmorris" },
         { value: "rieberg", label: "Rieberg" },
