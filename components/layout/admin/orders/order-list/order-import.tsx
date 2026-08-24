@@ -109,6 +109,7 @@ const CHANNEL_OPTIONS = [
   { value: "hagebau", label: "Hagebau" },
   { value: "prestige", label: "Prestige Home" },
   { value: "moebelix", label: "Moebelix" },
+  { value: "metro", label: "Metro" },
   { value: "otto", label: "Otto" },
   { value: "rieberg", label: "Rieberg" },
   { value: "temu", label: "Temu" },
@@ -226,6 +227,14 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
     invoice_address: "Lange Straße 21",
     invoice_city: "Anröchte",
     invoice_postal_code: "59609",
+    invoice_country: "DE",
+  },
+  metro: {
+    company_name: "METRO Markets GmbH",
+    tax_id: "DE317473290",
+    invoice_address: "Schlüterstraße 5",
+    invoice_city: "Düsseldorf",
+    invoice_postal_code: "40235",
     invoice_country: "DE",
   },
   // thêm sau nếu cần:

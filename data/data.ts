@@ -950,9 +950,14 @@ export const listChanel = [
     icon: "reiberg.jpg",
   },
   {
-    id: 25,
+    id: 27,
     name: "temu",
     icon: "temu.jpg",
+  },
+  {
+    id: 26,
+    name: "metro",
+    icon: "metro.jpg",
   },
 ];
 
