@@ -629,6 +629,11 @@ export default function EcommerceDashboard({
       isDashboardEconeloAndRestLoading) &&
     !hasAnyData;
 
+  const brandTypeRevenueTotals = React.useMemo(
+    () => getBrandTypeRevenueTotals(dashboardEconeloAndRest?.data ?? []),
+    [dashboardEconeloAndRest?.data],
+  );
+
   if (isLoading) {
     return <DashboardLoadingSkeleton />;
   }
@@ -706,10 +711,6 @@ export default function EcommerceDashboard({
   const netFromGrossByFormula = (gross: number) =>
     Math.max(0, gross - revenueDeductions);
 
-  const brandTypeRevenueTotals = React.useMemo(
-    () => getBrandTypeRevenueTotals(dashboardEconeloAndRest?.data ?? []),
-    [dashboardEconeloAndRest?.data],
-  );
   const hasEconeloBreakdown = brandTypeRevenueTotals.hasData;
   const apiBreakdownDetailLines = hasEconeloBreakdown
     ? [
