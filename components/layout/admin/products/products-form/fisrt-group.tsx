@@ -79,16 +79,32 @@ const ProductDetailInputs = ({
   const [isImageSelectionMode, setIsImageSelectionMode] = useState(false);
   const [selectedImageUrls, setSelectedImageUrls] = useState<string[]>([]);
 
-  function sanitizeFolderName(name: string) {
-    return name
-      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "") // loại ký tự không hợp lệ trong tên file
-      .replace(/\s+/g, "_") // đổi khoảng trắng thành _
+  function sanitizeFileSegment(value?: string | null) {
+    return (value || "unknown")
+      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
+      .replace(/\s+/g, "_")
       .trim();
+  }
+
+  function getImageExtension(url: string) {
+    try {
+      const pathname = new URL(url, window.location.origin).pathname;
+
+      return (
+        pathname.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)?.[1]?.toLowerCase() ||
+        "jpg"
+      );
+    } catch {
+      return (
+        url.match(/\.(jpg|jpeg|png|gif|webp|svg)(?:$|[?#])/i)?.[1]?.toLowerCase() ||
+        "jpg"
+      );
+    }
   }
 
   const handleDownloadZip = async () => {
     // Lấy dữ liệu realtime từ form
-    const { name, id_provider, static_files } = form.watch();
+    const { name, ean, sku, static_files } = form.watch();
     const files = Array.isArray(static_files)
       ? (static_files as Array<{ url?: string }>)
       : [];
@@ -112,10 +128,10 @@ const ProductDetailInputs = ({
     const toastId = toast.loading("Preparing images...");
 
     try {
-      // Tên folder dựa trên provider ID và product name
-      const folderName = `${id_provider || "unknown"}_${sanitizeFolderName(
-        name,
-      )}`;
+      const safeEan = sanitizeFileSegment(ean);
+      const safeSku = sanitizeFileSegment(sku);
+      const folderName = `${safeEan}_${safeSku}`;
+      const folder = zip.folder(folderName) ?? zip;
 
       let totalCount = 0;
 
@@ -127,13 +143,11 @@ const ProductDetailInputs = ({
           if (!response.ok) throw new Error("Failed to fetch");
 
           const blob = await response.blob();
-          const ext =
-            file.url
-              .match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)?.[1]
-              ?.toLowerCase() || "jpg";
-          const filename = `image_${index + 1}.${ext}`;
+          const ext = getImageExtension(file.url);
+          const imageNumber = String(index + 1).padStart(2, "0");
+          const filename = `${safeEan}_${imageNumber}.${ext}`;
 
-          zip.file(filename, blob, { binary: true });
+          folder.file(filename, blob, { binary: true });
           totalCount++;
         } catch (error) {
           console.error("Error downloading image:", file.url, error);
