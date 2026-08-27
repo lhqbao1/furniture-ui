@@ -52,9 +52,7 @@ function getExternalReference(order: CheckOutMain) {
 
 function formatOrderTags(order: CheckOutMain) {
   const tags = Array.isArray(order.tags)
-    ? order.tags
-        .map((item) => String(item?.tag ?? "").trim())
-        .filter(Boolean)
+    ? order.tags.map((item) => String(item?.tag ?? "").trim()).filter(Boolean)
     : [];
 
   return Array.from(new Set(tags)).join(" | ");
@@ -83,7 +81,12 @@ function calculateOrderNetValues(order: CheckOutMain) {
     const taxValue =
       // Keep export aligned with order details table logic.
       item?.products?.tax ?? item?.purchased_products?.tax ?? null;
-    const vatResult = calculateProductVAT(unitGross, taxValue, countryCode, taxId);
+    const vatResult = calculateProductVAT(
+      unitGross,
+      taxValue,
+      countryCode,
+      taxId,
+    );
     const vatRate = Number(vatResult.vatRate) || 0;
     const lineGross = +(unitGross * quantity).toFixed(2);
     const lineNet = +(Number(vatResult.net) * quantity).toFixed(2);
@@ -98,15 +101,12 @@ function calculateOrderNetValues(order: CheckOutMain) {
   const netAmount = linePricings.reduce((sum, line) => sum + line.lineNet, 0);
 
   const shippingGross = Math.max(0, Number(order.total_shipping) || 0);
-  const grossByVatRate = linePricings.reduce(
-    (acc, line) => {
-      if (line.lineGross <= 0) return acc;
-      const key = line.vatRate;
-      acc.set(key, +(Number(acc.get(key) || 0) + line.lineGross).toFixed(2));
-      return acc;
-    },
-    new Map<number, number>(),
-  );
+  const grossByVatRate = linePricings.reduce((acc, line) => {
+    if (line.lineGross <= 0) return acc;
+    const key = line.vatRate;
+    acc.set(key, +(Number(acc.get(key) || 0) + line.lineGross).toFixed(2));
+    return acc;
+  }, new Map<number, number>());
 
   let shippingNet = 0;
   const productBuckets = Array.from(grossByVatRate.entries())
@@ -118,7 +118,12 @@ function calculateOrderNetValues(order: CheckOutMain) {
 
   if (shippingGross > 0) {
     if (productBuckets.length === 0) {
-      shippingNet = +calculateProductVAT(shippingGross, "19%", countryCode, taxId).net.toFixed(2);
+      shippingNet = +calculateProductVAT(
+        shippingGross,
+        "19%",
+        countryCode,
+        taxId,
+      ).net.toFixed(2);
     } else {
       const totalProductGross = +productBuckets
         .reduce((sum, bucket) => sum + bucket.gross, 0)
@@ -137,13 +142,19 @@ function calculateOrderNetValues(order: CheckOutMain) {
         );
         remainingGross = +(remainingGross - allocatedGross).toFixed(2);
 
-        const lineShippingNet = +(allocatedGross / (1 + bucket.vatRate)).toFixed(2);
+        const lineShippingNet = +(
+          allocatedGross /
+          (1 + bucket.vatRate)
+        ).toFixed(2);
         shippingNet = +(shippingNet + lineShippingNet).toFixed(2);
       });
 
       if (remainingGross > 0) {
         const fallbackRate = productBuckets[productBuckets.length - 1].vatRate;
-        const fallbackShippingNet = +(remainingGross / (1 + fallbackRate)).toFixed(2);
+        const fallbackShippingNet = +(
+          remainingGross /
+          (1 + fallbackRate)
+        ).toFixed(2);
         shippingNet = +(shippingNet + fallbackShippingNet).toFixed(2);
       }
     }
@@ -175,12 +186,19 @@ function getCartItemExportValues(
   const quantity = Number(item?.quantity) || 0;
   const unitGross = getCartItemUnitGross(item);
   const taxValue = item?.products?.tax ?? item?.purchased_products?.tax ?? null;
-  const vatResult = calculateProductVAT(unitGross, taxValue, countryCode, taxId);
+  const vatResult = calculateProductVAT(
+    unitGross,
+    taxValue,
+    countryCode,
+    taxId,
+  );
   const unitNet = +Number(vatResult.net || 0).toFixed(2);
   const lineGross = +(unitGross * quantity).toFixed(2);
   const lineNet = +(unitNet * quantity).toFixed(2);
   const taxRate = +((Number(vatResult.vatRate) || 0) * 100).toFixed(2);
-  const productCost = +((Number(item?.products?.cost) || 0) * quantity).toFixed(2);
+  const productCost = +((Number(item?.products?.cost) || 0) * quantity).toFixed(
+    2,
+  );
   const freightCost = +(
     (Number(item?.products?.delivery_cost) || 0) * quantity
   ).toFixed(2);
@@ -199,7 +217,8 @@ function getCartItemExportValues(
 
 export function mapOrderListTemplateRows(data: CheckOutMain[]) {
   return data.flatMap((order) => {
-    const hasChildCheckouts = Array.isArray(order.checkouts) && order.checkouts.length > 0;
+    const hasChildCheckouts =
+      Array.isArray(order.checkouts) && order.checkouts.length > 0;
     const exportableCheckouts = getExportableCheckouts(order);
     if (hasChildCheckouts && exportableCheckouts.length === 0) return [];
 
@@ -209,8 +228,7 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
     const user = checkout?.user;
     const allItems = exportableCheckouts.flatMap((c) => c.cart?.items ?? []);
     const { netAmount, shippingNet } = calculateOrderNetValues(order);
-    const countryCode =
-      shipping?.country ?? invoice?.country ?? "DE";
+    const countryCode = shipping?.country ?? invoice?.country ?? "DE";
     const taxId = user?.tax_id ?? "";
     const rowItems: Array<CartItem | undefined> =
       allItems.length > 0 ? allItems : [undefined];
@@ -220,6 +238,8 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
       invoice_company_name: clean(user?.company_name ?? ""),
       invoice_tax_number: clean(user?.tax_id ?? ""),
       invoice_phone_number: clean(invoice?.phone_number ?? ""),
+      invoice_email: clean(user?.email ?? ""),
+
       invoice_address: clean(invoice?.address_line ?? ""),
       invoice_additional_address: clean(invoice?.additional_address_line ?? ""),
       invoice_city: clean(invoice?.city ?? ""),
@@ -229,7 +249,9 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
       recipient_name: clean(shipping?.recipient_name ?? ""),
       recipient_phone_number: clean(shipping?.phone_number ?? ""),
       shipping_address: clean(shipping?.address_line ?? ""),
-      shipping_additional_address: clean(shipping?.additional_address_line ?? ""),
+      shipping_additional_address: clean(
+        shipping?.additional_address_line ?? "",
+      ),
       shipping_city: clean(shipping?.city ?? ""),
       shipping_postal_code: clean(shipping?.postal_code ?? ""),
       shipping_country: clean(shipping?.country ?? ""),

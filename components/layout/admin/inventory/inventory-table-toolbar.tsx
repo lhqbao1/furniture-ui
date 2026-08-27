@@ -38,6 +38,7 @@ interface InventoryTableToolbarProps {
   isInventory?: boolean;
   filterContent?: React.ReactNode;
   searchContent?: React.ReactNode;
+  extraActionContent?: React.ReactNode;
   searchByEnter?: boolean;
 }
 
@@ -48,6 +49,7 @@ export default function InventoryTableToolbar({
   isInventory,
   filterContent,
   searchContent,
+  extraActionContent,
   searchByEnter = false,
 }: InventoryTableToolbarProps) {
   const router = useRouter();
@@ -143,7 +145,7 @@ export default function InventoryTableToolbar({
           )}
         </div>
 
-        <div className="grid w-full grid-cols-3 gap-2 md:w-fit md:grid-cols-[140px_110px_110px]">
+        <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 md:w-fit md:grid-cols-[140px_110px_110px]">
           <div className="min-w-0">
             <Select
               value={String(pageSize)}
@@ -191,6 +193,12 @@ export default function InventoryTableToolbar({
               Add PO
             </Button>
           )}
+
+          {extraActionContent ? (
+            <div className="flex min-w-0 [&_button]:w-full">
+              {extraActionContent}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

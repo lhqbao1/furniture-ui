@@ -195,9 +195,7 @@ const getCountryFlag = (countryCode?: string | null) => {
 
   return normalizedCountryCode
     .split("")
-    .map((character) =>
-      String.fromCodePoint(127397 + character.charCodeAt(0)),
-    )
+    .map((character) => String.fromCodePoint(127397 + character.charCodeAt(0)))
     .join("");
 };
 
@@ -417,7 +415,9 @@ export default function WarehousePage() {
 
     if (!normalizedSearch) return items;
 
-    return items.filter((item) => getSearchText(item).includes(normalizedSearch));
+    return items.filter((item) =>
+      getSearchText(item).includes(normalizedSearch),
+    );
   }, [data?.items, search]);
 
   const totalQuantity = React.useMemo(
@@ -474,7 +474,10 @@ export default function WarehousePage() {
     );
   };
 
-  const handlePrintProduct = async (item: SupplierCheckoutItem, key: string) => {
+  const handlePrintProduct = async (
+    item: SupplierCheckoutItem,
+    key: string,
+  ) => {
     const addresses = item.list_shipping_address ?? [];
 
     if (addresses.length === 0) {
@@ -626,7 +629,9 @@ export default function WarehousePage() {
           <div className="flex h-56 flex-col items-center justify-center rounded-3xl bg-slate-50 text-center text-slate-500">
             <PackageCheck className="mb-3 h-8 w-8 text-slate-300" />
             <p className="font-semibold text-slate-700">No items to prepare</p>
-            <p className="mt-1 text-sm">There are no matching preparation items.</p>
+            <p className="mt-1 text-sm">
+              There are no matching preparation items.
+            </p>
           </div>
         ) : (
           <>
@@ -659,7 +664,8 @@ export default function WarehousePage() {
                         aria-expanded={isExpanded}
                         onClick={() => toggleExpanded(rowKey)}
                         onKeyDown={(event) => {
-                          if (event.key !== "Enter" && event.key !== " ") return;
+                          if (event.key !== "Enter" && event.key !== " ")
+                            return;
 
                           event.preventDefault();
                           toggleExpanded(rowKey);
@@ -697,8 +703,10 @@ export default function WarehousePage() {
                               </p>
                               <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
                                 <span>
-                                  {formatNumber(item.list_shipping_address?.length)}
-                                  {" "}shipments
+                                  {formatNumber(
+                                    item.list_shipping_address?.length,
+                                  )}{" "}
+                                  shipments
                                 </span>
                                 <span>Status: PREPARATION_SHIPPING</span>
                               </div>
