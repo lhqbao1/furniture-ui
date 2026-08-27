@@ -2,6 +2,7 @@
 
 import { getInventoryColumns } from "@/components/layout/admin/inventory/columns";
 import PHInventoryFilterForm from "@/components/layout/admin/inventory/ph-filter-form";
+import PhysicalInventoryExportButton from "@/components/layout/admin/inventory/physical-inventory-export-button";
 import PhysicalInventoryFilterForm from "@/components/layout/admin/inventory/physical-filter-form";
 import PhysicalInventorySearch from "@/components/layout/admin/inventory/physical-inventory-search";
 import InventoryTableToolbar from "@/components/layout/admin/inventory/inventory-table-toolbar";
@@ -154,6 +155,11 @@ const AdminInventoryList = () => {
           searchContent={
             activeTab === "physical-inventory" ? (
               <PhysicalInventorySearch />
+            ) : undefined
+          }
+          extraActionContent={
+            activeTab === "physical-inventory" ? (
+              <PhysicalInventoryExportButton />
             ) : undefined
           }
         />
