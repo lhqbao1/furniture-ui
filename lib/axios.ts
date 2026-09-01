@@ -2,6 +2,9 @@
 import axios, { AxiosError } from "axios";
 
 const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const userApiV1BaseURL =
+  process.env.NEXT_PUBLIC_USER_API_V1_BASE_URL ||
+  "https://directors-stay-img-submitted.trycloudflare.com";
 
 // 1. Public API - không có token
 export const apiPublic = axios.create({
@@ -153,6 +156,40 @@ apiDSP.interceptors.response.use(
 
       // 👉 Redirect về admin login
       window.location.href = "/dsp/login";
+    }
+    return Promise.reject(error);
+  },
+);
+
+// 4. User API V1 Public - không có token
+export const apiUserV1Public = axios.create({
+  baseURL: userApiV1BaseURL,
+  withCredentials: false,
+});
+
+// 5. User API V1 - attach user_v1_access_token
+export const apiUserV1 = axios.create({
+  baseURL: userApiV1BaseURL,
+  withCredentials: false,
+});
+
+apiUserV1.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("user_v1_access_token");
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
+apiUserV1.interceptors.response.use(
+  (res) => res,
+  async (error: AxiosError) => {
+    if (error.response?.status === 401 && typeof window !== "undefined") {
+      localStorage.removeItem("user_v1_access_token");
+      localStorage.removeItem("user_v1_user_id");
     }
     return Promise.reject(error);
   },

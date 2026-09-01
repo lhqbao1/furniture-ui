@@ -104,6 +104,7 @@ const formatColumnLabel = (key: string) => {
     invoice_country: "Invoice Country",
     recipient_name: "Shipping Recipient Name",
     recipient_phone_number: "Shipping Recipient Phone Number",
+    email_shipping: "Shipping Email",
     shipping_address: "Shipping Address",
     shipping_additional_address: "Shipping Additional Address",
     shipping_city: "Shipping City",

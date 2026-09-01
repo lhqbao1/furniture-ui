@@ -11,6 +11,19 @@ const intlMiddleware = createMiddleware({
 export default function middleware(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
 
+  const userAuthV1Routes = ["/login", "/dashboard"];
+
+  if (
+    userAuthV1Routes.some(
+      (route) => pathname === route || pathname.startsWith(`${route}/`),
+    )
+  ) {
+    const response = NextResponse.next();
+    response.headers.set("Cache-Control", "no-store, max-age=0, must-revalidate");
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+    return response;
+  }
+
   if (pathname === "/en" || pathname.startsWith("/en/")) {
     const redirectUrl = req.nextUrl.clone();
     redirectUrl.pathname = pathname.replace(/^\/en(?=\/|$)/, "/de");

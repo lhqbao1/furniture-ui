@@ -248,6 +248,7 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
 
       recipient_name: clean(shipping?.recipient_name ?? ""),
       recipient_phone_number: clean(shipping?.phone_number ?? ""),
+      email_shipping: clean(shipping?.email ?? ""),
       shipping_address: clean(shipping?.address_line ?? ""),
       shipping_additional_address: clean(
         shipping?.additional_address_line ?? "",

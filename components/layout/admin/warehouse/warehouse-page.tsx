@@ -33,7 +33,7 @@ import React from "react";
 import { toast } from "sonner";
 
 const PRESTIGE_HOME_SUPPLIER_ID = "65d162e2-7c5d-46f9-86d3-21fcf4346efe";
-const WAREHOUSE_STATUSES = ["PREPARATION_SHIPPING"];
+const WAREHOUSE_STATUSES = ["PREPARATION_SHIPPING", "PAID"];
 const PAGE_SIZE_OPTIONS = [20, 50, 100];
 const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 
