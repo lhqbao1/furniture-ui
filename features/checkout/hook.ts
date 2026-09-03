@@ -114,10 +114,16 @@ export function useGetCheckOutSupplier({
 export function useGetSupplierCheckoutItems({
   supplier_id,
   status = ["PENDING"],
+  carrier,
 }: UseGetSupplierCheckoutItemsParams) {
   return useQuery({
-    queryKey: ["supplier-checkout-items", supplier_id, status.join(",")],
-    queryFn: () => getSupplierCheckoutItems({ supplier_id, status }),
+    queryKey: [
+      "supplier-checkout-items",
+      supplier_id,
+      status.join(","),
+      carrier ?? null,
+    ],
+    queryFn: () => getSupplierCheckoutItems({ supplier_id, status, carrier }),
     enabled: Boolean(supplier_id && status.length > 0),
     placeholderData: (previousData) => previousData,
     retry: false,
@@ -128,10 +134,17 @@ export function useGetSupplierCheckoutItems({
 export function useGetAdminSupplierCheckoutItems({
   supplier_id,
   status = ["PENDING"],
+  carrier,
 }: UseGetSupplierCheckoutItemsParams) {
   return useQuery({
-    queryKey: ["admin-supplier-checkout-items", supplier_id, status.join(",")],
-    queryFn: () => getAdminSupplierCheckoutItems({ supplier_id, status }),
+    queryKey: [
+      "admin-supplier-checkout-items",
+      supplier_id,
+      status.join(","),
+      carrier ?? null,
+    ],
+    queryFn: () =>
+      getAdminSupplierCheckoutItems({ supplier_id, status, carrier }),
     enabled: Boolean(supplier_id && status.length > 0),
     placeholderData: (previousData) => previousData,
     retry: false,
