@@ -58,6 +58,7 @@ export interface GetRefundOrdersParams {
 export interface GetSupplierCheckoutItemsParams {
   supplier_id: string;
   status: string[];
+  carrier?: string;
 }
 
 const sanitizeDateTimeParam = (value?: string) => {
@@ -224,11 +225,15 @@ export async function getCheckOutSupplier(params?: GetAllCheckoutParams) {
 export async function getSupplierCheckoutItems({
   supplier_id,
   status,
+  carrier,
 }: GetSupplierCheckoutItemsParams) {
   const { data } = await apiDSP.post(
     `/checkout/supplier/items/${supplier_id}`,
     status,
     {
+      params: {
+        ...(carrier !== undefined && { carrier }),
+      },
       headers: {
         "Content-Type": "application/json",
       },
@@ -241,11 +246,15 @@ export async function getSupplierCheckoutItems({
 export async function getAdminSupplierCheckoutItems({
   supplier_id,
   status,
+  carrier,
 }: GetSupplierCheckoutItemsParams) {
   const { data } = await apiAdmin.post(
     `/checkout/supplier/items/${supplier_id}`,
     status,
     {
+      params: {
+        ...(carrier !== undefined && { carrier }),
+      },
       headers: {
         "Content-Type": "application/json",
       },

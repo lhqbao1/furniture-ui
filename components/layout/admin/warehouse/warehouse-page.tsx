@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -10,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCreateDpdOutboundLabels } from "@/features/dpd/hook";
 import type { CreateDpdOutboundLabelsPayload } from "@/features/dpd/api";
 import { useGetAdminSupplierCheckoutItems } from "@/features/checkout/hook";
@@ -28,6 +30,7 @@ import {
   Search,
   Truck,
 } from "lucide-react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
@@ -36,6 +39,22 @@ const PRESTIGE_HOME_SUPPLIER_ID = "65d162e2-7c5d-46f9-86d3-21fcf4346efe";
 const WAREHOUSE_STATUSES = ["PREPARATION_SHIPPING", "PAID"];
 const PAGE_SIZE_OPTIONS = [20, 50, 100];
 const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
+const WAREHOUSE_CARRIER_OPTIONS = [
+  { value: "dpd", imageSrc: "/dpd.jpeg", imageAlt: "DPD" },
+  { value: "gls", imageSrc: "/gls-new.png", imageAlt: "GLS" },
+  {
+    value: "spedition",
+    imageSrc: "/cargoline.webp",
+    imageAlt: "Cargoline",
+  },
+] as const;
+
+type WarehouseCarrier = (typeof WAREHOUSE_CARRIER_OPTIONS)[number]["value"];
+
+const DEFAULT_WAREHOUSE_CARRIER: WarehouseCarrier = "dpd";
+
+const isWarehouseCarrier = (value?: string | null): value is WarehouseCarrier =>
+  WAREHOUSE_CARRIER_OPTIONS.some((option) => option.value === value);
 
 const formatNumber = (value?: number | string | null) => {
   const numericValue = Number(value ?? 0);
@@ -175,6 +194,84 @@ const openDpdLabelResponse = (response: unknown) => {
   } catch {
     return false;
   }
+};
+
+const parseJsonSafely = (value: string) => {
+  try {
+    return JSON.parse(value) as unknown;
+  } catch {
+    return value;
+  }
+};
+
+const getRecord = (value: unknown): Record<string, unknown> | null =>
+  value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+
+const readErrorResponseData = async (data: unknown) => {
+  if (data instanceof Blob) {
+    const text = await data.text();
+
+    return text ? parseJsonSafely(text) : null;
+  }
+
+  if (typeof data === "string") {
+    return parseJsonSafely(data);
+  }
+
+  return data;
+};
+
+const extractDpdErrorMessage = (data: unknown): string | null => {
+  if (typeof data === "string") return data.trim() || null;
+
+  const record = getRecord(data);
+  if (!record) return null;
+
+  const detail = record.detail;
+
+  if (typeof detail === "string") return detail.trim() || null;
+
+  const detailRecord = getRecord(detail);
+  const detailMessage = detailRecord?.message;
+
+  if (typeof detailMessage === "string" && detailMessage.trim()) {
+    return detailMessage.trim();
+  }
+
+  const dpdErrors = detailRecord?.dpd_errors;
+
+  if (Array.isArray(dpdErrors)) {
+    for (const dpdError of dpdErrors) {
+      const dpdErrorRecord = getRecord(dpdError);
+      const dpdErrorMessage = dpdErrorRecord?.message;
+
+      if (typeof dpdErrorMessage === "string" && dpdErrorMessage.trim()) {
+        return dpdErrorMessage.trim();
+      }
+    }
+  }
+
+  const message = record.message;
+
+  if (typeof message === "string" && message.trim()) {
+    return message.trim();
+  }
+
+  return null;
+};
+
+const getDpdErrorMessage = async (error: unknown) => {
+  const errorRecord = getRecord(error);
+  const responseRecord = getRecord(errorRecord?.response);
+  const responseData = await readErrorResponseData(responseRecord?.data);
+  const apiMessage = extractDpdErrorMessage(responseData);
+
+  if (apiMessage) return apiMessage;
+  if (error instanceof Error && error.message) return error.message;
+
+  return "Failed to create DPD labels";
 };
 
 const getAddressLine = (address: SupplierCheckoutItemShippingAddress) =>
@@ -388,12 +485,74 @@ function ExpandedAddresses({ item }: { item: SupplierCheckoutItem }) {
   );
 }
 
+function WarehouseTableSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-3xl border border-slate-200">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-[#EEF8F0] hover:bg-[#EEF8F0]">
+            <TableHead className="w-14 bg-[#EEF8F0]" />
+            <TableHead className="min-w-[420px] bg-[#EEF8F0]">
+              Product
+            </TableHead>
+            <TableHead className="bg-[#EEF8F0]">SKU</TableHead>
+            <TableHead className="bg-[#EEF8F0]">Quantity</TableHead>
+            <TableHead className="bg-[#EEF8F0]">Weight / item</TableHead>
+            <TableHead className="bg-[#EEF8F0]">Shipments</TableHead>
+            <TableHead className="bg-[#EEF8F0] text-right">Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <TableRow key={index}>
+              <TableCell>
+                <Skeleton className="h-9 w-9 rounded-full bg-slate-100" />
+              </TableCell>
+              <TableCell>
+                <div className="flex min-w-[420px] items-center gap-4 py-2">
+                  <Skeleton className="h-14 w-14 rounded-2xl bg-emerald-50" />
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <Skeleton className="h-5 w-full max-w-[520px] bg-slate-100" />
+                    <div className="flex gap-3">
+                      <Skeleton className="h-4 w-24 bg-slate-100" />
+                      <Skeleton className="h-4 w-44 bg-slate-100" />
+                    </div>
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-5 w-28 bg-slate-100" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-8 w-20 rounded-full bg-emerald-50" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-5 w-16 bg-slate-100" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-8 w-16 rounded-full bg-slate-100" />
+              </TableCell>
+              <TableCell className="text-right">
+                <Skeleton className="ml-auto h-10 w-24 rounded-xl bg-emerald-50" />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
 export default function WarehousePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const page = Math.max(1, Number(searchParams.get("page") ?? 1));
   const pageSize = Number(searchParams.get("page_size") ?? 50);
   const search = searchParams.get("search") ?? "";
+  const carrierParam = searchParams.get("carrier");
+  const activeCarrier = isWarehouseCarrier(carrierParam)
+    ? carrierParam
+    : DEFAULT_WAREHOUSE_CARRIER;
   const [searchInput, setSearchInput] = React.useState(search);
   const [expandedKeys, setExpandedKeys] = React.useState<string[]>([]);
   const [printingKey, setPrintingKey] = React.useState<string | null>(null);
@@ -407,6 +566,7 @@ export default function WarehousePage() {
     useGetAdminSupplierCheckoutItems({
       supplier_id: PRESTIGE_HOME_SUPPLIER_ID,
       status: WAREHOUSE_STATUSES,
+      carrier: activeCarrier,
     });
 
   const filteredItems = React.useMemo(() => {
@@ -466,6 +626,13 @@ export default function WarehousePage() {
     updateParams({ search: searchInput.trim(), page: 1 });
   };
 
+  const handleCarrierChange = (value: string) => {
+    if (!isWarehouseCarrier(value)) return;
+
+    setExpandedKeys([]);
+    updateParams({ carrier: value, page: 1 });
+  };
+
   const toggleExpanded = (key: string) => {
     setExpandedKeys((current) =>
       current.includes(key)
@@ -498,8 +665,8 @@ export default function WarehousePage() {
           ? "The label file was opened in a new tab."
           : "The API returned successfully, but no label URL was found.",
       });
-    } catch {
-      toast.error("Failed to create DPD labels");
+    } catch (error) {
+      toast.error(await getDpdErrorMessage(error));
     } finally {
       setPrintingKey(null);
     }
@@ -508,7 +675,11 @@ export default function WarehousePage() {
   const handleReset = () => {
     setSearchInput("");
     setExpandedKeys([]);
-    router.push("?");
+    router.push(
+      activeCarrier === DEFAULT_WAREHOUSE_CARRIER
+        ? "?"
+        : `?carrier=${activeCarrier}`,
+    );
   };
 
   return (
@@ -529,29 +700,62 @@ export default function WarehousePage() {
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                 Products
               </p>
-              <p className="mt-2 text-xl font-bold text-slate-950">
-                {formatNumber(filteredItems.length)}
-              </p>
+              {isLoading ? (
+                <Skeleton className="mt-3 h-6 w-12 bg-slate-100" />
+              ) : (
+                <p className="mt-2 text-xl font-bold text-slate-950">
+                  {formatNumber(filteredItems.length)}
+                </p>
+              )}
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                 To prepare
               </p>
-              <p className="mt-2 text-xl font-bold text-emerald-600">
-                {formatNumber(totalQuantity)}
-              </p>
+              {isLoading ? (
+                <Skeleton className="mt-3 h-6 w-12 bg-emerald-50" />
+              ) : (
+                <p className="mt-2 text-xl font-bold text-emerald-600">
+                  {formatNumber(totalQuantity)}
+                </p>
+              )}
             </div>
             <div className="col-span-2 rounded-2xl border border-slate-200 bg-white p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                 Shipments
               </p>
-              <p className="mt-2 text-xl font-bold text-slate-950">
-                {formatNumber(totalShipments)}
-              </p>
+              {isLoading ? (
+                <Skeleton className="mt-3 h-6 w-16 bg-slate-100" />
+              ) : (
+                <p className="mt-2 text-xl font-bold text-slate-950">
+                  {formatNumber(totalShipments)}
+                </p>
+              )}
             </div>
           </div>
         </div>
       </section>
+
+      <Tabs value={activeCarrier} onValueChange={handleCarrierChange}>
+        <TabsList className="grid w-full grid-cols-3 gap-1 rounded-2xl border border-slate-200 bg-white p-1 shadow-sm sm:w-fit">
+          {WAREHOUSE_CARRIER_OPTIONS.map((option) => (
+            <TabsTrigger
+              key={option.value}
+              value={option.value}
+              aria-label={option.imageAlt}
+              className="h-12 rounded-xl border-b-0 bg-white px-4 data-[state=active]:border-b-0 data-[state=active]:bg-emerald-50 data-[state=active]:ring-1 data-[state=active]:ring-emerald-200 sm:px-8"
+            >
+              <Image
+                src={option.imageSrc}
+                alt={option.imageAlt}
+                width={120}
+                height={36}
+                className="h-7 w-auto object-contain"
+              />
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
 
       <section className="rounded-[1.75rem] border border-slate-200 bg-white p-4 shadow-sm md:p-5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
@@ -609,10 +813,7 @@ export default function WarehousePage() {
 
       <section className="rounded-[1.75rem] border border-slate-200 bg-white p-3 shadow-sm md:p-5">
         {isLoading ? (
-          <div className="flex h-56 items-center justify-center rounded-3xl bg-slate-50 text-slate-500">
-            <Loader2 className="mr-2 h-5 w-5 animate-spin text-emerald-600" />
-            Loading preparation items...
-          </div>
+          <WarehouseTableSkeleton />
         ) : isError ? (
           <div className="flex h-56 flex-col items-center justify-center rounded-3xl bg-red-50 text-center text-red-600">
             <p className="font-semibold">Failed to load preparation items.</p>
