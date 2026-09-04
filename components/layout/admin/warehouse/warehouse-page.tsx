@@ -1,6 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -14,6 +23,11 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCreateDpdOutboundLabels } from "@/features/dpd/hook";
 import type { CreateDpdOutboundLabelsPayload } from "@/features/dpd/api";
+import { useCreateGlsOutboundLabels } from "@/features/gls/hook";
+import type {
+  CreateGlsOutboundLabelsPayload,
+  GlsOutboundOrderDataItem,
+} from "@/features/gls/api";
 import { useGetAdminSupplierCheckoutItems } from "@/features/checkout/hook";
 import {
   SupplierCheckoutItem,
@@ -22,6 +36,7 @@ import {
 import {
   ChevronDown,
   ChevronRight,
+  CheckCircle2,
   Loader2,
   MapPin,
   PackageCheck,
@@ -51,6 +66,13 @@ const WAREHOUSE_CARRIER_OPTIONS = [
 
 type WarehouseCarrier = (typeof WAREHOUSE_CARRIER_OPTIONS)[number]["value"];
 
+interface ShipmentConfirmDialogState {
+  productName: string;
+  shipments: SupplierCheckoutItemShippingAddress[];
+  selectedShipmentIds: string[];
+  shippedAt: Date;
+}
+
 const DEFAULT_WAREHOUSE_CARRIER: WarehouseCarrier = "dpd";
 
 const isWarehouseCarrier = (value?: string | null): value is WarehouseCarrier =>
@@ -64,8 +86,20 @@ const formatNumber = (value?: number | string | null) => {
   return new Intl.NumberFormat("de-DE").format(numericValue);
 };
 
+const formatDateOnly = (value: Date) =>
+  new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(value);
+
 const removeOrderCodeDashes = (value?: string | null) =>
   (value ?? "").replace(/-/g, "").trim();
+
+const getShipmentKey = (
+  address: SupplierCheckoutItemShippingAddress,
+  index: number,
+) => address.id || address.checkout_code || `shipment-${index}`;
 
 const splitRecipientName = (value?: string | null) => {
   const normalizedName = (value ?? "").trim().replace(/\s+/g, " ");
@@ -123,7 +157,7 @@ const splitStreetAndHouseNumber = (value?: string | null) => {
   };
 };
 
-const getDpdLabelUrl = (response: unknown): string | null => {
+const getOutboundLabelUrl = (response: unknown): string | null => {
   if (typeof response === "string") return response;
   if (!response || typeof response !== "object") return null;
 
@@ -146,14 +180,14 @@ const getDpdLabelUrl = (response: unknown): string | null => {
 
     if (typeof firstLabel === "string") return firstLabel;
     if (firstLabel && typeof firstLabel === "object") {
-      return getDpdLabelUrl(firstLabel);
+      return getOutboundLabelUrl(firstLabel);
     }
   }
 
   return null;
 };
 
-const openDpdLabelResponse = (response: unknown) => {
+const openOutboundLabelResponse = (response: unknown) => {
   if (response instanceof Blob) {
     const objectUrl = URL.createObjectURL(response);
 
@@ -163,7 +197,7 @@ const openDpdLabelResponse = (response: unknown) => {
     return true;
   }
 
-  const labelUrl = getDpdLabelUrl(response);
+  const labelUrl = getOutboundLabelUrl(response);
 
   if (!labelUrl) return false;
 
@@ -223,7 +257,7 @@ const readErrorResponseData = async (data: unknown) => {
   return data;
 };
 
-const extractDpdErrorMessage = (data: unknown): string | null => {
+const extractOutboundLabelErrorMessage = (data: unknown): string | null => {
   if (typeof data === "string") return data.trim() || null;
 
   const record = getRecord(data);
@@ -262,11 +296,11 @@ const extractDpdErrorMessage = (data: unknown): string | null => {
   return null;
 };
 
-const getDpdErrorMessage = async (error: unknown) => {
+const getOutboundLabelErrorMessage = async (error: unknown) => {
   const errorRecord = getRecord(error);
   const responseRecord = getRecord(errorRecord?.response);
   const responseData = await readErrorResponseData(responseRecord?.data);
-  const apiMessage = extractDpdErrorMessage(responseData);
+  const apiMessage = extractOutboundLabelErrorMessage(responseData);
 
   if (apiMessage) return apiMessage;
   if (error instanceof Error && error.message) return error.message;
@@ -354,10 +388,10 @@ const getSearchText = (item: SupplierCheckoutItem) =>
     .join(" ")
     .toLowerCase();
 
-const buildDpdPayload = (
+const buildOutboundOrderData = (
   item: SupplierCheckoutItem,
-): CreateDpdOutboundLabelsPayload => ({
-  orderdata: (item.list_shipping_address ?? []).map((address) => {
+): GlsOutboundOrderDataItem[] =>
+  (item.list_shipping_address ?? []).map((address) => {
     const { firstName, lastName } = splitRecipientName(address.recipient_name);
     const { street, houseNumber } = splitStreetAndHouseNumber(
       address.address_line,
@@ -384,10 +418,21 @@ const buildDpdPayload = (
         outbound_rf_2: item.name ?? "",
       },
     };
-  }),
+  });
+
+const buildDpdPayload = (
+  item: SupplierCheckoutItem,
+): CreateDpdOutboundLabelsPayload => ({
+  orderdata: buildOutboundOrderData(item),
   label_size: "A6",
   dpd_shipping_date: new Date().toISOString(),
   dpd_label_position: "UpperLeft",
+});
+
+const buildGlsPayload = (
+  item: SupplierCheckoutItem,
+): CreateGlsOutboundLabelsPayload => ({
+  orderdata: buildOutboundOrderData(item),
 });
 
 function ProductAvatar({ name }: { name: string }) {
@@ -409,9 +454,14 @@ function ProductAvatar({ name }: { name: string }) {
 function AddressCard({
   address,
   index,
+  onConfirm,
 }: {
   address: SupplierCheckoutItemShippingAddress;
   index: number;
+  onConfirm: (
+    address: SupplierCheckoutItemShippingAddress,
+    index: number,
+  ) => void;
 }) {
   const countryFlag = getCountryFlag(address.country);
   const ageStatus = getShipmentAgeStatus(address.created_at);
@@ -439,6 +489,15 @@ function AddressCard({
             {countryFlag ? <span aria-hidden="true">{countryFlag}</span> : null}
             <span>{address.country || "—"}</span>
           </span>
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => onConfirm(address, index)}
+            className="h-8 rounded-full bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700"
+          >
+            <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+            Confirm
+          </Button>
         </div>
       </div>
 
@@ -455,7 +514,17 @@ function AddressCard({
   );
 }
 
-function ExpandedAddresses({ item }: { item: SupplierCheckoutItem }) {
+function ExpandedAddresses({
+  item,
+  onConfirmShipment,
+}: {
+  item: SupplierCheckoutItem;
+  onConfirmShipment: (
+    item: SupplierCheckoutItem,
+    address: SupplierCheckoutItemShippingAddress,
+    index: number,
+  ) => void;
+}) {
   const addresses = item.list_shipping_address ?? [];
 
   return (
@@ -473,6 +542,9 @@ function ExpandedAddresses({ item }: { item: SupplierCheckoutItem }) {
               key={address.id || `${item.sku}-${index}`}
               address={address}
               index={index}
+              onConfirm={(selectedAddress, selectedIndex) =>
+                onConfirmShipment(item, selectedAddress, selectedIndex)
+              }
             />
           ))}
         </div>
@@ -556,7 +628,10 @@ export default function WarehousePage() {
   const [searchInput, setSearchInput] = React.useState(search);
   const [expandedKeys, setExpandedKeys] = React.useState<string[]>([]);
   const [printingKey, setPrintingKey] = React.useState<string | null>(null);
+  const [confirmDialog, setConfirmDialog] =
+    React.useState<ShipmentConfirmDialogState | null>(null);
   const createDpdOutboundLabels = useCreateDpdOutboundLabels();
+  const createGlsOutboundLabels = useCreateGlsOutboundLabels();
 
   React.useEffect(() => {
     setSearchInput(search);
@@ -641,6 +716,53 @@ export default function WarehousePage() {
     );
   };
 
+  const openConfirmDialog = (
+    item: SupplierCheckoutItem,
+    shipments: SupplierCheckoutItemShippingAddress[],
+  ) => {
+    if (shipments.length === 0) {
+      toast.error("No shipments to confirm for this product");
+      return;
+    }
+
+    setConfirmDialog({
+      productName: item.name || "Unnamed product",
+      shipments,
+      selectedShipmentIds: shipments.map((address, index) =>
+        getShipmentKey(address, index),
+      ),
+      shippedAt: new Date(),
+    });
+  };
+
+  const handleConfirmProduct = (item: SupplierCheckoutItem) => {
+    openConfirmDialog(item, item.list_shipping_address ?? []);
+  };
+
+  const handleConfirmShipment = (
+    item: SupplierCheckoutItem,
+    address: SupplierCheckoutItemShippingAddress,
+  ) => {
+    openConfirmDialog(item, [address]);
+  };
+
+  const toggleConfirmShipment = (shipmentId: string) => {
+    setConfirmDialog((current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        selectedShipmentIds: current.selectedShipmentIds.includes(shipmentId)
+          ? current.selectedShipmentIds.filter((id) => id !== shipmentId)
+          : [...current.selectedShipmentIds, shipmentId],
+      };
+    });
+  };
+
+  const handleConfirmSelectedShipments = () => {
+    setConfirmDialog(null);
+  };
+
   const handlePrintProduct = async (
     item: SupplierCheckoutItem,
     key: string,
@@ -655,18 +777,31 @@ export default function WarehousePage() {
     setPrintingKey(key);
 
     try {
-      const response = await createDpdOutboundLabels.mutateAsync(
-        buildDpdPayload(item),
-      );
-      const opened = openDpdLabelResponse(response);
+      let response: unknown;
 
-      toast.success("DPD labels created", {
+      if (activeCarrier === "gls") {
+        response = await createGlsOutboundLabels.mutateAsync(
+          buildGlsPayload(item),
+        );
+      } else if (activeCarrier === "dpd") {
+        response = await createDpdOutboundLabels.mutateAsync(
+          buildDpdPayload(item),
+        );
+      } else {
+        toast.error("Printing is only available for DPD and GLS");
+        return;
+      }
+
+      const opened = openOutboundLabelResponse(response);
+      const carrierLabel = activeCarrier === "gls" ? "GLS" : "DPD";
+
+      toast.success(`${carrierLabel} labels created`, {
         description: opened
           ? "The label file was opened in a new tab."
           : "The API returned successfully, but no label URL was found.",
       });
     } catch (error) {
-      toast.error(await getDpdErrorMessage(error));
+      toast.error(await getOutboundLabelErrorMessage(error));
     } finally {
       setPrintingKey(null);
     }
@@ -932,29 +1067,49 @@ export default function WarehousePage() {
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              void handlePrintProduct(item, rowKey);
-                            }}
-                            disabled={printingKey === rowKey}
-                            className="rounded-xl bg-emerald-600 px-4 text-white hover:bg-emerald-700"
-                          >
-                            {printingKey === rowKey ? (
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                              <Printer className="mr-2 h-4 w-4" />
-                            )}
-                            Print
-                          </Button>
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                void handlePrintProduct(item, rowKey);
+                              }}
+                              disabled={
+                                printingKey === rowKey ||
+                                activeCarrier === "spedition"
+                              }
+                              className="rounded-xl bg-emerald-600 px-4 text-white hover:bg-emerald-700"
+                            >
+                              {printingKey === rowKey ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : (
+                                <Printer className="mr-2 h-4 w-4" />
+                              )}
+                              Print
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleConfirmProduct(item);
+                              }}
+                              variant="outline"
+                              className="rounded-xl border-emerald-200 px-4 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
+                            >
+                              <CheckCircle2 className="mr-2 h-4 w-4" />
+                              Confirm
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
 
                       {isExpanded ? (
                         <TableRow>
                           <TableCell colSpan={7} className="bg-slate-50/60 p-4">
-                            <ExpandedAddresses item={item} />
+                            <ExpandedAddresses
+                              item={item}
+                              onConfirmShipment={handleConfirmShipment}
+                            />
                           </TableCell>
                         </TableRow>
                       ) : null}
@@ -993,6 +1148,102 @@ export default function WarehousePage() {
           </>
         )}
       </section>
+
+      <Dialog
+        open={Boolean(confirmDialog)}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDialog(null);
+        }}
+      >
+        <DialogContent className="max-h-[85vh] overflow-y-auto rounded-3xl sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Confirm shipment</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to confirm the selected shipments were sent
+              on{" "}
+              <span className="font-semibold text-slate-700">
+                {confirmDialog ? formatDateOnly(confirmDialog.shippedAt) : "—"}
+              </span>
+              ?
+            </DialogDescription>
+          </DialogHeader>
+
+          {confirmDialog ? (
+            <div className="space-y-4">
+              <div className="rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900 ring-1 ring-emerald-100">
+                <p className="font-semibold">{confirmDialog.productName}</p>
+                <p className="mt-1 text-emerald-700">
+                  {formatNumber(confirmDialog.selectedShipmentIds.length)} of{" "}
+                  {formatNumber(confirmDialog.shipments.length)} shipments
+                  selected.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {confirmDialog.shipments.map((address, index) => {
+                  const shipmentId = getShipmentKey(address, index);
+                  const isChecked =
+                    confirmDialog.selectedShipmentIds.includes(shipmentId);
+
+                  return (
+                    <label
+                      key={shipmentId}
+                      className="flex cursor-pointer gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-emerald-200 hover:bg-emerald-50/40"
+                    >
+                      <Checkbox
+                        checked={isChecked}
+                        onCheckedChange={() =>
+                          toggleConfirmShipment(shipmentId)
+                        }
+                        className="mt-1"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="font-semibold text-slate-950">
+                            {address.checkout_code || `Shipment #${index + 1}`}
+                          </p>
+                          <span className="rounded-full bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600 ring-1 ring-slate-200">
+                            {address.country || "—"}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm text-slate-600">
+                          {getAddressLine(address) || "No shipping address"}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                          <span>Created: {formatDateTime(address.created_at)}</span>
+                          {address.phone_number ? (
+                            <span>Phone: {address.phone_number}</span>
+                          ) : null}
+                          {address.email ? <span>Email: {address.email}</span> : null}
+                        </div>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-xl"
+              onClick={() => setConfirmDialog(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700"
+              disabled={!confirmDialog?.selectedShipmentIds.length}
+              onClick={handleConfirmSelectedShipments}
+            >
+              Confirm selected
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

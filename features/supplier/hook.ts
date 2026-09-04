@@ -5,6 +5,8 @@ import {
   editSupplier,
   getSupplier,
   sendSupplierTracking,
+  sendSupplierTrackingBulks,
+  SendTrackingBulksInput,
   SendTrackingInput,
 } from "./api";
 import { SupplierInput } from "@/types/supplier";
@@ -60,5 +62,12 @@ export const useSendSupplierTracking = () => {
   return useMutation({
     mutationFn: ({ checkoutId, payload }: SendTrackingVariables) =>
       sendSupplierTracking(checkoutId, payload),
+  });
+};
+
+export const useSendSupplierTrackingBulks = () => {
+  return useMutation({
+    mutationFn: (payload: SendTrackingBulksInput) =>
+      sendSupplierTrackingBulks(payload),
   });
 };

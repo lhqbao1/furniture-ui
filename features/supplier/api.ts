@@ -7,6 +7,23 @@ export interface SendTrackingInput {
   shipped_date: string; // ISO string
 }
 
+export interface SendTrackingBulkItem {
+  checkout_id: string;
+  tracking_number: string;
+  shipping_carrier: string;
+  shipped_date: string;
+  ship_code: string;
+}
+
+export interface SendTrackingBulksInput {
+  tracking: SendTrackingBulkItem[];
+}
+
+export interface SendTrackingBulksResponse {
+  message?: string;
+  [key: string]: unknown;
+}
+
 export const getSupplier = async () => {
   const { data } = await apiAdmin.get("/supplier");
   return data as SupplierResponse[];
@@ -56,4 +73,16 @@ export async function sendSupplierTracking(
   );
 
   return data;
+}
+
+export async function sendSupplierTrackingBulks(
+  input: SendTrackingBulksInput,
+) {
+  const { data } = await apiAdmin.post("/supplier/send-tracking-bulks", input, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return data as SendTrackingBulksResponse;
 }
