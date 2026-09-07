@@ -99,7 +99,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="de" translate="no">
+    <html lang="de" translate="no" suppressHydrationWarning>
       <head>
         <link
           rel="preconnect"
@@ -133,41 +133,42 @@ export default function RootLayout({
             __html: `window.__APP_VERSION__ = "${process.env.NEXT_PUBLIC_APP_VERSION}";`,
           }}
         />
+        {process.env.NODE_ENV === "production" && (
+          <>
+            <Script
+              id="awin-mastertag"
+              src="https://www.dwin1.com/121738.js"
+              strategy="afterInteractive"
+            />
 
-        <Script
-          id="awin-mastertag"
-          src="https://www.dwin1.com/121738.js"
-          strategy="afterInteractive"
-        />
-
-        <Script id="gtm-head" strategy="lazyOnload">
-          {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id=GTM-WSBWFTB5'+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-WSBWFTB5');
+            <Script id="gtm-head" strategy="lazyOnload">
+              {`
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id=GTM-WSBWFTB5'+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','GTM-WSBWFTB5');
           `}
-        </Script>
-        {/* <meta
+            </Script>
+            {/* <meta
           name="apple-mobile-web-app-capable"
           content="no"
         /> */}
-        <Script id="gtag-stub" strategy="beforeInteractive">
-          {`
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function () {
-      window.dataLayer.push(arguments);
-    };
-  `}
-        </Script>
+            <Script id="gtag-stub" strategy="beforeInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                window.gtag = function () {
+                  window.dataLayer.push(arguments);
+                };
+              `}
+            </Script>
 
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-17948582301"
-          strategy="lazyOnload"
-        />
+            <Script
+              src="https://www.googletagmanager.com/gtag/js?id=AW-17948582301"
+              strategy="lazyOnload"
+            />
 
-        {/* <Script
+            {/* <Script
           id="gtag-base"
           strategy="afterInteractive"
         >
@@ -178,53 +179,53 @@ export default function RootLayout({
             gtag('config', 'AW-17948582301');
                     `}
         </Script> */}
-        <Script id="gtag-init-safe" strategy="lazyOnload">
-          {`
-    (function () {
-      try {
-        const run = () => {
-          gtag('js', new Date());
-          gtag('config', 'AW-17948582301');
-        };
+            <Script id="gtag-init-safe" strategy="lazyOnload">
+              {`
+        (function () {
+          try {
+            const run = () => {
+              gtag('js', new Date());
+              gtag('config', 'AW-17948582301');
+            };
 
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(run, { timeout: 3000 });
-        } else {
-          setTimeout(run, 1500);
-        }
-      } catch (e) {
-        console.warn('gtag init failed safely', e);
-      }
-    })();
-  `}
-        </Script>
+            if ('requestIdleCallback' in window) {
+              requestIdleCallback(run, { timeout: 3000 });
+            } else {
+              setTimeout(run, 1500);
+            }
+          } catch (e) {
+            console.warn('gtag init failed safely', e);
+          }
+        })();
+      `}
+            </Script>
 
-        <Script id="google-ads-conversion-safe" strategy="lazyOnload">
-          {`
-    (function () {
-      try {
-        const run = () => {
-          if (!window.gtag) return;
-          gtag('event', 'conversion', {
-            'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B',
-            'transaction_id': ''
-          });
-        };
+            <Script id="google-ads-conversion-safe" strategy="lazyOnload">
+              {`
+        (function () {
+          try {
+            const run = () => {
+              if (!window.gtag) return;
+              gtag('event', 'conversion', {
+                'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B',
+                'transaction_id': ''
+              });
+            };
 
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(run, { timeout: 3000 });
-        } else {
-          setTimeout(run, 2000);
-        }
-      } catch (e) {
-        console.warn('Ads conversion failed safely', e);
-      }
-    })();
-  `}
-        </Script>
+            if ('requestIdleCallback' in window) {
+              requestIdleCallback(run, { timeout: 3000 });
+            } else {
+              setTimeout(run, 2000);
+            }
+          } catch (e) {
+            console.warn('Ads conversion failed safely', e);
+          }
+        })();
+      `}
+            </Script>
 
-        {/* Facebook Pixel */}
-        {/* <Script
+            {/* Facebook Pixel */}
+            {/* <Script
           id="fb-pixel"
           strategy="afterInteractive"
         >
@@ -242,49 +243,49 @@ export default function RootLayout({
           `}
         </Script> */}
 
-        <Script id="fb-pixel-safe" strategy="lazyOnload">
-          {`
-    (function () {
-      try {
-        const run = () => {
-          if (window.fbq) return;
+            <Script id="fb-pixel-safe" strategy="lazyOnload">
+              {`
+        (function () {
+          try {
+            const run = () => {
+              if (window.fbq) return;
 
-          const fbq = function () {
-            fbq.callMethod
-              ? fbq.callMethod.apply(fbq, arguments)
-              : fbq.queue.push(arguments);
-          };
+              const fbq = function () {
+                fbq.callMethod
+                  ? fbq.callMethod.apply(fbq, arguments)
+                  : fbq.queue.push(arguments);
+              };
 
-          fbq.queue = [];
-          fbq.loaded = true;
-          fbq.version = '2.0';
-          window.fbq = fbq;
+              fbq.queue = [];
+              fbq.loaded = true;
+              fbq.version = '2.0';
+              window.fbq = fbq;
 
-          const script = document.createElement('script');
-          script.async = true;
-          script.src = 'https://connect.facebook.net/en_US/fbevents.js';
+              const script = document.createElement('script');
+              script.async = true;
+              script.src = 'https://connect.facebook.net/en_US/fbevents.js';
 
-          if (document.body) {
-            document.body.appendChild(script);
+              if (document.body) {
+                document.body.appendChild(script);
+              }
+
+              fbq('init', '1625686318416498');
+              fbq('track', 'PageView');
+            };
+
+            if ('requestIdleCallback' in window) {
+              requestIdleCallback(run, { timeout: 3000 });
+            } else {
+              setTimeout(run, 1500);
+            }
+          } catch (e) {
+            console.warn('FB Pixel blocked safely', e);
           }
+        })();
+      `}
+            </Script>
 
-          fbq('init', '1625686318416498');
-          fbq('track', 'PageView');
-        };
-
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(run, { timeout: 3000 });
-        } else {
-          setTimeout(run, 1500);
-        }
-      } catch (e) {
-        console.warn('FB Pixel blocked safely', e);
-      }
-    })();
-  `}
-        </Script>
-
-        {/* <Script
+            {/* <Script
           id="google-ads-conversion"
           strategy="afterInteractive"
         >
@@ -296,43 +297,50 @@ export default function RootLayout({
                     `}
         </Script> */}
 
-        {/* Usercentrics Autoblocker */}
-        {/* <Script
+            {/* Usercentrics Autoblocker */}
+            {/* <Script
           id="usercentrics-autoblocker"
           src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
           strategy="beforeInteractive"
         /> */}
 
-        {/* Usercentrics CMP */}
-        <Script
-          id="usercentrics-cmp"
-          src="https://web.cmp.usercentrics.eu/ui/loader.js"
-          data-settings-id="RlDaintBne_uoh"
-          strategy="afterInteractive"
-        />
+            {/* Usercentrics CMP */}
+            <Script
+              id="usercentrics-cmp"
+              src="https://web.cmp.usercentrics.eu/ui/loader.js"
+              data-settings-id="RlDaintBne_uoh"
+              strategy="afterInteractive"
+            />
+          </>
+        )}
       </head>
 
       <body
         className={`${figtree.variable} ${libre.variable} font-sans antialiased`}
+        suppressHydrationWarning
       >
         <Providers>
-          <noscript>
-            <iframe
-              src="https://www.googletagmanager.com/ns.html?id=GTM-WSBWFTB5"
-              height="0"
-              width="0"
-              style={{ display: "none", visibility: "hidden" }}
-            />
-          </noscript>
+          {process.env.NODE_ENV === "production" && (
+            <>
+              <noscript>
+                <iframe
+                  src="https://www.googletagmanager.com/ns.html?id=GTM-WSBWFTB5"
+                  height="0"
+                  width="0"
+                  style={{ display: "none", visibility: "hidden" }}
+                />
+              </noscript>
 
-          <noscript>
-            <img
-              height="1"
-              width="1"
-              style={{ display: "none", visibility: "hidden" }}
-              src="https://www.facebook.com/tr?id=1625686318416498&ev=PageView&noscript=1"
-            />
-          </noscript>
+              <noscript>
+                <img
+                  height="1"
+                  width="1"
+                  style={{ display: "none", visibility: "hidden" }}
+                  src="https://www.facebook.com/tr?id=1625686318416498&ev=PageView&noscript=1"
+                />
+              </noscript>
+            </>
+          )}
           <QueryProvider>{children}</QueryProvider>
           <ClientBoot />
         </Providers>
