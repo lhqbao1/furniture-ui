@@ -1,4 +1,4 @@
-import { apiPublic } from "@/lib/axios";
+import { apiAdmin } from "@/lib/axios";
 
 export interface GlsOutboundShippingAddress {
   recipient_company: string;
@@ -19,6 +19,7 @@ export interface GlsOutboundParcelData {
   outbound_id: string;
   outbound_rf_1: string;
   outbound_rf_2: string;
+  cart_items_id: string;
 }
 
 export interface GlsOutboundOrderDataItem {
@@ -33,7 +34,7 @@ export interface CreateGlsOutboundLabelsPayload {
 export async function createGlsOutboundLabels(
   payload: CreateGlsOutboundLabelsPayload,
 ) {
-  const response = await apiPublic.post("/gls/outbound-labels", payload, {
+  const response = await apiAdmin.post("/gls/outbound-labels", payload, {
     headers: {
       "Content-Type": "application/json",
     },

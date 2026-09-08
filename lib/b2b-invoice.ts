@@ -150,12 +150,19 @@ export const B2B_INVOICE_PRESET_BY_MARKETPLACE: Record<
     invoice_postal_code: "40235",
     invoice_country: "DE",
   },
+  hornbach: {
+    company_name: "HORNBACH Baumarkt AG",
+    tax_id: "DE151116749",
+    invoice_address: "Hornbachstraße 11",
+    invoice_city: "Bornheim",
+    invoice_postal_code: "76879",
+    invoice_country: "DE",
+  },
   praktiker: null,
   check24: null,
   amazon: null,
   prestige: null,
   channel21: null,
-  hornbach: null,
   neckermann: null,
 };
 
