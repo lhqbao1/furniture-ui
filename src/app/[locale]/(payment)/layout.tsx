@@ -21,7 +21,7 @@ export default function MainLayout({
           <div className="flex-1">{children}</div>
         </div>
       </main>
-      <Footer />
+      {/* <Footer /> remove footer ticket PH-732 */}
     </>
   );
 }

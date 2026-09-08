@@ -264,13 +264,35 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
   return (
     <div className="flex gap-6 border-b py-6 items-start">
       {/* IMAGE */}
-      <div className="relative w-[120px] h-[120px] shrink-0">
-        <Image
-          src={item.image}
-          alt={item.name}
-          fill
-          className="object-cover cursor-pointer rounded-sm"
-        />
+      <div className="flex flex-col gap-2 items-center justify-between">
+
+        <div className="relative w-[120px] h-[120px] shrink-0">
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            className="object-cover cursor-pointer"
+          />
+        </div>
+
+        <div className="h-[38px] flex items-center">
+          <button
+            type="button"
+            onClick={() => handleAddToWishlist(item.id)}
+            className="cursor-pointer group rounded-sm p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-1"
+            aria-label={t("addToWishlistAria")}
+          >
+            <Heart
+              size={22}
+              className="
+                  transition
+                  text-muted-foreground
+                  group-hover:text-secondary
+                  group-hover:fill-secondary
+                "
+            />
+          </button>
+        </div>
       </div>
 
       {/* CONTENT */}
@@ -312,36 +334,23 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
           </div>
         </div>
 
-        <div className="flex md:flex-row flex-col-reverse md:items-end items-start justify-between mt-6">
+        <div className="flex md:flex-row flex-col-reverse md:items-end items-start justify-between mt-6 gap-2">
           {/* QUANTITY */}
-          <div className="flex items-center gap-3 mt-2">
-            <span className="text-sm">Anzahl:</span>
-            <QuantityControl
-              quantity={uiQuantity ?? 0}
-              onIncrease={handleIncrease}
-              onDecrease={handleDecrease}
-              isLoading={false} // ❌ KHÔNG block UI
-              decreaseLabel={t("decreaseQuantityAria")}
-              increaseLabel={t("increaseQuantityAria")}
-              quantityLabel={t("quantityAria")}
-            />
-            <div className="space-x-2">
-              <button
-                type="button"
-                onClick={() => handleAddToWishlist(item.id)}
-                className="cursor-pointer group rounded-sm p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-1"
-                aria-label={t("addToWishlistAria")}
-              >
-                <Heart
-                  size={18}
-                  className="
-                  transition
-                  text-muted-foreground
-                  group-hover:text-secondary
-                  group-hover:fill-secondary
-                "
-                />
-              </button>
+          <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1">
+              <></>
+              <span className="text-sm">Anzahl:</span>
+              <QuantityControl
+                quantity={uiQuantity ?? 0}
+                onIncrease={handleIncrease}
+                onDecrease={handleDecrease}
+                isLoading={false} // ❌ KHÔNG block UI
+                decreaseLabel={t("decreaseQuantityAria")}
+                increaseLabel={t("increaseQuantityAria")}
+                quantityLabel={t("quantityAria")}
+              />
+
+
               <button
                 type="button"
                 onClick={() => handleRemove(item.id)}
@@ -349,7 +358,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
                 aria-label={t("removeFromCartAria")}
               >
                 <Trash
-                  size={18}
+                  size={20}
                   className="
                   transition
                   text-muted-foreground
@@ -361,7 +370,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
             </div>
           </div>
           {/* RIGHT */}
-          <div className="flex gap-4 items-center justify-between">
+          <div className="flex flex-wrap gap-1 items-center justify-between">
             {/* PRICE */}
             <div className="text-lg font-semibold">
               {(item.price * uiQuantity).toLocaleString("de-DE", {
