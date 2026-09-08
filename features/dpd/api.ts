@@ -1,4 +1,4 @@
-import { apiPublic } from "@/lib/axios";
+import { apiAdmin } from "@/lib/axios";
 
 export interface DpdOutboundShippingAddress {
   recipient_company: string;
@@ -19,6 +19,7 @@ export interface DpdOutboundParcelData {
   outbound_id: string;
   outbound_rf_1: string;
   outbound_rf_2: string;
+  cart_items_id: string;
 }
 
 export interface DpdOutboundOrderDataItem {
@@ -36,7 +37,7 @@ export interface CreateDpdOutboundLabelsPayload {
 export async function createDpdOutboundLabels(
   payload: CreateDpdOutboundLabelsPayload,
 ) {
-  const response = await apiPublic.post("/dpd/outbound-labels", payload, {
+  const response = await apiAdmin.post("/dpd/outbound-labels", payload, {
     headers: {
       "Content-Type": "application/json",
     },

@@ -29,6 +29,8 @@ import type {
   GlsOutboundOrderDataItem,
 } from "@/features/gls/api";
 import { useGetAdminSupplierCheckoutItems } from "@/features/checkout/hook";
+import { useSendSupplierTrackingBulks } from "@/features/supplier/hook";
+import type { SendTrackingBulksInput } from "@/features/supplier/api";
 import {
   SupplierCheckoutItem,
   SupplierCheckoutItemShippingAddress,
@@ -101,6 +103,35 @@ const getShipmentKey = (
   index: number,
 ) => address.id || address.checkout_code || `shipment-${index}`;
 
+const hasCompleteShipmentLabel = (
+  address: SupplierCheckoutItemShippingAddress,
+) => {
+  const labels = address.labels ?? [];
+
+  return (
+    labels.length > 0 &&
+    labels.every(
+      (label) => Boolean(label.label?.trim()) && Boolean(label.tracking_number?.trim()),
+    )
+  );
+};
+
+const openExistingLabelUrls = (urls: string[]) => {
+  urls.forEach((url) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  });
+};
+
+const openShipmentLabels = (
+  address: SupplierCheckoutItemShippingAddress,
+) => {
+  openExistingLabelUrls(
+    (address.labels ?? [])
+      .map((label) => label.label.trim())
+      .filter(Boolean),
+  );
+};
+
 const splitRecipientName = (value?: string | null) => {
   const normalizedName = (value ?? "").trim().replace(/\s+/g, " ");
 
@@ -155,79 +186,6 @@ const splitStreetAndHouseNumber = (value?: string | null) => {
     street: normalizedAddress,
     houseNumber: " ",
   };
-};
-
-const getOutboundLabelUrl = (response: unknown): string | null => {
-  if (typeof response === "string") return response;
-  if (!response || typeof response !== "object") return null;
-
-  const record = response as Record<string, unknown>;
-  const directValue =
-    record.url ??
-    record.file_url ??
-    record.pdf_url ??
-    record.label_url ??
-    record.download_url ??
-    record.file ??
-    record.pdf ??
-    record.base64 ??
-    record.data;
-
-  if (typeof directValue === "string") return directValue;
-
-  if (Array.isArray(record.labels)) {
-    const firstLabel = record.labels[0];
-
-    if (typeof firstLabel === "string") return firstLabel;
-    if (firstLabel && typeof firstLabel === "object") {
-      return getOutboundLabelUrl(firstLabel);
-    }
-  }
-
-  return null;
-};
-
-const openOutboundLabelResponse = (response: unknown) => {
-  if (response instanceof Blob) {
-    const objectUrl = URL.createObjectURL(response);
-
-    window.open(objectUrl, "_blank", "noopener,noreferrer");
-    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
-
-    return true;
-  }
-
-  const labelUrl = getOutboundLabelUrl(response);
-
-  if (!labelUrl) return false;
-
-  if (labelUrl.startsWith("data:application/pdf")) {
-    window.open(labelUrl, "_blank", "noopener,noreferrer");
-    return true;
-  }
-
-  if (labelUrl.startsWith("http") || labelUrl.startsWith("/")) {
-    window.open(labelUrl, "_blank", "noopener,noreferrer");
-    return true;
-  }
-
-  try {
-    const byteCharacters = window.atob(labelUrl);
-    const byteNumbers = Array.from(byteCharacters, (character) =>
-      character.charCodeAt(0),
-    );
-    const blob = new Blob([new Uint8Array(byteNumbers)], {
-      type: "application/pdf",
-    });
-    const objectUrl = URL.createObjectURL(blob);
-
-    window.open(objectUrl, "_blank", "noopener,noreferrer");
-    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
-
-    return true;
-  } catch {
-    return false;
-  }
 };
 
 const parseJsonSafely = (value: string) => {
@@ -416,6 +374,7 @@ const buildOutboundOrderData = (
         outbound_id: removeOrderCodeDashes(address.checkout_code),
         outbound_rf_1: item.sku ?? "",
         outbound_rf_2: item.name ?? "",
+        cart_items_id: address.cart_items_id ?? "",
       },
     };
   });
@@ -423,7 +382,13 @@ const buildOutboundOrderData = (
 const buildDpdPayload = (
   item: SupplierCheckoutItem,
 ): CreateDpdOutboundLabelsPayload => ({
-  orderdata: buildOutboundOrderData(item),
+  orderdata: buildOutboundOrderData(item).map((order, index) => ({
+    ...order,
+    parcel_data: {
+      ...order.parcel_data,
+      cart_items_id: item.list_shipping_address[index]?.cart_items_id ?? "",
+    },
+  })),
   label_size: "A6",
   dpd_shipping_date: new Date().toISOString(),
   dpd_label_position: "UpperLeft",
@@ -433,6 +398,33 @@ const buildGlsPayload = (
   item: SupplierCheckoutItem,
 ): CreateGlsOutboundLabelsPayload => ({
   orderdata: buildOutboundOrderData(item),
+});
+
+const buildTrackingPayload = (
+  dialog: ShipmentConfirmDialogState,
+  carrier: WarehouseCarrier,
+): SendTrackingBulksInput => ({
+  tracking: dialog.shipments
+    .filter((address, index) =>
+      dialog.selectedShipmentIds.includes(getShipmentKey(address, index)),
+    )
+    .flatMap((address) => {
+      const label = address.labels?.[0];
+
+      if (!address.checkout_id || !label?.tracking_number || !label.label) {
+        return [];
+      }
+
+      return [
+        {
+          checkout_id: address.checkout_id,
+          tracking_number: label.tracking_number,
+          shipping_carrier: carrier,
+          shipped_date: label.created_at,
+          ship_code: address.checkout_code,
+        },
+      ];
+    }),
 });
 
 function ProductAvatar({ name }: { name: string }) {
@@ -455,6 +447,7 @@ function AddressCard({
   address,
   index,
   onConfirm,
+  onReprint,
 }: {
   address: SupplierCheckoutItemShippingAddress;
   index: number;
@@ -462,9 +455,11 @@ function AddressCard({
     address: SupplierCheckoutItemShippingAddress,
     index: number,
   ) => void;
+  onReprint: (address: SupplierCheckoutItemShippingAddress) => void;
 }) {
   const countryFlag = getCountryFlag(address.country);
   const ageStatus = getShipmentAgeStatus(address.created_at);
+  const isPrinted = hasCompleteShipmentLabel(address);
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -478,6 +473,12 @@ function AddressCard({
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
+          {isPrinted ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Printed
+            </span>
+          ) : null}
           {ageStatus ? (
             <span
               className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ring-1 ${ageStatus.className}`}
@@ -489,15 +490,6 @@ function AddressCard({
             {countryFlag ? <span aria-hidden="true">{countryFlag}</span> : null}
             <span>{address.country || "—"}</span>
           </span>
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => onConfirm(address, index)}
-            className="h-8 rounded-full bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700"
-          >
-            <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
-            Confirm
-          </Button>
         </div>
       </div>
 
@@ -510,6 +502,55 @@ function AddressCard({
         {address.phone_number ? <p>Phone: {address.phone_number}</p> : null}
         {address.email ? <p>Email: {address.email}</p> : null}
       </div>
+
+      {isPrinted ? (
+        <div className="mt-4 flex flex-col gap-4 border-t border-slate-100 pt-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0 space-y-1.5 text-xs text-slate-500">
+            <p className="font-semibold uppercase tracking-[0.12em] text-slate-400">
+              Tracking
+            </p>
+            {address.labels?.map((label) => (
+              <div key={label.id} className="flex flex-wrap items-center gap-3">
+                <span className="font-semibold tabular-nums text-slate-700">
+                  {label.tracking_number}
+                </span>
+                {label.label ? (
+                  <a
+                    href={label.label}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-emerald-700 underline underline-offset-2 hover:text-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                  >
+                    View label
+                  </a>
+                ) : null}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => onConfirm(address, index)}
+              className="h-9 rounded-xl bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-300"
+            >
+              <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+              Confirm
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => onReprint(address)}
+              variant="outline"
+              className="h-9 rounded-xl border-slate-200 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-slate-300"
+            >
+              <Printer className="mr-1.5 h-3.5 w-3.5" />
+              Reprint
+            </Button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -517,6 +558,7 @@ function AddressCard({
 function ExpandedAddresses({
   item,
   onConfirmShipment,
+  onReprintShipment,
 }: {
   item: SupplierCheckoutItem;
   onConfirmShipment: (
@@ -524,6 +566,7 @@ function ExpandedAddresses({
     address: SupplierCheckoutItemShippingAddress,
     index: number,
   ) => void;
+  onReprintShipment: (address: SupplierCheckoutItemShippingAddress) => void;
 }) {
   const addresses = item.list_shipping_address ?? [];
 
@@ -545,6 +588,7 @@ function ExpandedAddresses({
               onConfirm={(selectedAddress, selectedIndex) =>
                 onConfirmShipment(item, selectedAddress, selectedIndex)
               }
+              onReprint={onReprintShipment}
             />
           ))}
         </div>
@@ -632,6 +676,7 @@ export default function WarehousePage() {
     React.useState<ShipmentConfirmDialogState | null>(null);
   const createDpdOutboundLabels = useCreateDpdOutboundLabels();
   const createGlsOutboundLabels = useCreateGlsOutboundLabels();
+  const sendSupplierTrackingBulks = useSendSupplierTrackingBulks();
 
   React.useEffect(() => {
     setSearchInput(search);
@@ -736,7 +781,10 @@ export default function WarehousePage() {
   };
 
   const handleConfirmProduct = (item: SupplierCheckoutItem) => {
-    openConfirmDialog(item, item.list_shipping_address ?? []);
+    openConfirmDialog(
+      item,
+      (item.list_shipping_address ?? []).filter(hasCompleteShipmentLabel),
+    );
   };
 
   const handleConfirmShipment = (
@@ -744,6 +792,15 @@ export default function WarehousePage() {
     address: SupplierCheckoutItemShippingAddress,
   ) => {
     openConfirmDialog(item, [address]);
+  };
+
+  const handleReprintShipment = (
+    address: SupplierCheckoutItemShippingAddress,
+  ) => {
+    openShipmentLabels(address);
+    toast.success("Existing label opened", {
+      description: "The label file is ready to print again.",
+    });
   };
 
   const toggleConfirmShipment = (shipmentId: string) => {
@@ -759,8 +816,25 @@ export default function WarehousePage() {
     });
   };
 
-  const handleConfirmSelectedShipments = () => {
-    setConfirmDialog(null);
+  const handleConfirmSelectedShipments = async () => {
+    if (!confirmDialog) return;
+
+    const payload = buildTrackingPayload(confirmDialog, activeCarrier);
+
+    if (payload.tracking.length === 0) {
+      toast.error("No complete tracking data is available for confirmation");
+      return;
+    }
+
+    try {
+      await sendSupplierTrackingBulks.mutateAsync(payload);
+      await refetch();
+      setConfirmDialog(null);
+      toast.success("Shipment confirmation sent");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to confirm shipments";
+      toast.error(message);
+    }
   };
 
   const handlePrintProduct = async (
@@ -774,31 +848,43 @@ export default function WarehousePage() {
       return;
     }
 
+    const unprintedAddresses = addresses.filter(
+      (address) => !hasCompleteShipmentLabel(address),
+    );
+
+    if (unprintedAddresses.length === 0) {
+      toast.info("All shipments are already printed", {
+        description: "Use Reprint on an individual shipment to print it again.",
+      });
+      return;
+    }
+
     setPrintingKey(key);
+    const itemToPrint = {
+      ...item,
+      list_shipping_address: unprintedAddresses,
+    };
 
     try {
-      let response: unknown;
-
       if (activeCarrier === "gls") {
-        response = await createGlsOutboundLabels.mutateAsync(
-          buildGlsPayload(item),
+        await createGlsOutboundLabels.mutateAsync(
+          buildGlsPayload(itemToPrint),
         );
       } else if (activeCarrier === "dpd") {
-        response = await createDpdOutboundLabels.mutateAsync(
-          buildDpdPayload(item),
+        await createDpdOutboundLabels.mutateAsync(
+          buildDpdPayload(itemToPrint),
         );
       } else {
         toast.error("Printing is only available for DPD and GLS");
         return;
       }
 
-      const opened = openOutboundLabelResponse(response);
+      await refetch();
+
       const carrierLabel = activeCarrier === "gls" ? "GLS" : "DPD";
 
       toast.success(`${carrierLabel} labels created`, {
-        description: opened
-          ? "The label file was opened in a new tab."
-          : "The API returned successfully, but no label URL was found.",
+        description: "Labels created. Use Reprint on a shipment to print it.",
       });
     } catch (error) {
       toast.error(await getOutboundLabelErrorMessage(error));
@@ -991,6 +1077,12 @@ export default function WarehousePage() {
                 {pagedItems.map((item, index) => {
                   const rowKey = item.sku || `${item.name}-${index}`;
                   const isExpanded = expandedKeys.includes(rowKey);
+                  const hasPrintedShipments = (
+                    item.list_shipping_address ?? []
+                  ).some(hasCompleteShipmentLabel);
+                  const hasUnprintedShipments = (
+                    item.list_shipping_address ?? []
+                  ).some((address) => !hasCompleteShipmentLabel(address));
 
                   return (
                     <React.Fragment key={rowKey}>
@@ -1076,7 +1168,8 @@ export default function WarehousePage() {
                               }}
                               disabled={
                                 printingKey === rowKey ||
-                                activeCarrier === "spedition"
+                                activeCarrier === "spedition" ||
+                                !hasUnprintedShipments
                               }
                               className="rounded-xl bg-emerald-600 px-4 text-white hover:bg-emerald-700"
                             >
@@ -1085,20 +1178,22 @@ export default function WarehousePage() {
                               ) : (
                                 <Printer className="mr-2 h-4 w-4" />
                               )}
-                              Print
+                              {hasUnprintedShipments ? "Print" : "Printed"}
                             </Button>
-                            <Button
-                              type="button"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                handleConfirmProduct(item);
-                              }}
-                              variant="outline"
-                              className="rounded-xl border-emerald-200 px-4 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
-                            >
-                              <CheckCircle2 className="mr-2 h-4 w-4" />
-                              Confirm
-                            </Button>
+                            {hasPrintedShipments ? (
+                              <Button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleConfirmProduct(item);
+                                }}
+                                variant="outline"
+                                className="rounded-xl border-emerald-200 px-4 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
+                              >
+                                <CheckCircle2 className="mr-2 h-4 w-4" />
+                                Confirm
+                              </Button>
+                            ) : null}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -1109,6 +1204,7 @@ export default function WarehousePage() {
                             <ExpandedAddresses
                               item={item}
                               onConfirmShipment={handleConfirmShipment}
+                              onReprintShipment={handleReprintShipment}
                             />
                           </TableCell>
                         </TableRow>
@@ -1215,6 +1311,24 @@ export default function WarehousePage() {
                             <span>Phone: {address.phone_number}</span>
                           ) : null}
                           {address.email ? <span>Email: {address.email}</span> : null}
+                          {address.labels?.map((label) => (
+                            <React.Fragment key={label.id}>
+                              <span>
+                                Tracking: {label.tracking_number || "—"}
+                              </span>
+                              {label.label ? (
+                                <a
+                                  href={label.label}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  onClick={(event) => event.stopPropagation()}
+                                  className="font-semibold text-emerald-700 underline underline-offset-2 hover:text-emerald-800"
+                                >
+                                  View label
+                                </a>
+                              ) : null}
+                            </React.Fragment>
+                          ))}
                         </div>
                       </div>
                     </label>
@@ -1236,9 +1350,15 @@ export default function WarehousePage() {
             <Button
               type="button"
               className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700"
-              disabled={!confirmDialog?.selectedShipmentIds.length}
+              disabled={
+                !confirmDialog?.selectedShipmentIds.length ||
+                sendSupplierTrackingBulks.isPending
+              }
               onClick={handleConfirmSelectedShipments}
             >
+              {sendSupplierTrackingBulks.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
               Confirm selected
             </Button>
           </DialogFooter>

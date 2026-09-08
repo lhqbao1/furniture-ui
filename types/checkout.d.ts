@@ -258,6 +258,19 @@ export interface SupplierCheckoutItemShippingAddress {
   created_at: string;
   updated_at: string;
   checkout_code: string;
+  checkout_id?: string;
+  cart_items_id?: string | null;
+  labels?: SupplierCheckoutItemLabel[];
+}
+
+export interface SupplierCheckoutItemLabel {
+  id: string;
+  cart_item_id: string;
+  label: string;
+  tracking_number: string;
+  page_number: number | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface SupplierCheckoutItem {

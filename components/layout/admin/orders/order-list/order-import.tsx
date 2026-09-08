@@ -237,6 +237,14 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
     invoice_postal_code: "40235",
     invoice_country: "DE",
   },
+  hornbach: {
+    company_name: "HORNBACH Baumarkt AG",
+    tax_id: "DE151116749",
+    invoice_address: "Hornbachstraße 11",
+    invoice_city: "Bornheim",
+    invoice_postal_code: "76879",
+    invoice_country: "DE",
+  },
   // thêm sau nếu cần:
   praktiker: null,
   check24: null,

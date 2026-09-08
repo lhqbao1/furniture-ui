@@ -34,7 +34,7 @@ export const CHANEL_OPTIONS = [
   { key: "euro-tops", label: "Euro Tops", icon: "euro-top.png" },
   { key: "forstinger", label: "Forstinger", icon: "forstinger.jpeg" },
   { key: "freakout", label: "Freakout", icon: "freakout.png" },
-  { key: "hornbach", label: "Hornbach", icon: "horn.png" },
+  { key: "hornbach", label: "Hornbach", icon: "hornbach.png" },
   { key: "inprodius", label: "Inprodius", icon: "inprodius.png" },
   { key: "kaufland", label: "Kaufland", icon: "kau.png" },
   { key: "neckermann", label: "Neckermann", icon: "necker3.png" },
