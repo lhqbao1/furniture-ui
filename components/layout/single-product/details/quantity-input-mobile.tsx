@@ -35,7 +35,7 @@ export function FormQuantityInputMobile({
   };
 
   return (
-    <div className={cn("relative w-full", className)}>
+    <div className={cn("relative h-10 w-full", className)}>
       {/* ➖ Minus */}
       <Button
         type="button"
@@ -70,14 +70,10 @@ export function FormQuantityInputMobile({
             onChange(v);
           }
         }}
-        className="
-          h-full
-          text-center 
-          px-10
-          appearance-none 
-          [&::-webkit-inner-spin-button]:appearance-none
-          [&::-webkit-outer-spin-button]:appearance-none
-        "
+        className={cn(
+          "h-full w-full text-center px-10",
+          "appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+        )}
       />
 
       {/* ➕ Plus */}

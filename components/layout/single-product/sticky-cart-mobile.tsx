@@ -48,7 +48,7 @@ export default function MobileStickyCart({
       <div className="px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3">
         {/* Price */}
         <div className="flex gap-2 items-center justify-end">
-       {/*
+          {/*
 {oldPrice && oldPrice > price && (
   <div className="text-sm line-through text-gray-400">
     €
@@ -67,7 +67,7 @@ export default function MobileStickyCart({
             })}
           </div>
         </div>
-        <div className="flex items-start gap-3">
+        <div className="flex items-start justify-between gap-3">
           <FormField
             control={form.control}
             name="quantity"
@@ -108,7 +108,7 @@ export default function MobileStickyCart({
                 className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base w-full lg:min-h-[40px] lg:h-fit !h-[40px] bg-gray-500 text-white cursor-not-allowed"
                 type="button"
                 disabled
-                // disabled={productDetails.stock > 0 ? false : true}
+              // disabled={productDetails.stock > 0 ? false : true}
               >
                 {t("outStock")}
               </Button>
