@@ -33,6 +33,22 @@ import StripeLayout from "@/components/shared/stripe/stripe-layout";
 import AGBDialogTrigger from "../auth/sign-up/agb-dialog";
 import WiderrufDialogTrigger from "../auth/sign-up/widderuf-dialog";
 
+const CheckOutCustomerInfo = ({
+  className,
+  userLoginId,
+}: {
+  className?: string;
+  userLoginId?: string | null;
+}) => {
+  return (
+    <div className={cn("col-span-1 space-y-4 lg:space-y-12", className)}>
+      <CheckOutUserInformation />
+      <CheckOutShippingAddress key={`shipping-${userLoginId}`} />
+      {/* <CheckOutInvoiceAddress key={`invoice-${userId}`} /> */}
+    </div>
+  );
+};
+
 export default function CheckOutFormSection() {
   const t = useTranslations();
   const locale = useLocale();
@@ -178,15 +194,14 @@ export default function CheckOutFormSection() {
       {/* Main container */}
       <div
         className={cn(
-          `grid grid-cols-1 xl:grid-cols-3 gap-0 xl:gap-12 md:px-14 xl:px-36 px-4`,
+          `grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-12 md:px-14 xl:px-36 px-4`,
         )}
       >
-        {/* Left side */}
-        <div className="col-span-1 space-y-4 lg:space-y-12">
-          <CheckOutUserInformation />
-          <CheckOutShippingAddress key={`shipping-${userLoginId}`} />
-          {/* <CheckOutInvoiceAddress key={`invoice-${userId}`} /> */}
-        </div>
+        {/* Left side (Desktop: Ẩn mobile, hiện desktop) */}
+        <CheckOutCustomerInfo
+          className="hidden lg:block"
+          userLoginId={userLoginId}
+        />
 
         {/* Right side */}
         <div className="col-span-2 space-y-4 lg:space-y-4">
@@ -204,6 +219,12 @@ export default function CheckOutFormSection() {
             localCart={localCart}
             hasOtherCarrier={hasOtherCarrier}
             shippingCost={shippingCost}
+            userLoginId={userLoginId}
+          />
+
+          {/* UI mobile show side (Hiện mobile, ẩn desktop) */}
+          <CheckOutCustomerInfo
+            className="block lg:hidden"
             userLoginId={userLoginId}
           />
 
