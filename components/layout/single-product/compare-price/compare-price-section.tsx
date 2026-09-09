@@ -73,10 +73,10 @@ const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
   // 🔹 Lấy giá thấp nhất từ marketplace
   const minMarketplacePrice = hasMarketplace
     ? Math.min(
-        ...product.marketplace_products
-          .map((item) => item.final_price)
-          .filter((price): price is number => typeof price === "number"),
-      )
+      ...product.marketplace_products
+        .map((item) => item.final_price)
+        .filter((price): price is number => typeof price === "number"),
+    )
     : null;
 
   // 🔹 Check product có rẻ nhất không
@@ -109,7 +109,7 @@ const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
           <AccordionContent className="mt-4 md:mt-5">
             {openPriceComparision &&
               (!showContent ? <ComparePriceCardsSkeleton length={4} /> : (
-                <div className="mt-10 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 xl:grid-cols-4 xl:gap-8">
+                <div className="mt-10 grid w-full grid-cols-2 gap-4 sm:grid-cols-2 md:gap-6 xl:grid-cols-4 xl:gap-8">
                   {/* Marketplace prices */}
                   {hasMarketplace &&
                     product.marketplace_products.map((item) => (

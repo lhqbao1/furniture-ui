@@ -61,46 +61,46 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
    * -------------------------------------------------*/
   const item: CartItemUI | null = cartServer
     ? {
-        id: cartServer.id,
-        name: cartServer.products.name,
-        image: cartServer.products.static_files[0].url ?? "",
-        price: cartServer.products.final_price,
-        quantity: cartServer.quantity ?? 1,
-        brand: cartServer.products.brand?.name,
-        // variant: cartServer.products.,
-        // deliveryText: `Lieferung vor Weihnachten: ${cartServer.products.delivery_time} Werktage`,
-        deliveryText: cartServer.products.delivery_time,
-        length: cartServer.products.length,
-        width: cartServer.products.width,
-        height: cartServer.products.height,
-        color: cartServer.products.color,
-        stock: cartServer.products.stock,
-        inventory: cartServer.products.inventory_pos,
-        url_key: cartServer.products.url_key,
-        id_provider: cartServer.products.id_provider,
-        result_stock: cartServer.products.result_stock ?? 0,
-      }
+      id: cartServer.id,
+      name: cartServer.products.name,
+      image: cartServer.products.static_files[0].url ?? "",
+      price: cartServer.products.final_price,
+      quantity: cartServer.quantity ?? 1,
+      brand: cartServer.products.brand?.name,
+      // variant: cartServer.products.,
+      // deliveryText: `Lieferung vor Weihnachten: ${cartServer.products.delivery_time} Werktage`,
+      deliveryText: cartServer.products.delivery_time,
+      length: cartServer.products.length,
+      width: cartServer.products.width,
+      height: cartServer.products.height,
+      color: cartServer.products.color,
+      stock: cartServer.products.stock,
+      inventory: cartServer.products.inventory_pos,
+      url_key: cartServer.products.url_key,
+      id_provider: cartServer.products.id_provider,
+      result_stock: cartServer.products.result_stock ?? 0,
+    }
     : localProducts
       ? {
-          id: localProducts.product_id,
-          name: localProducts.product_name,
-          image: localProducts.img_url,
-          price: localProducts.final_price,
-          quantity: localProducts.quantity,
-          brand: localProducts.brand_name,
-          // variant: localProducts.variant,
-          // deliveryText: `Lieferung vor Weihnachten: ${localProducts.delivery_time} Werktage`,
-          deliveryText: localProducts.delivery_time,
-          length: localProducts.length,
-          width: localProducts.width,
-          height: localProducts.height,
-          color: localProducts.color,
-          stock: localProducts.stock,
-          inventory: localProducts.inventory,
-          url_key: localProducts.url_key,
-          id_provider: localProducts.id_provider,
-          result_stock: localProducts.result_stock ?? 0,
-        }
+        id: localProducts.product_id,
+        name: localProducts.product_name,
+        image: localProducts.img_url,
+        price: localProducts.final_price,
+        quantity: localProducts.quantity,
+        brand: localProducts.brand_name,
+        // variant: localProducts.variant,
+        // deliveryText: `Lieferung vor Weihnachten: ${localProducts.delivery_time} Werktage`,
+        deliveryText: localProducts.delivery_time,
+        length: localProducts.length,
+        width: localProducts.width,
+        height: localProducts.height,
+        color: localProducts.color,
+        stock: localProducts.stock,
+        inventory: localProducts.inventory,
+        url_key: localProducts.url_key,
+        id_provider: localProducts.id_provider,
+        result_stock: localProducts.result_stock ?? 0,
+      }
       : null;
 
   const [uiQuantity, setUiQuantity] = useState<number>(item?.quantity ?? 1);
@@ -313,7 +313,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
             </div>
 
             {item.deliveryText && (
-              <p className="text-black mt-6">
+              <p className="text-black">
                 {estimatedDeliveryRange ? (
                   <span className="text-primary">
                     {t.rich("deliveryDateRange", {
@@ -334,7 +334,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
           </div>
         </div>
 
-        <div className="flex md:flex-row flex-col-reverse md:items-end items-start justify-between mt-6 gap-2">
+        <div className="flex md:flex-row flex-col-reverse md:items-end items-start justify-between mt-4 gap-2">
           {/* QUANTITY */}
           <div className="flex items-center gap-1">
             <div className="flex items-center gap-1">

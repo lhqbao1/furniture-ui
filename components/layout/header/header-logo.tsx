@@ -20,7 +20,7 @@ const HeaderLogo = () => {
         </Link>
         <Link href={"/"}>
           <div
-            className="hidden lg:flex text-[29px] gap-1"
+            className="lg:flex lg:text-[29px] text-[22px] gap-1"
             translate="no"
           >
             <span className="text-secondary font-bold">Prestige</span>

@@ -100,7 +100,7 @@ const ComparePriceCard = ({
         )}
       >
         <div className="bg-white p-0 group z-0 pt-8 lg:px-4 px-2">
-          <Image
+          {/* <Image
             width={200}
             height={200}
             src={
@@ -110,16 +110,16 @@ const ComparePriceCard = ({
             }
             alt={product.name}
             className="w-full h-48 md:h-64 py-0 md:py-2 object-contain mb-2 rounded group-hover:scale-120 duration-500"
-          />
+          /> */}
 
           <div className="product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1">
-            <h3
+            {/* <h3
               className={cn(
                 "md:text-lg text-base text-black text-left line-clamp-2 lg:min-h-[80px] min-h-[48px]",
               )}
             >
               {product.name}
-            </h3>
+            </h3> */}
 
             <div className="space-y-2">
               {/* <ProductPricingField product={product} /> */}
@@ -141,7 +141,7 @@ const ComparePriceCard = ({
                 </div>
               )}
 
-              <div className="flex lg:flex-row flex-col lg:justify-between lg:items-center gap-2">
+              <div className="flex lg:flex-row flex-col lg:justify-between lg:items-center gap-2 flex-wrap">
                 {isProduct && dialogStep === "success" ? (
                   <>
                     <CountUp
@@ -150,11 +150,11 @@ const ComparePriceCard = ({
                       duration={0.8}
                       className="text-3xl"
                       startWhen={dialogStep === "success"}
-                      // onEnd={() => {
-                      //   if (matchedVoucher) {
-                      //     setLastVoucher(matchedVoucher.id);
-                      //   }
-                      // }}
+                    // onEnd={() => {
+                    //   if (matchedVoucher) {
+                    //     setLastVoucher(matchedVoucher.id);
+                    //   }
+                    // }}
                     />
                     €
                   </>

@@ -3,9 +3,7 @@ import { Star } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 import ListComments from "./review/list-comments";
-
 import GiveCommentSection from "./review/give-comment-section";
-import { useMediaQuery } from "react-responsive";
 import { useTranslations } from "next-intl";
 import { useAtom } from "jotai";
 import { reviewRatingFilterAtom } from "@/store/review";
@@ -25,10 +23,8 @@ interface ProductReviewTabProps {
 const ProductReviewTab = ({ productId }: ProductReviewTabProps) => {
   const t = useTranslations();
   const [selectedRate, setSelectedRate] = useAtom(reviewRatingFilterAtom);
-  const [showPic, setShowPic] = useState(true);
-  const [showComments, setShowComments] = useState(true);
-
-  const isMobile = useMediaQuery({ maxWidth: 640 });
+  const [showPic] = useState(true);
+  const [showComments] = useState(true);
 
   useEffect(() => {
     setSelectedRate(undefined);
@@ -38,74 +34,11 @@ const ProductReviewTab = ({ productId }: ProductReviewTabProps) => {
     <div className="space-y-2 md:space-y-4 xl:space-y-6">
       <h3 className="col-span-12 text-primary">{t("review")}</h3>
 
-      <div
-        className={`grid gap-6 ${isMobile ? "grid-cols-1" : "grid-cols-12 lg:gap-28"}`}
-      >
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-12 lg:gap-28">
         {/* LEFT: Reviews */}
-        <div
-          className={`${isMobile ? "col-span-1" : "lg:col-span-7 col-span-12"} flex flex-col gap-6`}
-        >
-          {/* <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-12'}`}>
-                    <div className={`${isMobile ? 'flex flex-row justify-between' : 'col-span-2 flex flex-col items-center justify-center gap-2'}`}>
-                        <h3 className='flex flex-row gap-1 items-center'>4.8 <Star /></h3>
-                        <p className='text-center'><span className='text-primary font-semibold'>120</span> {t('happyCustomer')}</p>
-                        {!isMobile && <p className='text-gray-500'>70 {t('reviews')}</p>}
-                    </div>
-
-                    {!isMobile && (
-                        <div className='col-span-6'>
-                            {reviewCount.map((item, index) => (
-                                <div key={index} className='flex flex-row gap-2 items-center'>
-                                    <div className='flex gap-1 items-center'>
-                                        <p className='min-w-2.5'>{item.title}</p>
-                                        <Star className='text-primary' stroke='#f15a24' fill='#f15a24' size={20} />
-                                    </div>
-                                    <div className="h-1.5 w-full bg-gray-300 relative overflow-hidden rounded-full">
-                                        <div style={{ width: `${item.percent}%` }} className="absolute top-0 left-0 h-full bg-secondary rounded-full" />
-                                    </div>
-                                    <p className='text-gray-600 font-semibold xl:w-4'>{item.percent}%</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    <div className={`${isMobile ? 'hidden' : 'col-span-4'}`}>
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <div className='relative cursor-pointer'>
-                                    {[20, 21, 22].map((item, index) => (
-                                        <div
-                                            key={index}
-                                            className='absolute xl:left-8 left:4 top-5'
-                                            style={{ transform: `rotate(${-[(index + 1) * 10]}deg)` }}
-                                        >
-                                            <Image src={`/${item}.png`} width={100} height={100} alt='' className='size-full' unoptimized />
-                                        </div>
-                                    ))}
-                                </div>
-                            </DialogTrigger>
-                            <DialogContent className='h-[90vh] w-[90vw] overflow-y-scroll py-6'>
-                                <DialogHeader>
-                                    <DialogTitle className='text-xl text-primary font-bold'>List Images</DialogTitle>
-                                    <DialogDescription className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 w-full h-full pt-4'>
-                                        {allProducts.map((item, index) => (
-                                            <div key={index}>
-                                                <Image src={item.image} height={200} width={200} alt='' className='w-full object-cover shadow-sm rounded-xl' unoptimized />
-                                            </div>
-                                        ))}
-                                    </DialogDescription>
-                                </DialogHeader>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </div> */}
-
-          <div
-            className={`grid gap-4 border-b border-gray-300 pb-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}
-          >
-            <div
-              className={`${isMobile ? "flex flex-row justify-between items-center" : "col-span-6 flex flex-row justify-between"}`}
-            >
+        <div className="col-span-1 sm:col-span-12 lg:col-span-7 flex flex-col gap-6">
+          <div className="grid gap-4 border-b border-gray-300 pb-4 grid-cols-1 sm:grid-cols-12">
+            <div className="flex flex-row justify-between items-center sm:col-span-6">
               <p
                 onClick={() => setSelectedRate(undefined)}
                 className={`cursor-pointer ${!selectedRate ? "text-primary font-semibold" : ""}`}
@@ -128,27 +61,6 @@ const ProductReviewTab = ({ productId }: ProductReviewTabProps) => {
                 </div>
               ))}
             </div>
-
-            {/* <div
-              className={`${isMobile ? "flex gap-4" : "col-span-6 flex gap-8"}`}
-            >
-              <div className="flex flex-row-reverse items-center gap-2">
-                <Checkbox
-                  id="pic"
-                  checked={showPic}
-                  onCheckedChange={(val) => setShowPic(!!val)}
-                />
-                <Label htmlFor="pic">{t("picOrVid")}</Label>
-              </div>
-              <div className="flex flex-row-reverse items-center gap-2">
-                <Checkbox
-                  id="comments"
-                  checked={showComments}
-                  onCheckedChange={(val) => setShowComments(!!val)}
-                />
-                <Label htmlFor="comments">{t("comments")}</Label>
-              </div>
-            </div> */}
           </div>
 
           <ListComments
@@ -159,9 +71,7 @@ const ProductReviewTab = ({ productId }: ProductReviewTabProps) => {
         </div>
 
         {/* RIGHT: Videos + Write Review */}
-        <div
-          className={`${isMobile ? "col-span-1" : "md:col-span-5 col-span-12"} flex flex-col gap-6`}
-        >
+        <div className="col-span-1 sm:col-span-12 md:col-span-5 flex flex-col gap-6">
           <GiveCommentSection productId={productId} />
         </div>
       </div>
