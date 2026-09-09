@@ -1,4 +1,4 @@
-const COUNTRY_NAME_MAP: Record<string, string> = {
+export const COUNTRY_NAME_MAP: Record<string, string> = {
   AL: "Albanien",
   AD: "Andorra",
   AM: "Armenien",
