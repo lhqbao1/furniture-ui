@@ -1604,15 +1604,19 @@ export default function WarehousePage() {
           if (!open) setSpeditionLabel(null);
         }}
       >
-        <DialogContent className="max-h-[94vh] max-w-2xl rounded-3xl bg-white p-4">
-          <DialogHeader>
+        <DialogContent className="flex max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-2xl flex-col overflow-hidden rounded-3xl bg-white p-4">
+          <DialogHeader className="shrink-0">
             <DialogTitle>Spedition label</DialogTitle>
             <DialogDescription>
               The label was created successfully and is ready to print.
             </DialogDescription>
           </DialogHeader>
-          {speditionLabel ? <SpeditionLabelPreview data={speditionLabel} /> : null}
-          <DialogFooter>
+          {speditionLabel ? (
+            <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl bg-slate-50 p-2 sm:p-4">
+              <SpeditionLabelPreview data={speditionLabel} />
+            </div>
+          ) : null}
+          <DialogFooter className="shrink-0 pt-2">
             <Button
               type="button"
               onClick={handlePrintSpeditionLabel}
