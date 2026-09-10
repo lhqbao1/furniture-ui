@@ -45,18 +45,6 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     color: "#111111",
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    borderBottomWidth: 1,
-    borderBottomColor: "#111111",
-    paddingBottom: 7,
-  },
-  warehouse: { fontSize: 18, fontWeight: "bold" },
-  headerRight: { alignItems: "flex-end" },
-  parcelLabel: { fontSize: 14, fontWeight: "bold" },
-  subtitle: { fontSize: 7, marginTop: 3 },
   section: { borderBottomWidth: 1, borderBottomColor: "#111111", paddingVertical: 7 },
   sectionTitle: { fontSize: 7, fontWeight: "bold", marginBottom: 5 },
   recipientName: { fontSize: 12, fontWeight: "bold", marginBottom: 3 },
@@ -113,16 +101,8 @@ const Barcode = ({ value }: { value: string }) => {
 export const SpeditionLabelPdf = ({ data }: SpeditionLabelPdfProps) => (
   <Document>
     <Page size="A6" style={styles.page} wrap={false}>
-      <View style={styles.header}>
-        <Text style={styles.warehouse}>WAREHOUSE</Text>
-        <View style={styles.headerRight}>
-          <Text style={styles.parcelLabel}>{data.recipient.countryCode || "--"}</Text>
-          <Text style={styles.subtitle}>INTERNAL PARCEL LABEL</Text>
-        </View>
-      </View>
-
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>SHIP TO</Text>
+        <Text style={styles.sectionTitle}>EMPFÄNGER</Text>
         <Text style={styles.recipientName}>{data.recipient.name || "-"}</Text>
         <Text style={styles.bodyText}>{data.recipient.street || "-"}</Text>
         <Text style={styles.bodyText}>
@@ -132,7 +112,7 @@ export const SpeditionLabelPdf = ({ data }: SpeditionLabelPdfProps) => (
 
       <View style={styles.section}>
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>ORDER</Text>
+          <Text style={styles.detailLabel}>AUFTRAG</Text>
           <Text style={styles.detailValue}>{data.orderCode || "-"}</Text>
         </View>
         <View style={styles.detailRow}>
@@ -140,21 +120,21 @@ export const SpeditionLabelPdf = ({ data }: SpeditionLabelPdfProps) => (
           <Text style={styles.detailValue}>{data.sku || "-"}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>PRODUCT</Text>
+          <Text style={styles.detailLabel}>PRODUKT</Text>
           <Text style={styles.detailValue}>{data.productName || "-"}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>PARCEL</Text>
+          <Text style={styles.detailLabel}>PAKET</Text>
           <Text style={styles.detailValue}>{data.parcelNumber} / {data.parcelCount}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>WEIGHT</Text>
+          <Text style={styles.detailLabel}>GEWICHT</Text>
           <Text style={styles.detailValue}>{data.weightKg} kg</Text>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>SSCC</Text>
+        <Text style={styles.sectionTitle}>NVE</Text>
         <View style={styles.sscc}>
           <Barcode value={data.sscc} />
           <Text style={styles.ssccText}>
@@ -165,15 +145,15 @@ export const SpeditionLabelPdf = ({ data }: SpeditionLabelPdfProps) => (
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>REFERENCE</Text>
+        <Text style={styles.sectionTitle}>REFERENZ</Text>
         <View style={styles.referenceText}>
           <Text style={styles.referenceValue}>{data.reference || "-"}</Text>
-          <Text style={styles.createdAt}>Created: {data.createdAt || "-"}</Text>
+          <Text style={styles.createdAt}>Erstellt: {data.createdAt || "-"}</Text>
           {data.deliveryNote ? <Text style={styles.deliveryNote}>{data.deliveryNote}</Text> : null}
         </View>
       </View>
 
-      <Text style={styles.sender}>SENDER{data.sender ? `\n${data.sender}` : ""}</Text>
+      <Text style={styles.sender}>ABSENDER{data.sender ? `\n${data.sender}` : ""}</Text>
     </Page>
   </Document>
 );
