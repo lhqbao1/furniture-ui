@@ -278,6 +278,9 @@ export interface SupplierCheckoutItem {
   name: string;
   sku: string;
   weight_per_item: number;
+  height?: number | string | null;
+  width?: number | string | null;
+  length?: number | string | null;
   list_shipping_address: SupplierCheckoutItemShippingAddress[];
 }
 
