@@ -18,16 +18,8 @@ export function SpeditionLabelPreview({ data }: { data: SpeditionLabelData }) {
 
   return (
     <div className="mx-auto aspect-[105/148] w-full max-w-[420px] border border-slate-300 bg-white p-5 text-black shadow-sm">
-      <div className="flex items-start justify-between border-b border-black pb-3">
-        <strong className="text-2xl">WAREHOUSE</strong>
-        <div className="text-right">
-          <strong className="text-xl">{data.recipient.countryCode || "--"}</strong>
-          <p className="text-[10px]">INTERNAL PARCEL LABEL</p>
-        </div>
-      </div>
-
       <section className="border-b border-black py-3">
-        <p className="text-[10px] font-bold">SHIP TO</p>
+        <p className="text-[10px] font-bold">EMPFÄNGER</p>
         <p className="mt-1 text-base font-bold">{data.recipient.name || "-"}</p>
         <p className="text-sm">{data.recipient.street || "-"}</p>
         <p className="text-sm">
@@ -38,11 +30,11 @@ export function SpeditionLabelPreview({ data }: { data: SpeditionLabelData }) {
 
       <section className="space-y-1 border-b border-black py-3 text-xs">
         {[
-          ["ORDER", data.orderCode],
+          ["AUFTRAG", data.orderCode],
           ["SKU", data.sku],
-          ["PRODUCT", data.productName],
-          ["PARCEL", `${data.parcelNumber} / ${data.parcelCount}`],
-          ["WEIGHT", `${data.weightKg} kg`],
+          ["PRODUKT", data.productName],
+          ["PAKET", `${data.parcelNumber} / ${data.parcelCount}`],
+          ["GEWICHT", `${data.weightKg} kg`],
         ].map(([label, value]) => (
           <div key={label} className="flex gap-3">
             <strong className="w-14 shrink-0">{label}</strong>
@@ -52,7 +44,7 @@ export function SpeditionLabelPreview({ data }: { data: SpeditionLabelData }) {
       </section>
 
       <section className="border-b border-black py-3">
-        <p className="text-[10px] font-bold">SSCC</p>
+        <p className="text-[10px] font-bold">NVE</p>
         {barcode ? (
           <div
             className="mt-2 flex justify-center"
@@ -66,12 +58,14 @@ export function SpeditionLabelPreview({ data }: { data: SpeditionLabelData }) {
       </section>
 
       <section className="border-b border-black py-3">
-        <p className="text-[10px] font-bold">REFERENCE</p>
+        <p className="text-[10px] font-bold">REFERENZ</p>
         <p className="mt-1 text-sm font-bold">{data.reference || "-"}</p>
-        <p className="text-[10px]">Created: {data.createdAt || "-"}</p>
+        <p className="text-[10px]">Erstellt: {data.createdAt || "-"}</p>
       </section>
 
-      <p className="pt-2 text-[10px]">SENDER{data.sender ? ` · ${data.sender}` : ""}</p>
+      <p className="whitespace-pre-line pt-2 text-[10px]">
+        ABSENDER{data.sender ? `\n${data.sender}` : ""}
+      </p>
     </div>
   );
 }

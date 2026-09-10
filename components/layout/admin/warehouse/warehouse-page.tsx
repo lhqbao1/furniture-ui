@@ -542,6 +542,8 @@ const mapSpeditionLabelData = (
     sscc: response.sscc[0] ?? "",
     reference: order.delivery_note_number || order.outbound_id,
     createdAt: order.delivery_date,
+    sender:
+      "Prestige Home GmbH\nGewerbestraße 4\n90579 Langenzenn\nGermany\n0049 1520 6576 549",
   };
 };
 
@@ -574,6 +576,8 @@ const buildSpeditionLabelDataFromShipment = (
     sscc: trackingNumber ?? "",
     reference: address.checkout_code,
     createdAt: formatDateForSpedition(address.created_at),
+    sender:
+      "Prestige Home GmbH\nGewerbestraße 4\n90579 Langenzenn\nGermany\n0049 1520 6576 549",
   };
 };
 
@@ -1606,9 +1610,9 @@ export default function WarehousePage() {
       >
         <DialogContent className="flex max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-2xl flex-col overflow-hidden rounded-3xl bg-white p-4">
           <DialogHeader className="shrink-0">
-            <DialogTitle>Spedition label</DialogTitle>
+            <DialogTitle>Speditionsetikett</DialogTitle>
             <DialogDescription>
-              The label was created successfully and is ready to print.
+              Das Etikett wurde erfolgreich erstellt und kann gedruckt werden.
             </DialogDescription>
           </DialogHeader>
           {speditionLabel ? (
@@ -1623,7 +1627,7 @@ export default function WarehousePage() {
               className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700"
             >
               <Printer className="mr-2 h-4 w-4" />
-              Print label
+              Etikett drucken
             </Button>
           </DialogFooter>
         </DialogContent>
