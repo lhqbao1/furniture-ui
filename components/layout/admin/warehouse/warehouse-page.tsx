@@ -62,12 +62,7 @@ import React from "react";
 import { toast } from "sonner";
 
 const PRESTIGE_HOME_SUPPLIER_ID = "65d162e2-7c5d-46f9-86d3-21fcf4346efe";
-const PREPARE_NEEDED_STATUSES = [
-  "PREPARATION_SHIPPING",
-  "PAID",
-  "EXCHANGE_PREPARATION_SHIPPING",
-  "EXCHANGE",
-];
+const PREPARE_NEEDED_STATUSES = ["PREPARATION_SHIPPING", "PAID", "EXCHANGE"];
 const DISPATCHED_STATUSES = ["SHIPPED", "COMPLETED"];
 const WAREHOUSE_VIEW_OPTIONS = [
   { value: "prepare-needed", label: "Prepare needed" },
@@ -172,7 +167,9 @@ const hasCompleteShipmentLabel = (
 const hasShipmentTrackingNumber = (
   address: SupplierCheckoutItemShippingAddress,
 ) =>
-  (address.labels ?? []).some((label) => Boolean(label.tracking_number?.trim()));
+  (address.labels ?? []).some((label) =>
+    Boolean(label.tracking_number?.trim()),
+  );
 
 const hasCompleteShipmentForCarrier = (
   address: SupplierCheckoutItemShippingAddress,
@@ -1483,7 +1480,8 @@ export default function WarehousePage() {
                               {activeCarrier === "spedition" &&
                               hasInvalidSpeditionPackage ? (
                                 <p className="mt-2 text-xs font-semibold text-red-600">
-                                  Missing package data: {missingSpeditionPackageFields.join(", ")}
+                                  Missing package data:{" "}
+                                  {missingSpeditionPackageFields.join(", ")}
                                 </p>
                               ) : null}
                             </div>
@@ -1517,9 +1515,7 @@ export default function WarehousePage() {
                                   event.stopPropagation();
                                   void handlePrintProduct(item, rowKey);
                                 }}
-                                disabled={
-                                  printingKey === rowKey
-                                }
+                                disabled={printingKey === rowKey}
                                 className="rounded-xl bg-emerald-600 px-4 text-white hover:bg-emerald-700"
                               >
                                 {printingKey === rowKey ? (
