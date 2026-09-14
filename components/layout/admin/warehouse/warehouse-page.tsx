@@ -478,7 +478,7 @@ const buildSpeditionPayload = (
       weight: Number(item.weight_per_item) || 0,
       content: item.name ?? "",
       outbound_rf_1: item.sku ?? "",
-      package_type: "PL",
+      package_type: "FP",
       length_cm: length,
       width_cm: width,
       height_cm: height,
