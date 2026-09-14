@@ -501,7 +501,7 @@ const buildSpeditionPayload = (
           recipient_country: address.country || "DE",
         },
         outbound_id: address.checkout_code ?? "",
-        delivery_date: formatDateForSpedition(address.created_at),
+        delivery_date: formatDateForSpedition(new Date().toISOString()),
         delivery_note_number: address.checkout_code ?? "",
       },
     ],
