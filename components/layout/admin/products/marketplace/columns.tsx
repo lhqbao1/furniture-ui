@@ -16,6 +16,7 @@ import EditProductDrawer from "./edit-product-drawer";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 import { getIncomingDisplayItems } from "@/lib/product-incoming-stock";
+import { MarketplaceQuickPriceEdit } from "./marketplace-quick-price";
 
 type Marketplace = "kaufland" | "ebay" | "amazon";
 const MARKETPLACE_COLUMN_ORDER: Marketplace[] = [
@@ -104,12 +105,12 @@ function SyncToMarketplace({
   const isActive = marketplaceProduct?.is_active;
 
   return (
-    <div className="flex justify-start gap-2 items-center">
-      {/* Nếu product active trong marketplace => hiện form update */}
-      {isActive ? (
-        // 🔹 CASE 1: Product đã active trên marketplace
-        marketplace === "amazon" ? (
-          <>
+    <div className="flex flex-col gap-1 items-center">
+      <div className="flex justify-start gap-2 items-center">
+        {/* Nếu product active trong marketplace => hiện form update */}
+        {isActive ? (
+          // 🔹 CASE 1: Product đã active trên marketplace
+          marketplace === "amazon" ? (
             <SyncToAmazonForm
               updating={updating}
               setUpdating={setUpdating}
@@ -118,19 +119,17 @@ function SyncToMarketplace({
               currentMarketplace={marketplace}
               isActive={isActive ?? false}
             />
-          </>
-        ) : (
-          <SyncToEbayForm
-            updating={updating}
-            setUpdating={setUpdating}
-            product={product}
-            isUpdating
-            currentMarketplace={marketplace}
-          />
-        )
-      ) : // 🔹 CASE 2: Product CHƯA active — kiểm tra marketplace
-      marketplace === "amazon" ? (
-        <>
+          ) : (
+            <SyncToEbayForm
+              updating={updating}
+              setUpdating={setUpdating}
+              product={product}
+              isUpdating
+              currentMarketplace={marketplace}
+            />
+          )
+        ) : // 🔹 CASE 2: Product CHƯA active — kiểm tra marketplace
+        marketplace === "amazon" ? (
           <SyncToAmazonForm
             updating={updating}
             setUpdating={setUpdating}
@@ -139,9 +138,7 @@ function SyncToMarketplace({
             isActive={isActive ?? false}
             isAdd
           />
-        </>
-      ) : (
-        <>
+        ) : (
           <SyncToEbayForm
             updating={updating}
             setUpdating={setUpdating}
@@ -149,16 +146,20 @@ function SyncToMarketplace({
             isAdd
             currentMarketplace={marketplace}
           />
-        </>
-      )}
+        )}
 
-      {/* Nếu đang active => nút Remove */}
-      {isActive && (
-        <RemoveFromMarketplaceDialog
-          marketplace={marketplace}
-          marketplaceProduct={marketplaceProduct}
-          product={product}
-        />
+        {/* Nút Remove chỉ còn cho Amazon */}
+        {isActive && marketplace === "amazon" && (
+          <RemoveFromMarketplaceDialog
+            marketplace={marketplace}
+            marketplaceProduct={marketplaceProduct}
+            product={product}
+          />
+        )}
+      </div>
+
+      {(marketplace === "ebay" || marketplace === "kaufland") && (
+        <MarketplaceQuickPriceEdit product={product} marketplace={marketplace} />
       )}
     </div>
   );
@@ -173,24 +174,30 @@ function AddProductMarketplace({
 }) {
   const [updating, setUpdating] = useState<boolean>(false);
   return (
-    <div className="flex justify-center">
-      {marketplace === "amazon" ? (
-        <SyncToAmazonForm
-          updating={updating}
-          setUpdating={setUpdating}
-          product={product}
-          currentMarketplace={marketplace}
-          isActive={false}
-          isAdd
-        />
-      ) : (
-        <SyncToEbayForm
-          isAdd
-          setUpdating={setUpdating}
-          product={product}
-          isUpdating={false}
-          currentMarketplace={marketplace}
-        />
+    <div className="flex flex-col gap-1 items-center">
+      <div className="flex justify-center">
+        {marketplace === "amazon" ? (
+          <SyncToAmazonForm
+            updating={updating}
+            setUpdating={setUpdating}
+            product={product}
+            currentMarketplace={marketplace}
+            isActive={false}
+            isAdd
+          />
+        ) : (
+          <SyncToEbayForm
+            isAdd
+            setUpdating={setUpdating}
+            product={product}
+            isUpdating={false}
+            currentMarketplace={marketplace}
+          />
+        )}
+      </div>
+
+      {(marketplace === "ebay" || marketplace === "kaufland") && (
+        <MarketplaceQuickPriceEdit product={product} marketplace={marketplace} />
       )}
     </div>
   );
@@ -406,6 +413,7 @@ const MARKETPLACE_ICONS: Record<Marketplace, string> = {
 const marketplaceColumns: ColumnDef<ProductItem>[] = MARKETPLACE_COLUMN_ORDER.map(
   (marketplace) => ({
     id: marketplace,
+    meta: { width: 200 },
     header: () => (
       <div className="flex justify-center items-center uppercase">
         <Image
