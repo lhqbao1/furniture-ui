@@ -43,6 +43,7 @@ export async function getMe() {
   return data as User;
 }
 
+
 export async function loginGoogle() {
   const { data } = await api.get("/google/login");
   return data;

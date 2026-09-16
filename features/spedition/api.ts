@@ -13,6 +13,22 @@ export interface SpeditionOutboundShippingAddress {
   recipient_country: string;
 }
 
+export interface SpeditionDangerousGoods {
+  unNumber: string;
+  properShippingName: string;
+  releaseCode: string;
+  hazardClass: string;
+  classificationCode: string;
+  packagingDescription: string;
+  transportCategory: string;
+  tunnelRestrictionCode: string;
+  netWeightKg: number;
+  netWeightQualifier: string;
+  limitedQuantity: boolean;
+  exceptedQuantity: boolean;
+  environmentallyHazardous: boolean;
+}
+
 export interface SpeditionOutboundParcelData {
   weight: number;
   content: string;
@@ -25,6 +41,7 @@ export interface SpeditionOutboundParcelData {
   volume_cbm: number;
   loading_meters: 0.6;
   cart_items_id: string;
+  dangerous_goods?: SpeditionDangerousGoods;
 }
 
 export interface SpeditionOutboundOrderDataItem {
@@ -44,7 +61,6 @@ export interface SpeditionOutboundLabelPayload {
     weight: number | string;
     volume_cbm: number | string;
     loading_meters: number | string;
-    dangerous_goods?: Record<string, unknown>;
   };
   orderdata: SpeditionOutboundOrderDataItem[];
 }
