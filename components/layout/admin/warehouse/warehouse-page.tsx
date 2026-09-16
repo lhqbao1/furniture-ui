@@ -433,8 +433,10 @@ const getShipmentAgeStatus = (createdAt?: string | null) => {
   const ageInMs = Date.now() - createdAtTime;
 
   if (ageInMs > 2 * ONE_DAY_IN_MS) {
+    const lateDays = Math.max(1, Math.floor(ageInMs / ONE_DAY_IN_MS));
+
     return {
-      label: "Late",
+      label: `${lateDays} days late`,
       className: "bg-red-600 text-white ring-red-600",
     };
   }
