@@ -128,16 +128,16 @@ export default function CheckOutFormSection() {
     const productsTotal =
       userLoginId
         ? (cartItems ?? [])
-            .flatMap((g) => g.items)
-            .filter((i) => i.is_active)
-            .reduce((sum, item) => sum + (item.final_price ?? 0), 0)
+          .flatMap((g) => g.items)
+          .filter((i) => i.is_active)
+          .reduce((sum, item) => sum + (item.final_price ?? 0), 0)
         : (localCart ?? [])
-            .filter((i) => i.is_active)
-            .reduce(
-              (sum, item) =>
-                sum + (item.item_price ?? 0) * (item.quantity ?? 1),
-              0,
-            );
+          .filter((i) => i.is_active)
+          .reduce(
+            (sum, item) =>
+              sum + (item.item_price ?? 0) * (item.quantity ?? 1),
+            0,
+          );
 
     return (
       productsTotal +
@@ -295,6 +295,16 @@ export default function CheckOutFormSection() {
 
           <div className="fixed bottom-0 left-0 z-50 w-full border-t bg-white shadow-lg md:hidden">
             <div className="px-4 py-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">{t("total")}</span>
+                <span className="text-lg font-semibold text-secondary">
+                  €{" "}{totalEuro.toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+
+                </span>
+              </div>
               <Button
                 type="submit"
                 className="text-base w-full py-6"

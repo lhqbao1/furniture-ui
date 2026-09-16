@@ -310,6 +310,12 @@ const CartSummary = ({
 
       <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t shadow-lg md:hidden">
         <div className="px-4 py-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-600">{t("totalWithTax")}</span>
+            <span className="text-lg font-semibold text-secondary">
+              {formatCurrency(totalWithDiscount)}
+            </span>
+          </div>
           <Button
             onClick={onCheckout}
             className="
