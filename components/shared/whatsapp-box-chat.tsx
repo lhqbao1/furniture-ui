@@ -54,7 +54,7 @@ export default function WhatsAppChatBox() {
   /* 🔹 AFTER all hooks */
   if (!mounted || isInternalToolRoute || isMobile) return null;
 
-  const PHONE_NUMBER = "+4930814537080";
+  const PHONE_NUMBER = "+4916092028890";
 
   const handleSend = () => {
     if (!message.trim()) return;
