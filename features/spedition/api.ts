@@ -33,8 +33,7 @@ export interface SpeditionOutboundParcelData {
   weight: number;
   content: string;
   outbound_rf_1: string;
-  // package_type: "FP";
-  package_type: "KT";
+  package_type: "FP" | "KT";
   length_cm: number;
   width_cm: number;
   height_cm: number;
