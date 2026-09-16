@@ -571,6 +571,8 @@ const buildSpeditionPayload = (
   const length = Number(item.length) || 0;
   const width = Number(item.width) || 0;
   const height = Number(item.height) || 0;
+  const packageType = getSpeditionPackageType(item.name ?? "");
+  const packageWidth = packageType === "FP" ? Math.max(width, 80) : width;
   const { firstName, lastName } = splitRecipientName(address.recipient_name);
   const { street, houseNumber } = splitStreetAndHouseNumber(
     address.address_line,
@@ -579,11 +581,13 @@ const buildSpeditionPayload = (
     weight: Number(item.weight_per_item) || 0,
     content: item.name ?? "",
     outbound_rf_1: item.sku ?? "",
-    package_type: getSpeditionPackageType(item.name ?? ""),
+    package_type: packageType,
     length_cm: length,
-    width_cm: width,
+    width_cm: packageWidth,
     height_cm: height,
-    volume_cbm: roundToThreeDecimals((length * width * height) / 1000000),
+    volume_cbm: roundToThreeDecimals(
+      (length * packageWidth * height) / 1000000,
+    ),
     loading_meters: 0.6,
     cart_items_id: address.cart_items_id ?? "",
   };

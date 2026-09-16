@@ -294,6 +294,9 @@ const getOrderCustomerEmail = (
   return invoiceEmail;
 };
 
+const getResendCheckoutId = (order: CheckOutMain): string | undefined =>
+  order.checkouts?.find((checkout) => checkout.supplier == null)?.id;
+
 const getOrderListInvoiceDisplayAmount = (order: CheckOutMain): number => {
   const totalAmount = toNumber(order.total_amount);
   const discountAmount = Math.max(
@@ -369,6 +372,7 @@ const ActionCell = ({
   status,
   refundAmount,
   marketplaceOrderId,
+  resendCheckoutId,
 }: {
   id: string;
   expandedRowId?: string | null;
@@ -382,6 +386,7 @@ const ActionCell = ({
   status?: string | null;
   refundAmount?: number | null;
   marketplaceOrderId?: string | null;
+  resendCheckoutId?: string;
 }) => {
   const resendToAmm = useSendXmlToAmmAfterHoldOn();
   const [canResendToAmm, setCanResendToAmm] = useState(false);
@@ -622,7 +627,9 @@ const ActionCell = ({
         </>
       )}
 
-      {canResendToAmm && (
+      {canResendToAmm &&
+        String(status ?? "").trim().toUpperCase() === "PAID" &&
+        resendCheckoutId && (
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -632,7 +639,7 @@ const ActionCell = ({
               disabled={resendToAmm.isPending}
               onClick={() =>
                 resendToAmm.mutate(
-                  { checkout_id: id },
+                  { checkout_id: resendCheckoutId },
                   {
                     onSuccess: () => toast.success("Order resent to AMM"),
                     onError: () => toast.error("Failed to resend order to AMM"),
@@ -1169,6 +1176,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
         status={row.original.status}
         refundAmount={row.original.refund_amount}
         marketplaceOrderId={row.original.checkout_code}
+        resendCheckoutId={getResendCheckoutId(row.original)}
       />
     ),
   },
@@ -1344,6 +1352,7 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
         status={row.original.status}
         refundAmount={row.original.refund_amount}
         marketplaceOrderId={row.original.checkout_code}
+        resendCheckoutId={getResendCheckoutId(row.original)}
       />
     ),
   },
