@@ -7,7 +7,6 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useAtom } from "jotai";
 import { whatsappBubbleVisibleAtom } from "@/store/whatsapp-bubble";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const STORAGE_KEY = "whatsapp-chat-open";
 
@@ -19,7 +18,6 @@ export default function WhatsAppChatBox() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [mounted, setMounted] = useState(false);
   const [bubbleVisible, setBubbleVisible] = useAtom(whatsappBubbleVisibleAtom);
-  const isMobile = useIsMobile();
 
   const currentUrl =
     typeof window !== "undefined"
@@ -52,7 +50,7 @@ export default function WhatsAppChatBox() {
     pathname.includes("/login");
 
   /* 🔹 AFTER all hooks */
-  if (!mounted || isInternalToolRoute || isMobile) return null;
+  if (!mounted || isInternalToolRoute) return null;
 
   const PHONE_NUMBER = "+4916092028890";
 
