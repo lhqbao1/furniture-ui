@@ -1,5 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { importProductToAmm, importWeAvis } from "@/features/amm/api";
+import {
+  importProductToAmm,
+  importWeAvis,
+  sendXmlToAmmAfterHoldOn,
+  SendXmlToAmmAfterHoldOnPayload,
+} from "@/features/amm/api";
 import { ImportWeAvisPayload } from "@/lib/schema/amm-weavis";
 
 export function useImportAmmProducts() {
@@ -11,5 +16,12 @@ export function useImportAmmProducts() {
 export function useImportProductToAmm() {
   return useMutation({
     mutationFn: (ids: string[]) => importProductToAmm(ids),
+  });
+}
+
+export function useSendXmlToAmmAfterHoldOn() {
+  return useMutation({
+    mutationFn: (payload: SendXmlToAmmAfterHoldOnPayload) =>
+      sendXmlToAmmAfterHoldOn(payload),
   });
 }

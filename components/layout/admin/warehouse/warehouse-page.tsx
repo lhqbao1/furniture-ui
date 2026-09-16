@@ -31,6 +31,7 @@ import type {
 import type {
   CreateSpeditionOutboundLabelPayload,
   CreateSpeditionOutboundLabelResponse,
+  SpeditionDangerousGoods,
 } from "@/features/spedition/api";
 import { useCreateSpeditionOutboundLabel } from "@/features/spedition/hook";
 import { useGetAdminSupplierCheckoutItems } from "@/features/checkout/hook";
@@ -149,6 +150,65 @@ const getShipmentKey = (
   address: SupplierCheckoutItemShippingAddress,
   index: number,
 ) => address.id || address.checkout_code || `shipment-${index}`;
+
+type GroupedWarehouseShipment = SupplierCheckoutItemShippingAddress & {
+  pcs: number;
+};
+
+const normalizeShipmentValue = (value?: string | null) =>
+  String(value ?? "").trim().toLowerCase();
+
+const getShipmentGroupKey = (
+  address: SupplierCheckoutItemShippingAddress,
+) =>
+  [
+    address.checkout_code,
+    address.recipient_name,
+    address.email,
+    address.phone_number,
+    address.address_line,
+    address.additional_address_line,
+    address.postal_code,
+    address.city,
+    address.country,
+  ]
+    .map(normalizeShipmentValue)
+    .join("|");
+
+const getGroupedShipmentAddresses = (
+  item: SupplierCheckoutItem,
+): GroupedWarehouseShipment[] => {
+  const grouped = new Map<string, GroupedWarehouseShipment>();
+
+  (item.list_shipping_address ?? []).forEach((address) => {
+    const groupKey = getShipmentGroupKey(address);
+    const existing = grouped.get(groupKey);
+
+    if (!existing) {
+      grouped.set(groupKey, { ...address, pcs: 1 });
+      return;
+    }
+
+    const labels = [...(existing.labels ?? []), ...(address.labels ?? [])];
+    const uniqueLabels = labels.filter(
+      (label, index, allLabels) =>
+        allLabels.findIndex(
+          (candidate) =>
+            candidate.id === label.id ||
+            (candidate.tracking_number === label.tracking_number &&
+              candidate.label === label.label),
+        ) === index,
+    );
+
+    grouped.set(groupKey, {
+      ...existing,
+      labels: uniqueLabels,
+      pcs: existing.pcs + 1,
+    });
+  });
+
+  return Array.from(grouped.values());
+};
 
 const hasCompleteShipmentLabel = (
   address: SupplierCheckoutItemShippingAddress,
@@ -461,6 +521,49 @@ const buildGlsPayload = (
 
 const roundToThreeDecimals = (value: number) => Math.round(value * 1000) / 1000;
 
+const FP_SPEDITION_PRODUCT_NAMES = new Set([
+  "WPC Sichtschutzzaun CARACAS - 5 Zaunelemente + 6 Pfosten - ca. 9 m - Anthrazit",
+  "WPC Sichtschutzzaun CARACAS - 5 Zaunelemente + 6 Pfosten - ca. 9 m - Grau",
+]);
+
+const getSpeditionPackageType = (productName: string): "FP" | "KT" => {
+  const normalizedName = productName.trim();
+
+  return normalizedName.startsWith("Seniorenmobil") ||
+    normalizedName.startsWith("E-Seniorenmobil") ||
+    FP_SPEDITION_PRODUCT_NAMES.has(normalizedName)
+    ? "FP"
+    : "KT";
+};
+
+const hasSpeditionDangerousGoods = (productName: string) => {
+  const normalizedName = productName.trim().toLowerCase();
+
+  return (
+    (normalizedName.startsWith("seniorenmobil") ||
+      normalizedName.startsWith("e-seniorenmobil")) &&
+    normalizedName.includes("lithium")
+  );
+};
+
+const DENIA_RED_DANGEROUS_GOODS: Omit<
+  SpeditionDangerousGoods,
+  "properShippingName"
+> = {
+  unNumber: "3556",
+  releaseCode: "0",
+  hazardClass: "9",
+  classificationCode: "M11",
+  packagingDescription: "Grossverpackung gemäß P912",
+  transportCategory: "0",
+  tunnelRestrictionCode: "-",
+  netWeightKg: 12,
+  netWeightQualifier: "NGW",
+  limitedQuantity: false,
+  exceptedQuantity: false,
+  environmentallyHazardous: false,
+};
+
 const buildSpeditionPayload = (
   item: SupplierCheckoutItem,
   address: SupplierCheckoutItemShippingAddress,
@@ -472,20 +575,28 @@ const buildSpeditionPayload = (
   const { street, houseNumber } = splitStreetAndHouseNumber(
     address.address_line,
   );
+  const parcelData: CreateSpeditionOutboundLabelPayload["parcel_data"] = {
+    weight: Number(item.weight_per_item) || 0,
+    content: item.name ?? "",
+    outbound_rf_1: item.sku ?? "",
+    package_type: getSpeditionPackageType(item.name ?? ""),
+    length_cm: length,
+    width_cm: width,
+    height_cm: height,
+    volume_cbm: roundToThreeDecimals((length * width * height) / 1000000),
+    loading_meters: 0.6,
+    cart_items_id: address.cart_items_id ?? "",
+  };
+
+  if (hasSpeditionDangerousGoods(item.name ?? "")) {
+    parcelData.dangerous_goods = {
+      ...DENIA_RED_DANGEROUS_GOODS,
+      properShippingName: item.name,
+    };
+  }
 
   return {
-    parcel_data: {
-      weight: Number(item.weight_per_item) || 0,
-      content: item.name ?? "",
-      outbound_rf_1: item.sku ?? "",
-      package_type: "KT",
-      length_cm: length,
-      width_cm: width,
-      height_cm: height,
-      volume_cbm: roundToThreeDecimals((length * width * height) / 1000000),
-      loading_meters: 0.6,
-      cart_items_id: address.cart_items_id ?? "",
-    },
+    parcel_data: parcelData,
     orderdata: [
       {
         shipping_address: {
@@ -493,7 +604,7 @@ const buildSpeditionPayload = (
           recipient_first_name: firstName,
           recipient_last_name: lastName,
           recipient_email: address.email ?? "",
-          recipient_phone: address.phone_number ?? "",
+          recipient_phone: address.phone_number?.trim() || "4928672670108",
           recipient_street: street,
           recipient_house_no: houseNumber,
           recipient_zip: address.postal_code ?? "",
@@ -628,6 +739,7 @@ function ProductAvatar({ name }: { name: string }) {
 function AddressCard({
   address,
   index,
+  pcs,
   onConfirm,
   onReprint,
   onPrint,
@@ -637,6 +749,7 @@ function AddressCard({
 }: {
   address: SupplierCheckoutItemShippingAddress;
   index: number;
+  pcs: number;
   onConfirm: (
     address: SupplierCheckoutItemShippingAddress,
     index: number,
@@ -664,6 +777,9 @@ function AddressCard({
           <p className="mt-1 font-semibold text-slate-950">
             {address.checkout_code || "—"}
           </p>
+          <span className="mt-2 inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-sm font-extrabold text-emerald-800 ring-2 ring-emerald-300">
+            {formatNumber(pcs)} pcs.
+          </span>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
           {isPrinted && allowConfirm ? (
@@ -790,7 +906,7 @@ function ExpandedAddresses({
   allowShipmentPrint: boolean;
   carrier: WarehouseCarrier;
 }) {
-  const addresses = item.list_shipping_address ?? [];
+  const addresses = getGroupedShipmentAddresses(item);
 
   return (
     <div className="rounded-3xl bg-slate-50 p-4 md:p-5">
@@ -807,6 +923,7 @@ function ExpandedAddresses({
               key={address.id || `${item.sku}-${index}`}
               address={address}
               index={index}
+              pcs={address.pcs}
               onConfirm={(selectedAddress, selectedIndex) =>
                 onConfirmShipment(item, selectedAddress, selectedIndex)
               }
@@ -950,7 +1067,7 @@ export default function WarehousePage() {
   const totalShipments = React.useMemo(
     () =>
       filteredItems.reduce(
-        (total, item) => total + (item.list_shipping_address?.length ?? 0),
+        (total, item) => total + getGroupedShipmentAddresses(item).length,
         0,
       ),
     [filteredItems],
@@ -1029,7 +1146,7 @@ export default function WarehousePage() {
   const handleConfirmProduct = (item: SupplierCheckoutItem) => {
     openConfirmDialog(
       item,
-      (item.list_shipping_address ?? []).filter((address) =>
+      getGroupedShipmentAddresses(item).filter((address) =>
         hasCompleteShipmentForCarrier(address, activeCarrier),
       ),
     );
@@ -1154,7 +1271,7 @@ export default function WarehousePage() {
     item: SupplierCheckoutItem,
     key: string,
   ) => {
-    const addresses = item.list_shipping_address ?? [];
+    const addresses = getGroupedShipmentAddresses(item);
 
     if (addresses.length === 0) {
       toast.error("No shipments to print for this product");
@@ -1408,13 +1525,14 @@ export default function WarehousePage() {
                 {pagedItems.map((item, index) => {
                   const rowKey = item.sku || `${item.name}-${index}`;
                   const isExpanded = expandedKeys.includes(rowKey);
+                  const groupedShipments = getGroupedShipmentAddresses(item);
                   const hasPrintedShipments = (
-                    item.list_shipping_address ?? []
+                    groupedShipments
                   ).some((address) =>
                     hasCompleteShipmentForCarrier(address, activeCarrier),
                   );
                   const hasUnprintedShipments = (
-                    item.list_shipping_address ?? []
+                    groupedShipments
                   ).some(
                     (address) =>
                       !hasCompleteShipmentForCarrier(address, activeCarrier),
@@ -1471,9 +1589,7 @@ export default function WarehousePage() {
                               </p>
                               <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
                                 <span>
-                                  {formatNumber(
-                                    item.list_shipping_address?.length,
-                                  )}{" "}
+                                  {formatNumber(groupedShipments.length)}{" "}
                                   shipments
                                 </span>
                               </div>
@@ -1501,7 +1617,7 @@ export default function WarehousePage() {
                         <TableCell>
                           <span className="inline-flex items-center gap-2 rounded-full bg-slate-50 px-3 py-1 text-sm font-semibold text-slate-600 ring-1 ring-slate-200">
                             <Truck className="h-4 w-4" />
-                            {formatNumber(item.list_shipping_address?.length)}
+                            {formatNumber(groupedShipments.length)}
                           </span>
                         </TableCell>
                         <TableCell className="text-right">

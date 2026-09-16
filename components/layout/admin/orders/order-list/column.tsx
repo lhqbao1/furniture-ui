@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { createPortal } from "react-dom";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckOut, CheckOutMain } from "@/types/checkout";
@@ -15,6 +15,7 @@ import {
   ExternalLink,
   Eye,
   FileText,
+  Send,
 } from "lucide-react";
 import { getOrderTagOption, listChanel } from "@/data/data";
 import { useRouter } from "@/src/i18n/navigation";
@@ -41,6 +42,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getMainCheckOutByMainCheckOutId } from "@/features/checkout/api";
 import { formatDeliveryRangeLabel } from "./delivery-range";
+import { useSendXmlToAmmAfterHoldOn } from "@/features/amm/hook";
+import { toast } from "sonner";
 
 const toNumber = (value: unknown) => {
   const parsed = Number(value);
@@ -56,6 +59,11 @@ const CANCELLABLE_EXCHANGE_STATUSES = new Set([
 
 const canCancelExchangeOrder = (status?: string | null) =>
   CANCELLABLE_EXCHANGE_STATUSES.has(status?.toLowerCase().trim() ?? "");
+
+const RESEND_TO_AMM_ADMIN_IDS = new Set([
+  "9490a32a-9d76-4f40-8d0a-818481b27add",
+  "8df0bd39-b7ad-4586-b5d7-b684efff5e08",
+]);
 
 const getOrderExternalReference = (order: CheckOutMain) =>
   (order.netto_buyer ?? order.netto_buyer_id ?? "").trim();
@@ -375,6 +383,21 @@ const ActionCell = ({
   refundAmount?: number | null;
   marketplaceOrderId?: string | null;
 }) => {
+  const resendToAmm = useSendXmlToAmmAfterHoldOn();
+  const [canResendToAmm, setCanResendToAmm] = useState(false);
+
+  useEffect(() => {
+    const storedAdminId = String(
+      localStorage.getItem("admin_user_id") ?? "",
+    )
+      .trim()
+      .replace(/^['"]|['"]$/g, "");
+
+    setCanResendToAmm(
+      RESEND_TO_AMM_ADMIN_IDS.has(storedAdminId),
+    );
+  }, []);
+
   const router = useRouter();
   const locale = useLocale();
 
@@ -597,6 +620,32 @@ const ActionCell = ({
               document.body,
             )}
         </>
+      )}
+
+      {canResendToAmm && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              type="button"
+              disabled={resendToAmm.isPending}
+              onClick={() =>
+                resendToAmm.mutate(
+                  { checkout_id: id },
+                  {
+                    onSuccess: () => toast.success("Order resent to AMM"),
+                    onError: () => toast.error("Failed to resend order to AMM"),
+                  },
+                )
+              }
+              className="hover:bg-emerald-50"
+            >
+              <Send className="w-4 h-4 text-emerald-600" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Resend to AMM</TooltipContent>
+        </Tooltip>
       )}
 
       {/* Expand button */}
