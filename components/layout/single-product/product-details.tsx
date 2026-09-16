@@ -63,7 +63,7 @@ const ProductDetails = ({
         {productDetails ? (
           <div className="flex flex-col gap-8">
             <div className="grid grid-cols-12 xl:gap-16 gap-8">
-              <div className="xl:col-span-6 col-span-12">
+              <div id="product-images" className="xl:col-span-6 col-span-12">
                 <ProductImageWrapper productDetails={productDetails} />
               </div>
 
@@ -88,15 +88,19 @@ const ProductDetails = ({
                 </div>
                 <ListStarsReview reviews={reviews} />
 
-                <ProductDetailsPrice
-                  productDetails={productDetails}
-                  isProductDetails={true}
-                />
+                <div id="product-price">
+                  <ProductDetailsPrice
+                    productDetails={productDetails}
+                    isProductDetails={true}
+                  />
+                </div>
 
-                <ProductDetailsLogistic
-                  productDetails={productDetails}
-                  serverDeliveryRange={serverDeliveryRange}
-                />
+                <div id="product-policy">
+                  <ProductDetailsLogistic
+                    productDetails={productDetails}
+                    serverDeliveryRange={serverDeliveryRange}
+                  />
+                </div>
                 {productDetails.meta_description && (
                   <div className="seo-content text-sm shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-2xl px-4 py-3 mt-2">
                     <h2 className="text-sm mb-0.5">

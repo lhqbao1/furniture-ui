@@ -30,6 +30,7 @@ import ProductReviewTab from "@/components/layout/single-product/tabs/review";
 import { getInventoryPoByProductId } from "@/features/incoming-inventory/inventory/api";
 import { calculateDeliveryEstimate } from "@/hooks/get-estimated-shipping";
 import ComparePriceSection from "@/components/layout/single-product/compare-price/compare-price-section";
+import ProductQuickNav from "@/components/layout/single-product/product-quick-nav";
 import {
   getBrandName,
   getFirstCategoryName,
@@ -560,6 +561,8 @@ export default async function Page({
       </Script>
       <div className="flex justify-center items-center">
         <div className="w-full pb-28 md:pb-0 lg:w-10/12">
+          <ProductQuickNav />
+
           {/* ️🔥 CRITICAL FIRST PAINT → PPR ưu tiên render */}
           <ProductDetails
             productDetails={plainProduct}

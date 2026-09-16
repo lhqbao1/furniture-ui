@@ -13,7 +13,7 @@ export default function MainLayout({
       <PageHeader />
       <main className="relative w-full">
         {/* <StickyIcon /> */}
-        <div className="overflow-x-hidden">
+        <div className="overflow-x-clip">
           <HalfBannerGuard height={200} />
           <div className="container-padding flex-1 min-h-screen">
             {children}
