@@ -521,8 +521,6 @@ const buildGlsPayload = (
 
 const roundToThreeDecimals = (value: number) => Math.round(value * 1000) / 1000;
 
-const DENIA_RED_PRODUCT_NAME =
-  "E-Seniorenmobil Denia, Lithium-Akku, 3-Rad, 1000 Watt, Rot";
 const FP_SPEDITION_PRODUCT_NAMES = new Set([
   "WPC Sichtschutzzaun CARACAS - 5 Zaunelemente + 6 Pfosten - ca. 9 m - Anthrazit",
   "WPC Sichtschutzzaun CARACAS - 5 Zaunelemente + 6 Pfosten - ca. 9 m - Grau",
@@ -536,6 +534,16 @@ const getSpeditionPackageType = (productName: string): "FP" | "KT" => {
     FP_SPEDITION_PRODUCT_NAMES.has(normalizedName)
     ? "FP"
     : "KT";
+};
+
+const hasSpeditionDangerousGoods = (productName: string) => {
+  const normalizedName = productName.trim().toLowerCase();
+
+  return (
+    (normalizedName.startsWith("seniorenmobil") ||
+      normalizedName.startsWith("e-seniorenmobil")) &&
+    normalizedName.includes("lithium")
+  );
 };
 
 const DENIA_RED_DANGEROUS_GOODS: Omit<
@@ -580,7 +588,7 @@ const buildSpeditionPayload = (
     cart_items_id: address.cart_items_id ?? "",
   };
 
-  if (item.name === DENIA_RED_PRODUCT_NAME) {
+  if (hasSpeditionDangerousGoods(item.name ?? "")) {
     parcelData.dangerous_goods = {
       ...DENIA_RED_DANGEROUS_GOODS,
       properShippingName: item.name,
