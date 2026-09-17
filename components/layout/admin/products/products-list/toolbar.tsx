@@ -44,6 +44,7 @@ import { useGetSuppliers } from "@/features/supplier/hook";
 import { useGetBrands } from "@/features/brand/hook";
 import { useGetCategories } from "@/features/category/hook";
 import { flattenCategoryOptions } from "./toolbar/filter/category/category-options";
+import ProductStatusFilter from "./toolbar/filter/status";
 
 export enum ToolbarType {
   product = "product",
@@ -183,6 +184,7 @@ export default function TableToolbar({
   const resetAllFilters = React.useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
     FILTER_KEYS.forEach((key) => params.delete(key));
+    params.set("all_products", "true");
     pushWithParams(params);
     setSearchValue("");
   }, [pushWithParams, searchParams]);
@@ -257,10 +259,10 @@ export default function TableToolbar({
     });
 
     const allProducts = searchParams.get("all_products");
-    if (allProducts === "true" || allProducts === "false") {
+    if (allProducts === "false") {
       chips.push({
         id: "all-products",
-        label: `Status: ${allProducts === "true" ? "Active only" : "Inactive"}`,
+        label: "Status: Inactive",
         onRemove: () => removeFilterParam("all_products"),
       });
     }
@@ -516,6 +518,12 @@ export default function TableToolbar({
               </Button>
             )} */}
           </div>
+
+          {type === ToolbarType.product && (
+            <div className="w-fit max-w-full rounded-xl border border-secondary/10 bg-white px-3 py-2 shadow-sm">
+              <ProductStatusFilter defaultActiveOnly />
+            </div>
+          )}
         </div>
 
         {type === ToolbarType.product && activeFilterChips.length > 0 ? (

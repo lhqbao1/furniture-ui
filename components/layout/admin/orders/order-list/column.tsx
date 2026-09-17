@@ -39,7 +39,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMainCheckOutByMainCheckOutId } from "@/features/checkout/api";
 import { formatDeliveryRangeLabel } from "./delivery-range";
 import { useSendXmlToAmmAfterHoldOn } from "@/features/amm/hook";
@@ -389,18 +389,15 @@ const ActionCell = ({
   resendCheckoutId?: string;
 }) => {
   const resendToAmm = useSendXmlToAmmAfterHoldOn();
+  const queryClient = useQueryClient();
   const [canResendToAmm, setCanResendToAmm] = useState(false);
 
   useEffect(() => {
-    const storedAdminId = String(
-      localStorage.getItem("admin_user_id") ?? "",
-    )
+    const storedAdminId = String(localStorage.getItem("admin_user_id") ?? "")
       .trim()
       .replace(/^['"]|['"]$/g, "");
 
-    setCanResendToAmm(
-      RESEND_TO_AMM_ADMIN_IDS.has(storedAdminId),
-    );
+    setCanResendToAmm(RESEND_TO_AMM_ADMIN_IDS.has(storedAdminId));
   }, []);
 
   const router = useRouter();
@@ -627,33 +624,45 @@ const ActionCell = ({
         </>
       )}
 
-      {canResendToAmm &&
-        String(status ?? "").trim().toUpperCase() === "PAID" &&
-        resendCheckoutId && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              type="button"
-              disabled={resendToAmm.isPending}
-              onClick={() =>
-                resendToAmm.mutate(
-                  { checkout_id: resendCheckoutId },
-                  {
-                    onSuccess: () => toast.success("Order resent to AMM"),
-                    onError: () => toast.error("Failed to resend order to AMM"),
-                  },
-                )
-              }
-              className="hover:bg-emerald-50"
-            >
-              <Send className="w-4 h-4 text-emerald-600" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Resend to AMM</TooltipContent>
-        </Tooltip>
-      )}
+      {(canResendToAmm &&
+        String(status ?? "")
+          .trim()
+          .toUpperCase() === "PAID") ||
+        (String(status ?? "")
+          .trim()
+          .toUpperCase() === "CANCELED_NO_STOCK" &&
+          resendCheckoutId && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  type="button"
+                  disabled={resendToAmm.isPending}
+                  onClick={() =>
+                    resendToAmm.mutate(
+                      { checkout_id: resendCheckoutId },
+                      {
+                        onSuccess: async () => {
+                          await queryClient.refetchQueries({
+                            queryKey: ["checkout-main"],
+                            type: "active",
+                          });
+                          toast.success("Order resent to AMM");
+                        },
+                        onError: () =>
+                          toast.error("Failed to resend order to AMM"),
+                      },
+                    )
+                  }
+                  className="hover:bg-emerald-50"
+                >
+                  <Send className="w-4 h-4 text-emerald-600" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Resend to AMM</TooltipContent>
+            </Tooltip>
+          ))}
 
       {/* Expand button */}
       <Button

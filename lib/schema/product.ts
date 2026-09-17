@@ -119,6 +119,7 @@ export const addProductSchema = z.object({
   delivery_charge: z.number().nonnegative().optional().nullable(),
 
   cost: z.number().optional().nullable(),
+  carton_per_label: z.number().int().nonnegative().optional().nullable(),
   delivery_cost: z.number().optional().nullable(),
   discount_percent: z.number().nonnegative().optional(),
   discount_amount: z.number().nonnegative().optional(),
@@ -195,6 +196,7 @@ export const defaultValues = {
   is_bundle: false,
   is_econelo: false,
   sku: "",
+  carton_per_label: null as number | null,
   stock: 0,
   collection: null as string | null,
   ean: "",

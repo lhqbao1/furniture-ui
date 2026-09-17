@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import ProductStatusFilter from "./filter/status";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import SupplierFilter from "./filter/supplier-filter";
 import BrandFilter from "./filter/brand/brand-filter";
@@ -18,15 +17,11 @@ export default function FilterForm({ isDSP = false }: FilterFormProps) {
   const pathname = usePathname(); // ví dụ "/admin/products"
 
   const handleReset = () => {
-    router.push(pathname, { scroll: false });
+    router.push(`${pathname}?all_products=true`, { scroll: false });
   };
 
   return (
     <div className="space-y-6">
-      {/* All / Active toggles */}
-
-      <ProductStatusFilter />
-
       {!isDSP && <SupplierFilter />}
 
       <BrandFilter />

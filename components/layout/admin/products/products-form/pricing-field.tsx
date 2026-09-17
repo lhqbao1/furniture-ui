@@ -203,6 +203,35 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="carton_per_label"
+          render={({ field }) => (
+            <FormItem className="mt-6 flex flex-col">
+              <FormLabel className="text-black font-semibold text-sm">
+                Cartons per label
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min={0}
+                  step={1}
+                  inputMode="numeric"
+                  value={field.value ?? ""}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    field.onChange(value === "" ? null : event.target.valueAsNumber);
+                  }}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
 
       <div className="lg:col-span-3 col-span-12">

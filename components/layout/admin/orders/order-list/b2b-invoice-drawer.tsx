@@ -341,7 +341,7 @@ export default function B2BInvoiceDrawer({
           Menge: quantity,
           Versand: formatEur(shippingNet),
           "E.-Preis": formatEur(unitNet),
-          "USt.": formatTaxPercent(taxValue),
+          "USt.": formatTaxPercent(unitVatCalculation.vatRate),
           "G.-Preis": formatEur(rowNet),
         },
       ];
