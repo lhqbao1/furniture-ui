@@ -204,6 +204,7 @@ export type ProductItem = {
   delivery_charge?: number;
   id_provider: string;
   cost: number;
+  carton_per_label?: number | null;
   discount_percent?: number;
   discount_amount?: number;
   tax: string;

@@ -324,7 +324,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
           rowTotalGross: rowGross + shippingGross,
           vatRate,
           rowVat,
-          tax: formatTaxPercent(taxValue),
+          tax: formatTaxPercent(vatRate),
           productName: formatProductNameWithIdProvider(item),
         };
       });
