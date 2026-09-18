@@ -100,7 +100,10 @@ const pickFirstPackageDimension = (packages: unknown): PackageValue | null => {
 
 const getBundleMappedPackage = (bundle: unknown): PackageValue => {
   const bundleSource = (bundle ?? {}) as Record<string, unknown>;
-  const bundleItem = (bundleSource.bundle_item ?? {}) as Record<string, unknown>;
+  const bundleItem = (bundleSource.bundle_item ?? {}) as Record<
+    string,
+    unknown
+  >;
 
   const packageFromBundleItem = pickFirstPackageDimension(bundleItem.packages);
   if (packageFromBundleItem) return packageFromBundleItem;
@@ -520,97 +523,93 @@ const ProductLogisticsGroup = ({
       )} */}
 
       {/* --- REAL PACKAGE INPUTS --- */}
-      {fields.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-sm text-black font-semibold">
-              Packaging (cm)
-            </div>
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm text-black font-semibold">Packaging (cm)</div>
 
-            <button
-              type="button"
-              onClick={() => {
-                append({
-                  length: null,
-                  height: null,
-                  width: null,
-                  weight: null,
-                });
-              }}
-              disabled={hasBundleItems}
-              className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700"
-            >
-              <span className="text-lg leading-none">+</span>
-              Add package
-            </button>
-          </div>
-
-          <div className="flex flex-col gap-4 mt-2">
-            {fields.map((pkg, index) => (
-              <div
-                key={pkg.id}
-                className="flex flex-col w-full border p-3 rounded-2xl shadow-sm"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="font-semibold text-sm text-gray-700">
-                    Package #{index + 1}
-                  </div>
-
-                  <Button
-                    type="button"
-                    onClick={() => remove(index)}
-                    disabled={hasBundleItems}
-                    className="text-xs"
-                    size={"icon"}
-                    variant={"red"}
-                  >
-                    X
-                  </Button>
-                </div>
-
-                <div className="grid lg:grid-cols-4 grid-cols-2 gap-3 w-full">
-                  {["length", "width", "height", "weight"].map((key) => (
-                    <FormField
-                      key={key}
-                      control={control}
-                      name={`packages.${index}.${key}`}
-                      render={({ field }) => (
-                        <FormItem className="flex-1 flex flex-col">
-                          <div className="flex flex-col-reverse items-center ">
-                            <FormControl>
-                              <Input
-                                type="number"
-                                placeholder=""
-                                min={0}
-                                step="0.01"
-                                inputMode="decimal"
-                                {...field}
-                                value={field.value ?? ""}
-                                onChange={(e) =>
-                                  field.onChange(
-                                    e.target.value === ""
-                                      ? null
-                                      : e.target.valueAsNumber,
-                                  )
-                                }
-                                disabled={hasBundleItems}
-                              />
-                            </FormControl>
-                            <FormLabel className="text-black font-semibold text-sm capitalize">
-                              {key}
-                            </FormLabel>
-                          </div>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              append({
+                length: null,
+                height: null,
+                width: null,
+                weight: null,
+              });
+            }}
+            disabled={hasBundleItems}
+            className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700"
+          >
+            <span className="text-lg leading-none">+</span>
+            Add package
+          </button>
         </div>
-      )}
+
+        <div className="flex flex-col gap-4 mt-2">
+          {fields.map((pkg, index) => (
+            <div
+              key={pkg.id}
+              className="flex flex-col w-full border p-3 rounded-2xl shadow-sm"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="font-semibold text-sm text-gray-700">
+                  Package #{index + 1}
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={() => remove(index)}
+                  disabled={hasBundleItems}
+                  className="text-xs"
+                  size={"icon"}
+                  variant={"red"}
+                >
+                  X
+                </Button>
+              </div>
+
+              <div className="grid lg:grid-cols-4 grid-cols-2 gap-3 w-full">
+                {["length", "width", "height", "weight"].map((key) => (
+                  <FormField
+                    key={key}
+                    control={control}
+                    name={`packages.${index}.${key}`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1 flex flex-col">
+                        <div className="flex flex-col-reverse items-center ">
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder=""
+                              min={0}
+                              step="0.01"
+                              inputMode="decimal"
+                              {...field}
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value === ""
+                                    ? null
+                                    : e.target.valueAsNumber,
+                                )
+                              }
+                              disabled={hasBundleItems}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-black font-semibold text-sm capitalize">
+                            {key}
+                          </FormLabel>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
