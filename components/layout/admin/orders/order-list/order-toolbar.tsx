@@ -473,11 +473,10 @@ export default function OrderToolbar({
                     <label
                       key={option.value}
                       htmlFor={optionId}
-                      className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 transition-colors ${
-                        checked
-                          ? "border-secondary bg-white text-secondary shadow-sm"
-                          : "border-transparent text-slate-600 hover:bg-white/80 hover:text-slate-900"
-                      }`}
+                      className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 transition-colors ${checked
+                        ? "border-secondary bg-white text-secondary shadow-sm"
+                        : "border-transparent text-slate-600 hover:bg-white/80 hover:text-slate-900"
+                        }`}
                     >
                       <RadioGroupItem
                         id={optionId}
@@ -574,11 +573,11 @@ export default function OrderToolbar({
         </div>
 
         {type === ToolbarType.order ? (
-          <div className="flex w-full flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div className="rounded-xl border border-secondary/10 bg-muted/20 p-3 w-full xl:w-1/2">
+          <div className="flex w-full flex-col gap-3">
+            <div className="rounded-xl border border-secondary/10 bg-muted/20 p-3 w-full">
               <OrderB2BFilter showRevenue={showB2BRevenue} />
             </div>
-            <div className="flex w-full justify-end xl:contents">
+            <div className="flex w-full justify-end">
               <div className="w-fit rounded-xl border border-secondary/10 bg-muted/20 p-3 text-sm font-semibold text-secondary">
                 Total invoice: €
                 {totalInvoice.toLocaleString("de-DE", {
