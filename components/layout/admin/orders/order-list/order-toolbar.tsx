@@ -37,6 +37,7 @@ import OrderFilterForm from "../../orders/order-list/filter/filter-form";
 import { useSearchParams } from "next/navigation";
 import OrderImport from "./order-import";
 import ConfirmInvoicedImport from "./confirm-invoiced-import";
+import { getOrderListInvoiceDisplayAmount } from "./column";
 import UpdateMainCheckoutImport from "./update-main-checkout-import";
 import { CheckOutMain } from "@/types/checkout";
 import { toast } from "sonner";
@@ -69,6 +70,7 @@ interface OrderToolbarProps {
   addButtonModalContent?: React.ReactNode;
   exportData?: ProductItem[];
   type: ToolbarType;
+  orders?: CheckOutMain[];
   selectedOrders?: CheckOutMain[];
   showB2BRevenue?: boolean;
   showClaimedFilters?: boolean;
@@ -134,6 +136,7 @@ export default function OrderToolbar({
   addButtonUrl,
   addButtonModalContent,
   type,
+  orders = [],
   selectedOrders = [],
   showB2BRevenue = true,
   showClaimedFilters = false,
@@ -176,6 +179,15 @@ export default function OrderToolbar({
 
     return map;
   }, []);
+
+  const totalInvoice = React.useMemo(
+    () =>
+      orders.reduce(
+        (sum, order) => sum + getOrderListInvoiceDisplayAmount(order),
+        0,
+      ),
+    [orders],
+  );
 
   const channelLabelMap = React.useMemo(() => {
     const map = new Map<string, string>();
@@ -562,8 +574,19 @@ export default function OrderToolbar({
         </div>
 
         {type === ToolbarType.order ? (
-          <div className="rounded-xl border border-secondary/10 bg-muted/20 p-3 w-full xl:w-1/2">
-            <OrderB2BFilter showRevenue={showB2BRevenue} />
+          <div className="flex w-full flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+            <div className="rounded-xl border border-secondary/10 bg-muted/20 p-3 w-full xl:w-1/2">
+              <OrderB2BFilter showRevenue={showB2BRevenue} />
+            </div>
+            <div className="flex w-full justify-end xl:contents">
+              <div className="w-fit rounded-xl border border-secondary/10 bg-muted/20 p-3 text-sm font-semibold text-secondary">
+                Total invoice: €
+                {totalInvoice.toLocaleString("de-DE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </div>
+            </div>
           </div>
         ) : null}
 

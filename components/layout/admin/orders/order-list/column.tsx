@@ -297,7 +297,9 @@ const getOrderCustomerEmail = (
 const getResendCheckoutId = (order: CheckOutMain): string | undefined =>
   order.checkouts?.find((checkout) => checkout.supplier == null)?.id;
 
-const getOrderListInvoiceDisplayAmount = (order: CheckOutMain): number => {
+export const getOrderListInvoiceDisplayAmount = (
+  order: CheckOutMain,
+): number => {
   const totalAmount = toNumber(order.total_amount);
   const discountAmount = Math.max(
     Math.abs(toNumber(order.voucher_amount)),

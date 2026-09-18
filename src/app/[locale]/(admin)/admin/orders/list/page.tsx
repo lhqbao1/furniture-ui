@@ -91,6 +91,7 @@ const OrderList = () => {
           setPage={setPage}
           setPageSize={setPageSize}
           type={ToolbarType.order}
+          orders={filteredItems}
           selectedOrders={selectedOrders}
           showCountryFilter
           showShipmentFilter
