@@ -624,45 +624,42 @@ const ActionCell = ({
         </>
       )}
 
-      {(canResendToAmm &&
+      {canResendToAmm &&
+        resendCheckoutId &&
         String(status ?? "")
           .trim()
-          .toUpperCase() === "PAID") ||
-        (String(status ?? "")
-          .trim()
-          .toUpperCase() === "CANCELED_NO_STOCK" &&
-          resendCheckoutId && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  type="button"
-                  disabled={resendToAmm.isPending}
-                  onClick={() =>
-                    resendToAmm.mutate(
-                      { checkout_id: resendCheckoutId },
-                      {
-                        onSuccess: async () => {
-                          await queryClient.refetchQueries({
-                            queryKey: ["checkout-main"],
-                            type: "active",
-                          });
-                          toast.success("Order resent to AMM");
-                        },
-                        onError: () =>
-                          toast.error("Failed to resend order to AMM"),
+          .toUpperCase() === "PAID" && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                type="button"
+                disabled={resendToAmm.isPending}
+                onClick={() =>
+                  resendToAmm.mutate(
+                    { checkout_id: resendCheckoutId },
+                    {
+                      onSuccess: async () => {
+                        await queryClient.refetchQueries({
+                          queryKey: ["checkout-main"],
+                          type: "active",
+                        });
+                        toast.success("Order resent to AMM");
                       },
-                    )
-                  }
-                  className="hover:bg-emerald-50"
-                >
-                  <Send className="w-4 h-4 text-emerald-600" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Resend to AMM</TooltipContent>
-            </Tooltip>
-          ))}
+                      onError: () =>
+                        toast.error("Failed to resend order to AMM"),
+                    },
+                  )
+                }
+                className="hover:bg-emerald-50"
+              >
+                <Send className="w-4 h-4 text-emerald-600" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Resend to AMM</TooltipContent>
+          </Tooltip>
+        )}
 
       {/* Expand button */}
       <Button
