@@ -2,14 +2,18 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { Package, X } from "lucide-react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { SHIPMENT_CARRIERS } from "@/data/data";
+
+const OTHER_ID = "other";
 
 interface CarrierSelectProps {
   value?: string;
@@ -17,44 +21,56 @@ interface CarrierSelectProps {
 }
 
 const CarrierSelect = ({ value, onChange }: CarrierSelectProps) => {
-  const [selectedLabel, setSelectedLabel] = React.useState<string>("");
+  const isKnownCarrier = SHIPMENT_CARRIERS.some((c) => c.id === value);
+
+  // Custom (free text) mode is active once the user picks "Other", or when
+  // the current value doesn't match any predefined carrier id (e.g. loaded
+  // from a saved order that already has a custom carrier name).
+  const [isCustom, setIsCustom] = React.useState(() => !!value && !isKnownCarrier);
 
   React.useEffect(() => {
-    if (!value) {
-      setSelectedLabel("");
-      return;
+    if (value && !isKnownCarrier) {
+      setIsCustom(true);
     }
+  }, [value, isKnownCarrier]);
 
-    if (value === "spedition") {
-      const currentIsSpedition = SHIPMENT_CARRIERS.find(
-        (c) => c.id === "spedition" && c.label === selectedLabel,
-      );
-      if (currentIsSpedition) return;
+  const selected = SHIPMENT_CARRIERS.find((c) => c.id === value);
 
-      const defaultSpedition = SHIPMENT_CARRIERS.find(
-        (c) => c.id === "spedition",
-      );
-      setSelectedLabel(defaultSpedition?.label ?? "");
-      return;
-    }
-
-    const match = SHIPMENT_CARRIERS.find((c) => c.id === value);
-    setSelectedLabel(match?.label ?? "");
-  }, [value, selectedLabel]);
-
-  const selected = selectedLabel
-    ? SHIPMENT_CARRIERS.find((c) => c.label === selectedLabel)
-    : value
-      ? SHIPMENT_CARRIERS.find((c) => c.id === value)
-      : undefined;
+  if (isCustom) {
+    return (
+      <div className="flex items-center gap-2">
+        <Input
+          placeholder="Enter shipping carrier"
+          value={value ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          className="flex-1"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          title="Choose from list"
+          onClick={() => {
+            setIsCustom(false);
+            onChange("");
+          }}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <Select
-      value={selectedLabel}
-      onValueChange={(label) => {
-        setSelectedLabel(label);
-        const carrier = SHIPMENT_CARRIERS.find((c) => c.label === label);
-        onChange(carrier?.id ?? label);
+      value={value}
+      onValueChange={(id) => {
+        if (id === OTHER_ID) {
+          setIsCustom(true);
+          onChange("");
+          return;
+        }
+        onChange(id);
       }}
     >
       <SelectTrigger
@@ -63,13 +79,17 @@ const CarrierSelect = ({ value, onChange }: CarrierSelectProps) => {
       >
         {selected ? (
           <div className="flex items-center gap-2">
-            <Image
-              src={selected.logo}
-              alt={selected.label}
-              width={20}
-              height={20}
-              className="object-contain"
-            />
+            {selected.logo ? (
+              <Image
+                src={selected.logo}
+                alt={selected.label}
+                width={20}
+                height={20}
+                className="object-contain"
+              />
+            ) : (
+              <Package className="h-5 w-5 text-muted-foreground" />
+            )}
             <span className="capitalize">{selected.label}</span>
           </div>
         ) : (
@@ -79,15 +99,19 @@ const CarrierSelect = ({ value, onChange }: CarrierSelectProps) => {
 
       <SelectContent>
         {SHIPMENT_CARRIERS.map((carrier) => (
-          <SelectItem key={carrier.label} value={carrier.label}>
+          <SelectItem key={carrier.id} value={carrier.id}>
             <div className="flex items-center gap-2">
-              <Image
-                src={carrier.logo}
-                alt={carrier.label}
-                width={20}
-                height={20}
-                className="object-contain"
-              />
+              {carrier.logo ? (
+                <Image
+                  src={carrier.logo}
+                  alt={carrier.label}
+                  width={20}
+                  height={20}
+                  className="object-contain"
+                />
+              ) : (
+                <Package className="h-5 w-5 text-muted-foreground" />
+              )}
               <span className="capitalize">{carrier.label}</span>
             </div>
           </SelectItem>
